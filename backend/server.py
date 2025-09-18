@@ -195,9 +195,9 @@ async def login(user_data: UserLogin):
 # Super Admin endpoints
 @api_router.get("/admin/dashboard")
 async def get_dashboard(current_user: User = Depends(get_super_admin)):
-    buildings = await db.buildings.find().to_list(None)
-    users = await db.users.find({"role": UserRole.BUILDING_ADMIN}).to_list(None)
-    units = await db.units.find().to_list(None)
+    buildings = serialize_docs(await db.buildings.find().to_list(None))
+    users = serialize_docs(await db.users.find({"role": UserRole.BUILDING_ADMIN}).to_list(None))
+    units = serialize_docs(await db.units.find().to_list(None))
     
     return {
         "total_buildings": len(buildings),
