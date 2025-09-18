@@ -12,11 +12,12 @@ import { Badge } from './components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './components/ui/dialog';
 import { Alert, AlertDescription } from './components/ui/alert';
+import { Checkbox } from './components/ui/checkbox';
 import { Toaster } from './components/ui/sonner';
 import { toast } from 'sonner';
 
 // Icons
-import { Building2, Users, Phone, Plus, Trash2, Edit, QrCode, LogOut, BarChart3, Settings } from 'lucide-react';
+import { Building2, Users, Phone, Plus, Trash2, Edit, QrCode, LogOut, BarChart3, Settings, Home } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -143,7 +144,8 @@ const Login = () => {
           
           <div className="mt-6 p-4 bg-slate-50 rounded-lg">
             <p className="text-sm text-slate-600 mb-2">Credenciales de prueba:</p>
-            <p className="text-xs text-slate-500">Super Admin: super@admin.com / admin123</p>
+            <p className="text-xs text-slate-500">Super Admin: diegofridman@gmail.com / tangotango</p>
+            <p className="text-xs text-slate-500">Admin Edificio: diego@daf-il.net / tangotango</p>
           </div>
         </CardContent>
       </Card>
@@ -155,7 +157,7 @@ const Login = () => {
 const SuperAdminDashboard = () => {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [buildingName, setBuildingName] = useState('');
+  const [edificioNombre, setEdificioNombre] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [createLoading, setCreateLoading] = useState(false);
   const { logout } = useAuth();
@@ -175,18 +177,18 @@ const SuperAdminDashboard = () => {
     }
   };
 
-  const createBuilding = async (e) => {
+  const createEdificio = async (e) => {
     e.preventDefault();
     setCreateLoading(true);
     
     try {
-      await axios.post(`${API}/admin/buildings`, {
-        name: buildingName,
+      await axios.post(`${API}/admin/edificios`, {
+        nombre: edificioNombre,
         admin_email: adminEmail
       });
       
       toast.success('Edificio creado exitosamente');
-      setBuildingName('');
+      setEdificioNombre('');
       setAdminEmail('');
       fetchDashboard();
     } catch (error) {
@@ -196,11 +198,11 @@ const SuperAdminDashboard = () => {
     }
   };
 
-  const deleteBuilding = async (buildingId) => {
+  const deleteEdificio = async (edificioId) => {
     if (!window.confirm('¿Estás seguro de eliminar este edificio?')) return;
     
     try {
-      await axios.delete(`${API}/admin/buildings/${buildingId}`);
+      await axios.delete(`${API}/admin/edificios/${edificioId}`);
       toast.success('Edificio eliminado');
       fetchDashboard();
     } catch (error) {
@@ -238,7 +240,7 @@ const SuperAdminDashboard = () => {
                 <Building2 className="h-8 w-8 text-blue-500" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Total Edificios</p>
-                  <p className="text-2xl font-bold text-gray-900">{dashboard?.total_buildings || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900">{dashboard?.total_edificios || 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -259,10 +261,10 @@ const SuperAdminDashboard = () => {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
-                <Phone className="h-8 w-8 text-purple-500" />
+                <Home className="h-8 w-8 text-purple-500" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Total Viviendas</p>
-                  <p className="text-2xl font-bold text-gray-900">{dashboard?.total_units || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900">{dashboard?.total_viviendas || 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -274,7 +276,7 @@ const SuperAdminDashboard = () => {
                 <BarChart3 className="h-8 w-8 text-orange-500" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Edificios Activos</p>
-                  <p className="text-2xl font-bold text-gray-900">{dashboard?.active_buildings || 0}</p>
+                  <p className="text-2xl font-bold text-gray-900">{dashboard?.edificios_activos || 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -282,23 +284,27 @@ const SuperAdminDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Create Building */}
+          {/* Create Edificio */}
           <Card>
             <CardHeader>
               <CardTitle>Crear Nuevo Edificio</CardTitle>
               <CardDescription>Agrega un edificio y asigna un administrador</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={createBuilding} className="space-y-4">
+              <form onSubmit={createEdificio} className="space-y-4">
                 <div>
-                  <Label htmlFor="buildingName">Nombre del edificio</Label>
+                  <Label htmlFor="edificioNombre">Nombre del edificio</Label>
                   <Input
-                    id="buildingName"
-                    value={buildingName}
-                    onChange={(e) => setBuildingName(e.target.value)}
-                    placeholder="Edificio Las Torres"
+                    id="edificioNombre"
+                    value={edificioNombre}
+                    onChange={(e) => setEdificioNombre(e.target.value)}
+                    placeholder="Edificio Las Torres (min. 3 caracteres)"
                     required
+                    minLength={3}
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Este nombre se convertirá en la URL: www.xxxx.com/nombre-edificio
+                  </p>
                 </div>
                 <div>
                   <Label htmlFor="adminEmail">Email del administrador</Label>
@@ -318,44 +324,44 @@ const SuperAdminDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Buildings List */}
+          {/* Edificios List */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Edificios ({dashboard?.buildings?.length || 0})</CardTitle>
+                <CardTitle>Edificios ({dashboard?.edificios?.length || 0})</CardTitle>
                 <CardDescription>Gestiona todos los edificios del sistema</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboard?.buildings?.map((building) => (
-                    <div key={building.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  {dashboard?.edificios?.map((edificio) => (
+                    <div key={edificio.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex-1">
-                        <h3 className="font-medium">{building.name}</h3>
-                        <p className="text-sm text-gray-500">Admin: {building.admin_email}</p>
-                        <p className="text-sm text-gray-500">Slug: {building.slug}</p>
-                        <Badge variant={building.is_active ? "default" : "secondary"}>
-                          {building.is_active ? 'Activo' : 'Inactivo'}
+                        <h3 className="font-medium">{edificio.nombre}</h3>
+                        <p className="text-sm text-gray-500">Admin: {edificio.admin_email}</p>
+                        <p className="text-sm text-gray-500">URL: /{edificio.slug}</p>
+                        <Badge variant={edificio.is_active ? "default" : "secondary"}>
+                          {edificio.is_active ? 'Activo' : 'Inactivo'}
                         </Badge>
                       </div>
                       <div className="flex space-x-2">
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => window.open(`/b/${building.slug}`, '_blank')}
+                          onClick={() => window.open(`/${edificio.slug}`, '_blank')}
                         >
                           <QrCode className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => deleteBuilding(building.id)}
+                          onClick={() => deleteEdificio(edificio.id)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
                   ))}
-                  {(!dashboard?.buildings || dashboard.buildings.length === 0) && (
+                  {(!dashboard?.edificios || dashboard.edificios.length === 0) && (
                     <p className="text-center text-gray-500 py-8">No hay edificios creados</p>
                   )}
                 </div>
@@ -368,24 +374,25 @@ const SuperAdminDashboard = () => {
   );
 };
 
-// Building Admin Dashboard
-const BuildingAdminDashboard = () => {
-  const [buildingData, setBuildingData] = useState(null);
+// Edificio Admin Dashboard
+const EdificioAdminDashboard = () => {
+  const [edificioData, setEdificioData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [unitName, setUnitName] = useState('');
-  const [unitPhone, setUnitPhone] = useState('');
-  const [editingUnit, setEditingUnit] = useState(null);
+  const [nombreFamilia, setNombreFamilia] = useState('');
+  const [phone, setPhone] = useState('');
+  const [publicarNombre, setPublicarNombre] = useState(true);
+  const [editingVivienda, setEditingVivienda] = useState(null);
   const [createLoading, setCreateLoading] = useState(false);
   const { logout } = useAuth();
 
   useEffect(() => {
-    fetchBuildingData();
+    fetchEdificioData();
   }, []);
 
-  const fetchBuildingData = async () => {
+  const fetchEdificioData = async () => {
     try {
-      const response = await axios.get(`${API}/buildings/my`);
-      setBuildingData(response.data);
+      const response = await axios.get(`${API}/edificios/my`);
+      setEdificioData(response.data);
     } catch (error) {
       toast.error('Error al cargar datos del edificio');
     } finally {
@@ -393,20 +400,22 @@ const BuildingAdminDashboard = () => {
     }
   };
 
-  const createUnit = async (e) => {
+  const createVivienda = async (e) => {
     e.preventDefault();
     setCreateLoading(true);
     
     try {
-      await axios.post(`${API}/buildings/my/units`, {
-        name: unitName,
-        phone: unitPhone
+      await axios.post(`${API}/edificios/my/viviendas`, {
+        nombre_familia: nombreFamilia,
+        phone: phone,
+        publicar_nombre: publicarNombre
       });
       
       toast.success('Vivienda agregada exitosamente');
-      setUnitName('');
-      setUnitPhone('');
-      fetchBuildingData();
+      setNombreFamilia('');
+      setPhone('');
+      setPublicarNombre(true);
+      fetchEdificioData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al agregar vivienda');
     } finally {
@@ -414,28 +423,29 @@ const BuildingAdminDashboard = () => {
     }
   };
 
-  const updateUnit = async (unitId) => {
+  const updateVivienda = async (viviendaId) => {
     try {
-      await axios.put(`${API}/buildings/my/units/${unitId}`, {
-        name: editingUnit.name,
-        phone: editingUnit.phone
+      await axios.put(`${API}/edificios/my/viviendas/${viviendaId}`, {
+        nombre_familia: editingVivienda.nombre_familia,
+        phone: editingVivienda.phone,
+        publicar_nombre: editingVivienda.publicar_nombre
       });
       
       toast.success('Vivienda actualizada');
-      setEditingUnit(null);
-      fetchBuildingData();
+      setEditingVivienda(null);
+      fetchEdificioData();
     } catch (error) {
       toast.error('Error al actualizar vivienda');
     }
   };
 
-  const deleteUnit = async (unitId) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta vivienda?')) return;
+  const deleteVivienda = async (viviendaId) => {
+    if (!window.confirm('¿Estás seguro de eliminar esta vivienda? Los números se reorganizarán automáticamente.')) return;
     
     try {
-      await axios.delete(`${API}/buildings/my/units/${unitId}`);
-      toast.success('Vivienda eliminada');
-      fetchBuildingData();
+      await axios.delete(`${API}/edificios/my/viviendas/${viviendaId}`);
+      toast.success('Vivienda eliminada y números reorganizados');
+      fetchEdificioData();
     } catch (error) {
       toast.error('Error al eliminar vivienda');
     }
@@ -453,7 +463,7 @@ const BuildingAdminDashboard = () => {
             <div className="flex items-center">
               <Building2 className="h-8 w-8 text-indigo-600 mr-3" />
               <h1 className="text-xl font-semibold text-gray-900">
-                {buildingData?.building?.name || 'Mi Edificio'}
+                {edificioData?.edificio?.nombre || 'Mi Edificio'}
               </h1>
             </div>
             <Button variant="outline" onClick={logout}>
@@ -465,22 +475,22 @@ const BuildingAdminDashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Building Info */}
+        {/* Edificio Info */}
         <Card className="mb-8">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">{buildingData?.building?.name}</h2>
-                <p className="text-gray-600">Slug: {buildingData?.building?.slug}</p>
-                <p className="text-gray-600">Viviendas: {buildingData?.units?.length || 0}/20</p>
+                <h2 className="text-2xl font-bold text-gray-900">{edificioData?.edificio?.nombre}</h2>
+                <p className="text-gray-600">URL: /{edificioData?.edificio?.slug}</p>
+                <p className="text-gray-600">Viviendas: {edificioData?.viviendas?.length || 0}/20</p>
               </div>
               <div className="text-right">
                 <Button
-                  onClick={() => window.open(buildingData?.qr_url, '_blank')}
+                  onClick={() => window.open(edificioData?.url_publica, '_blank')}
                   className="mb-2"
                 >
                   <QrCode className="h-4 w-4 mr-2" />
-                  Ver QR Público
+                  Ver Página Pública
                 </Button>
                 <p className="text-sm text-gray-500">Comparte este enlace con visitantes</p>
               </div>
@@ -489,40 +499,53 @@ const BuildingAdminDashboard = () => {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Add Unit */}
+          {/* Add Vivienda */}
           <Card>
             <CardHeader>
               <CardTitle>Agregar Vivienda</CardTitle>
               <CardDescription>
-                {(buildingData?.units?.length || 0)}/20 viviendas agregadas
+                {(edificioData?.viviendas?.length || 0)}/20 viviendas agregadas
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={createUnit} className="space-y-4">
+              <form onSubmit={createVivienda} className="space-y-4">
                 <div>
-                  <Label htmlFor="unitName">Nombre de la familia/persona</Label>
+                  <Label htmlFor="nombreFamilia">Nombre de la familia/persona</Label>
                   <Input
-                    id="unitName"
-                    value={unitName}
-                    onChange={(e) => setUnitName(e.target.value)}
+                    id="nombreFamilia"
+                    value={nombreFamilia}
+                    onChange={(e) => setNombreFamilia(e.target.value)}
                     placeholder="Familia García"
                     required
                   />
                 </div>
                 <div>
-                  <Label htmlFor="unitPhone">Número de teléfono</Label>
+                  <Label htmlFor="phone">Número de teléfono</Label>
                   <Input
-                    id="unitPhone"
-                    value={unitPhone}
-                    onChange={(e) => setUnitPhone(e.target.value)}
+                    id="phone"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     placeholder="+972501234567"
                     required
                   />
                 </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="publicarNombre"
+                    checked={publicarNombre}
+                    onCheckedChange={setPublicarNombre}
+                  />
+                  <Label htmlFor="publicarNombre" className="text-sm">
+                    Publicar nombre en el intercomunicador
+                  </Label>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Si no publicas el nombre, aparecerá como "Residente" en la vista pública
+                </p>
                 <Button 
                   type="submit" 
                   className="w-full" 
-                  disabled={createLoading || (buildingData?.units?.length || 0) >= 20}
+                  disabled={createLoading || (edificioData?.viviendas?.length || 0) >= 20}
                 >
                   {createLoading ? 'Agregando...' : 'Agregar Vivienda'}
                 </Button>
@@ -530,34 +553,41 @@ const BuildingAdminDashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Units List */}
+          {/* Viviendas List */}
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
                 <CardTitle>Viviendas</CardTitle>
-                <CardDescription>Gestiona las viviendas de tu edificio</CardDescription>
+                <CardDescription>Gestiona las viviendas de tu edificio (ordenadas por número)</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {buildingData?.units?.map((unit) => (
-                    <div key={unit.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      {editingUnit?.id === unit.id ? (
+                  {edificioData?.viviendas?.map((vivienda) => (
+                    <div key={vivienda.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      {editingVivienda?.id === vivienda.id ? (
                         <div className="flex-1 space-y-2">
                           <Input
-                            value={editingUnit.name}
-                            onChange={(e) => setEditingUnit({...editingUnit, name: e.target.value})}
-                            placeholder="Nombre"
+                            value={editingVivienda.nombre_familia}
+                            onChange={(e) => setEditingVivienda({...editingVivienda, nombre_familia: e.target.value})}
+                            placeholder="Nombre de familia"
                           />
                           <Input
-                            value={editingUnit.phone}
-                            onChange={(e) => setEditingUnit({...editingUnit, phone: e.target.value})}
+                            value={editingVivienda.phone}
+                            onChange={(e) => setEditingVivienda({...editingVivienda, phone: e.target.value})}
                             placeholder="Teléfono"
                           />
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={editingVivienda.publicar_nombre}
+                              onCheckedChange={(checked) => setEditingVivienda({...editingVivienda, publicar_nombre: checked})}
+                            />
+                            <Label className="text-sm">Publicar nombre</Label>
+                          </div>
                           <div className="flex space-x-2">
-                            <Button size="sm" onClick={() => updateUnit(unit.id)}>
+                            <Button size="sm" onClick={() => updateVivienda(vivienda.id)}>
                               Guardar
                             </Button>
-                            <Button size="sm" variant="outline" onClick={() => setEditingUnit(null)}>
+                            <Button size="sm" variant="outline" onClick={() => setEditingVivienda(null)}>
                               Cancelar
                             </Button>
                           </div>
@@ -565,21 +595,29 @@ const BuildingAdminDashboard = () => {
                       ) : (
                         <>
                           <div className="flex-1">
-                            <h3 className="font-medium">{unit.name}</h3>
-                            <p className="text-sm text-gray-500">{unit.phone}</p>
+                            <div className="flex items-center space-x-2">
+                              <Badge variant="outline">#{vivienda.numero}</Badge>
+                              <h3 className="font-medium">{vivienda.nombre_familia}</h3>
+                            </div>
+                            <p className="text-sm text-gray-500">{vivienda.phone}</p>
+                            <div className="flex items-center space-x-2 mt-1">
+                              <Badge variant={vivienda.publicar_nombre ? "default" : "secondary"}>
+                                {vivienda.publicar_nombre ? 'Público' : 'Privado'}
+                              </Badge>
+                            </div>
                           </div>
                           <div className="flex space-x-2">
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => setEditingUnit(unit)}
+                              onClick={() => setEditingVivienda(vivienda)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => deleteUnit(unit.id)}
+                              onClick={() => deleteVivienda(vivienda.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -588,7 +626,7 @@ const BuildingAdminDashboard = () => {
                       )}
                     </div>
                   ))}
-                  {(!buildingData?.units || buildingData.units.length === 0) && (
+                  {(!edificioData?.viviendas || edificioData.viviendas.length === 0) && (
                     <p className="text-center text-gray-500 py-8">No hay viviendas agregadas</p>
                   )}
                 </div>
@@ -601,21 +639,21 @@ const BuildingAdminDashboard = () => {
   );
 };
 
-// Public Building View
-const PublicBuilding = () => {
+// Public Edificio View
+const PublicEdificio = () => {
   const { slug } = useParams();
-  const [building, setBuilding] = useState(null);
+  const [edificio, setEdificio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchBuilding();
+    fetchEdificio();
   }, [slug]);
 
-  const fetchBuilding = async () => {
+  const fetchEdificio = async () => {
     try {
-      const response = await axios.get(`${API}/public/buildings/${slug}`);
-      setBuilding(response.data);
+      const response = await axios.get(`${API}/public/edificios/${slug}`);
+      setEdificio(response.data);
     } catch (error) {
       setError('Edificio no encontrado');
     } finally {
@@ -658,7 +696,7 @@ const PublicBuilding = () => {
           <Card className="mb-6">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-bold text-slate-800 mb-2">
-                {building?.name}
+                {edificio?.nombre}
               </CardTitle>
               <CardDescription className="text-lg">
                 Selecciona la vivienda que deseas contactar
@@ -667,19 +705,21 @@ const PublicBuilding = () => {
           </Card>
 
           <div className="grid gap-4">
-            {building?.units?.map((unit) => (
-              <Card key={unit.id} className="hover:shadow-md transition-shadow cursor-pointer">
+            {edificio?.viviendas?.map((vivienda) => (
+              <Card key={vivienda.id} className="hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-slate-800 mb-1">
-                        Vivienda
-                      </h3>
-                      <p className="text-lg text-slate-600">{unit.name}</p>
+                      <div className="flex items-center space-x-2 mb-2">
+                        <Badge variant="outline" className="text-lg px-3 py-1">
+                          Vivienda #{vivienda.numero}
+                        </Badge>
+                      </div>
+                      <p className="text-lg text-slate-600 font-medium">{vivienda.nombre_familia}</p>
                     </div>
                     <Button
-                      onClick={() => callResident(unit.phone)}
-                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg"
+                      onClick={() => callResident(vivienda.phone)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg call-button"
                     >
                       <Phone className="h-5 w-5 mr-2" />
                       Llamar
@@ -690,7 +730,7 @@ const PublicBuilding = () => {
             ))}
           </div>
 
-          {(!building?.units || building.units.length === 0) && (
+          {(!edificio?.viviendas || edificio.viviendas.length === 0) && (
             <Card>
               <CardContent className="p-8 text-center">
                 <p className="text-slate-600">No hay viviendas disponibles en este edificio.</p>
@@ -730,7 +770,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/b/:slug" element={<PublicBuilding />} />
+            <Route path="/:slug" element={<PublicEdificio />} />
             
             <Route 
               path="/admin" 
@@ -744,8 +784,8 @@ function App() {
             <Route 
               path="/dashboard" 
               element={
-                <ProtectedRoute requiredRole="building_admin">
-                  <BuildingAdminDashboard />
+                <ProtectedRoute requiredRole="edificio_admin">
+                  <EdificioAdminDashboard />
                 </ProtectedRoute>
               } 
             />
