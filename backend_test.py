@@ -305,6 +305,9 @@ def main():
         ("Super Admin Dashboard", tester.test_super_admin_dashboard),
         ("Create Building", tester.test_create_building),
         
+        # Building admin full flow test
+        ("Building Admin Full Flow", tester.test_building_admin_full_flow),
+        
         # Public access
         ("Public Building View", tester.test_public_building_view),
         ("Non-existent Public Building", tester.test_nonexistent_public_building),
