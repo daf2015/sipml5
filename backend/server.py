@@ -176,7 +176,7 @@ async def create_super_admin():
 # Auth endpoints
 @api_router.post("/auth/login", response_model=Token)
 async def login(user_data: UserLogin):
-    user_doc = await db.users.find_one({"email": user_data.email})
+    user_doc = serialize_doc(await db.users.find_one({"email": user_data.email}))
     if not user_doc or not verify_password(user_data.password, user_doc["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
