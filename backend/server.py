@@ -338,7 +338,7 @@ async def update_unit(unit_id: str, unit_data: UnitCreate, current_user: User = 
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Unit not found")
     
-    unit = await db.units.find_one({"id": unit_id})
+    unit = serialize_doc(await db.units.find_one({"id": unit_id}))
     if isinstance(unit.get('created_at'), str):
         unit['created_at'] = datetime.fromisoformat(unit['created_at'])
     
