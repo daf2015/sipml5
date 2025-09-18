@@ -23,6 +23,20 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# Helper function to convert MongoDB documents to dictionaries without ObjectId
+def serialize_doc(doc):
+    """Convert MongoDB document to dict, removing ObjectId"""
+    if doc is None:
+        return None
+    # Remove the _id field and any other ObjectId fields
+    if '_id' in doc:
+        del doc['_id']
+    return doc
+
+def serialize_docs(docs):
+    """Convert list of MongoDB documents to list of dicts"""
+    return [serialize_doc(doc) for doc in docs]
+
 # Security
 SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production')
 ALGORITHM = "HS256"
