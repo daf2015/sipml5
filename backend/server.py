@@ -14,6 +14,8 @@ import jwt
 from passlib.context import CryptContext
 import secrets
 import string
+import re
+from unidecode import unidecode
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -46,74 +48,88 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 # Create the main app
-app = FastAPI(title="Building Intercom API")
+app = FastAPI(title="Sistema Intercomunicador API")
 api_router = APIRouter(prefix="/api")
 
 # Models
 class UserRole:
     SUPER_ADMIN = "super_admin"
-    BUILDING_ADMIN = "building_admin"
+    EDIFICIO_ADMIN = "edificio_admin"
 
 class User(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     email: str
     role: str
     is_active: bool = True
-    building_id: Optional[str] = None
+    edificio_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserCreate(BaseModel):
     email: str
     password: str
-    role: str = UserRole.BUILDING_ADMIN
-    building_id: Optional[str] = None
+    role: str = UserRole.EDIFICIO_ADMIN
+    edificio_id: Optional[str] = None
 
 class UserLogin(BaseModel):
     email: str
     password: str
 
-class Building(BaseModel):
+class Edificio(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    slug: str
+    nombre: str
+    slug: str  # URL-friendly name
     admin_email: str
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    units_count: int = 0
+    viviendas_count: int = 0
 
-class BuildingCreate(BaseModel):
-    name: str
+class EdificioCreate(BaseModel):
+    nombre: str
     admin_email: str
+    
+    @validator('nombre')
+    def validate_nombre(cls, v):
+        if len(v) < 3:
+            raise ValueError('El nombre del edificio debe tener al menos 3 caracteres')
+        return v
 
-class Unit(BaseModel):
+class Vivienda(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    building_id: str
-    name: str  # Nombre de persona o familia
+    edificio_id: str
+    numero: int  # Número de vivienda (1, 2, 3, etc.)
+    nombre_familia: str  # Nombre de persona o familia
     phone: str  # Número en formato internacional
+    publicar_nombre: bool = True  # Checkbox para mostrar nombre públicamente
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class UnitCreate(BaseModel):
-    name: str
+class ViviendaCreate(BaseModel):
+    nombre_familia: str
     phone: str
+    publicar_nombre: bool = True
 
     @validator('phone')
     def validate_phone(cls, v):
         # Basic validation for international format
         if not v.startswith('+'):
-            raise ValueError('Phone number must start with +')
+            raise ValueError('El número de teléfono debe empezar con +')
         if len(v) < 8 or len(v) > 15:
-            raise ValueError('Invalid phone number length')
+            raise ValueError('Formato de número telefónico inválido')
         return v
+
+class ViviendaUpdate(BaseModel):
+    nombre_familia: str
+    phone: str
+    publicar_nombre: bool = True
 
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: User
 
-class BuildingPublic(BaseModel):
-    name: str
-    units: List[dict]
+class EdificioPublic(BaseModel):
+    nombre: str
+    viviendas: List[dict]
 
 # Utility functions
 def hash_password(password: str) -> str:
@@ -129,9 +145,18 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def generate_slug() -> str:
-    """Generate random 6-character slug"""
-    return ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(6))
+def create_slug_from_name(nombre: str) -> str:
+    """Create URL-friendly slug from edificio name"""
+    # Convert to lowercase and remove accents
+    slug = unidecode(nombre.lower())
+    # Replace spaces and special chars with hyphens
+    slug = re.sub(r'[^a-z0-9]+', '-', slug)
+    # Remove leading/trailing hyphens
+    slug = slug.strip('-')
+    # Ensure minimum length
+    if len(slug) < 3:
+        slug = slug + ''.join(secrets.choice(string.digits) for _ in range(3 - len(slug)))
+    return slug
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     try:
@@ -154,38 +179,53 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 
 async def get_super_admin(current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.SUPER_ADMIN:
-        raise HTTPException(status_code=403, detail="Super admin access required")
+        raise HTTPException(status_code=403, detail="Acceso de Super Admin requerido")
     return current_user
 
-async def get_building_admin_or_super(current_user: User = Depends(get_current_user)):
-    if current_user.role not in [UserRole.SUPER_ADMIN, UserRole.BUILDING_ADMIN]:
-        raise HTTPException(status_code=403, detail="Admin access required")
+async def get_edificio_admin_or_super(current_user: User = Depends(get_current_user)):
+    if current_user.role not in [UserRole.SUPER_ADMIN, UserRole.EDIFICIO_ADMIN]:
+        raise HTTPException(status_code=403, detail="Acceso de administrador requerido")
     return current_user
 
-# Initialize super admin on startup
-async def create_super_admin():
-    super_admin = await db.users.find_one({"role": UserRole.SUPER_ADMIN})
+# Initialize users on startup
+async def create_initial_users():
+    # Create super admin
+    super_admin = await db.users.find_one({"email": "diegofridman@gmail.com"})
     if not super_admin:
         super_admin_data = {
             "id": str(uuid.uuid4()),
-            "email": "super@admin.com",
-            "password": hash_password("admin123"),
+            "email": "diegofridman@gmail.com",
+            "password": hash_password("tangotango"),
             "role": UserRole.SUPER_ADMIN,
             "is_active": True,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.users.insert_one(super_admin_data)
-        print("Super admin created: super@admin.com / admin123")
+        print("Super admin creado: diegofridman@gmail.com / tangotango")
+    
+    # Create edificio admin
+    edificio_admin = await db.users.find_one({"email": "diego@daf-il.net"})
+    if not edificio_admin:
+        edificio_admin_data = {
+            "id": str(uuid.uuid4()),
+            "email": "diego@daf-il.net",
+            "password": hash_password("tangotango"),
+            "role": UserRole.EDIFICIO_ADMIN,
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.insert_one(edificio_admin_data)
+        print("Admin de edificio creado: diego@daf-il.net / tangotango")
 
 # Auth endpoints
 @api_router.post("/auth/login", response_model=Token)
 async def login(user_data: UserLogin):
     user_doc = serialize_doc(await db.users.find_one({"email": user_data.email}))
     if not user_doc or not verify_password(user_data.password, user_doc["password"]):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code=401, detail="Credenciales inválidas")
     
     if not user_doc["is_active"]:
-        raise HTTPException(status_code=401, detail="Account is inactive")
+        raise HTTPException(status_code=401, detail="Cuenta inactiva")
     
     # Convert datetime strings back to datetime objects
     if isinstance(user_doc.get('created_at'), str):
@@ -199,175 +239,230 @@ async def login(user_data: UserLogin):
 # Super Admin endpoints
 @api_router.get("/admin/dashboard")
 async def get_dashboard(current_user: User = Depends(get_super_admin)):
-    buildings = serialize_docs(await db.buildings.find().to_list(None))
-    users = serialize_docs(await db.users.find({"role": UserRole.BUILDING_ADMIN}).to_list(None))
-    units = serialize_docs(await db.units.find().to_list(None))
+    edificios = serialize_docs(await db.edificios.find().to_list(None))
+    users = serialize_docs(await db.users.find({"role": UserRole.EDIFICIO_ADMIN}).to_list(None))
+    viviendas = serialize_docs(await db.viviendas.find().to_list(None))
     
     return {
-        "total_buildings": len(buildings),
+        "total_edificios": len(edificios),
         "total_admins": len(users),
-        "total_units": len(units),
-        "active_buildings": len([b for b in buildings if b.get("is_active", True)]),
-        "buildings": buildings,
-        "recent_buildings": sorted(buildings, key=lambda x: x.get("created_at", ""), reverse=True)[:5]
+        "total_viviendas": len(viviendas),
+        "edificios_activos": len([e for e in edificios if e.get("is_active", True)]),
+        "edificios": edificios,
+        "edificios_recientes": sorted(edificios, key=lambda x: x.get("created_at", ""), reverse=True)[:5]
     }
 
-@api_router.post("/admin/buildings", response_model=Building)
-async def create_building(building_data: BuildingCreate, current_user: User = Depends(get_super_admin)):
-    # Check if admin email already has a building
-    existing_admin = await db.users.find_one({"email": building_data.admin_email, "role": UserRole.BUILDING_ADMIN})
-    if existing_admin and existing_admin.get("building_id"):
-        raise HTTPException(status_code=400, detail="Admin already has a building assigned")
+@api_router.post("/admin/edificios", response_model=Edificio)
+async def create_edificio(edificio_data: EdificioCreate, current_user: User = Depends(get_super_admin)):
+    # Create slug from name
+    base_slug = create_slug_from_name(edificio_data.nombre)
+    slug = base_slug
+    counter = 1
     
-    building = Building(
-        name=building_data.name,
-        slug=generate_slug(),
-        admin_email=building_data.admin_email
+    # Check for unique slug
+    while await db.edificios.find_one({"slug": slug}):
+        slug = f"{base_slug}-{counter}"
+        counter += 1
+    
+    # Check if admin email already has an edificio
+    existing_admin = await db.users.find_one({"email": edificio_data.admin_email, "role": UserRole.EDIFICIO_ADMIN})
+    if existing_admin and existing_admin.get("edificio_id"):
+        raise HTTPException(status_code=400, detail="El administrador ya tiene un edificio asignado")
+    
+    edificio = Edificio(
+        nombre=edificio_data.nombre,
+        slug=slug,
+        admin_email=edificio_data.admin_email
     )
     
-    building_dict = building.dict()
-    building_dict["created_at"] = building_dict["created_at"].isoformat()
+    edificio_dict = edificio.dict()
+    edificio_dict["created_at"] = edificio_dict["created_at"].isoformat()
     
-    await db.buildings.insert_one(building_dict)
+    await db.edificios.insert_one(edificio_dict)
     
     # Create or update admin user
     if existing_admin:
         await db.users.update_one(
-            {"email": building_data.admin_email},
-            {"$set": {"building_id": building.id}}
+            {"email": edificio_data.admin_email},
+            {"$set": {"edificio_id": edificio.id}}
         )
     else:
         # Generate random password for new admin
         temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(8))
         admin_user = {
             "id": str(uuid.uuid4()),
-            "email": building_data.admin_email,
+            "email": edificio_data.admin_email,
             "password": hash_password(temp_password),
-            "role": UserRole.BUILDING_ADMIN,
-            "building_id": building.id,
+            "role": UserRole.EDIFICIO_ADMIN,
+            "edificio_id": edificio.id,
             "is_active": True,
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.users.insert_one(admin_user)
-        print(f"Building admin created: {building_data.admin_email} / {temp_password}")
+        print(f"Admin de edificio creado: {edificio_data.admin_email} / {temp_password}")
     
-    return building
+    return edificio
 
-@api_router.delete("/admin/buildings/{building_id}")
-async def delete_building(building_id: str, current_user: User = Depends(get_super_admin)):
-    # Delete units first
-    await db.units.delete_many({"building_id": building_id})
+@api_router.delete("/admin/edificios/{edificio_id}")
+async def delete_edificio(edificio_id: str, current_user: User = Depends(get_super_admin)):
+    # Delete viviendas first
+    await db.viviendas.delete_many({"edificio_id": edificio_id})
     
-    # Delete building
-    result = await db.buildings.delete_one({"id": building_id})
+    # Delete edificio
+    result = await db.edificios.delete_one({"id": edificio_id})
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Building not found")
+        raise HTTPException(status_code=404, detail="Edificio no encontrado")
     
     # Deactivate admin user
     await db.users.update_one(
-        {"building_id": building_id},
-        {"$set": {"is_active": False, "building_id": None}}
+        {"edificio_id": edificio_id},
+        {"$set": {"is_active": False, "edificio_id": None}}
     )
     
-    return {"message": "Building deleted successfully"}
+    return {"message": "Edificio eliminado exitosamente"}
 
-# Building Admin endpoints
-@api_router.get("/buildings/my")
-async def get_my_building(current_user: User = Depends(get_building_admin_or_super)):
+# Edificio Admin endpoints
+@api_router.get("/edificios/my")
+async def get_my_edificio(current_user: User = Depends(get_edificio_admin_or_super)):
     if current_user.role == UserRole.SUPER_ADMIN:
-        raise HTTPException(status_code=400, detail="Super admin doesn't have a specific building")
+        raise HTTPException(status_code=400, detail="Super admin no tiene edificio específico")
     
-    building = serialize_doc(await db.buildings.find_one({"id": current_user.building_id}))
-    if not building:
-        raise HTTPException(status_code=404, detail="Building not found")
+    edificio = serialize_doc(await db.edificios.find_one({"id": current_user.edificio_id}))
+    if not edificio:
+        raise HTTPException(status_code=404, detail="Edificio no encontrado")
     
-    units = serialize_docs(await db.units.find({"building_id": current_user.building_id}).to_list(None))
+    viviendas = serialize_docs(await db.viviendas.find({"edificio_id": current_user.edificio_id}).sort("numero", 1).to_list(None))
     
     # Convert datetime strings back if needed
-    if isinstance(building.get('created_at'), str):
-        building['created_at'] = datetime.fromisoformat(building['created_at'])
+    if isinstance(edificio.get('created_at'), str):
+        edificio['created_at'] = datetime.fromisoformat(edificio['created_at'])
     
-    building_obj = Building(**building)
-    building_obj.units_count = len(units)
+    edificio_obj = Edificio(**edificio)
+    edificio_obj.viviendas_count = len(viviendas)
     
     return {
-        "building": building_obj,
-        "units": units,
-        "qr_url": f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/b/{building['slug']}"
+        "edificio": edificio_obj,
+        "viviendas": viviendas,
+        "url_publica": f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/{edificio['slug']}"
     }
 
-@api_router.post("/buildings/my/units", response_model=Unit)
-async def add_unit(unit_data: UnitCreate, current_user: User = Depends(get_building_admin_or_super)):
-    if current_user.role == UserRole.BUILDING_ADMIN and not current_user.building_id:
-        raise HTTPException(status_code=400, detail="No building assigned")
+@api_router.post("/edificios/my/viviendas", response_model=Vivienda)
+async def add_vivienda(vivienda_data: ViviendaCreate, current_user: User = Depends(get_edificio_admin_or_super)):
+    if current_user.role == UserRole.EDIFICIO_ADMIN and not current_user.edificio_id:
+        raise HTTPException(status_code=400, detail="No hay edificio asignado")
     
-    building_id = current_user.building_id if current_user.role == UserRole.BUILDING_ADMIN else None
+    edificio_id = current_user.edificio_id if current_user.role == UserRole.EDIFICIO_ADMIN else None
     
     if current_user.role == UserRole.SUPER_ADMIN:
-        raise HTTPException(status_code=400, detail="Super admin must specify building")
+        raise HTTPException(status_code=400, detail="Super admin debe especificar edificio")
     
-    # Check unit limit (20 max)
-    units_count = await db.units.count_documents({"building_id": building_id})
-    if units_count >= 20:
-        raise HTTPException(status_code=400, detail="Maximum 20 units per building")
+    # Check vivienda limit (20 max)
+    viviendas_count = await db.viviendas.count_documents({"edificio_id": edificio_id})
+    if viviendas_count >= 20:
+        raise HTTPException(status_code=400, detail="Máximo 20 viviendas por edificio")
     
-    unit = Unit(
-        building_id=building_id,
-        name=unit_data.name,
-        phone=unit_data.phone
+    # Get next vivienda number
+    last_vivienda = await db.viviendas.find_one(
+        {"edificio_id": edificio_id}, 
+        sort=[("numero", -1)]
+    )
+    next_numero = (last_vivienda["numero"] + 1) if last_vivienda else 1
+    
+    vivienda = Vivienda(
+        edificio_id=edificio_id,
+        numero=next_numero,
+        nombre_familia=vivienda_data.nombre_familia,
+        phone=vivienda_data.phone,
+        publicar_nombre=vivienda_data.publicar_nombre
     )
     
-    unit_dict = unit.dict()
-    unit_dict["created_at"] = unit_dict["created_at"].isoformat()
+    vivienda_dict = vivienda.dict()
+    vivienda_dict["created_at"] = vivienda_dict["created_at"].isoformat()
     
-    await db.units.insert_one(unit_dict)
-    return unit
+    await db.viviendas.insert_one(vivienda_dict)
+    return vivienda
 
-@api_router.put("/buildings/my/units/{unit_id}", response_model=Unit)
-async def update_unit(unit_id: str, unit_data: UnitCreate, current_user: User = Depends(get_building_admin_or_super)):
+@api_router.put("/edificios/my/viviendas/{vivienda_id}", response_model=Vivienda)
+async def update_vivienda(vivienda_id: str, vivienda_data: ViviendaUpdate, current_user: User = Depends(get_edificio_admin_or_super)):
     update_data = {
-        "name": unit_data.name,
-        "phone": unit_data.phone
+        "nombre_familia": vivienda_data.nombre_familia,
+        "phone": vivienda_data.phone,
+        "publicar_nombre": vivienda_data.publicar_nombre
     }
     
-    filter_query = {"id": unit_id}
-    if current_user.role == UserRole.BUILDING_ADMIN:
-        filter_query["building_id"] = current_user.building_id
+    filter_query = {"id": vivienda_id}
+    if current_user.role == UserRole.EDIFICIO_ADMIN:
+        filter_query["edificio_id"] = current_user.edificio_id
     
-    result = await db.units.update_one(filter_query, {"$set": update_data})
+    result = await db.viviendas.update_one(filter_query, {"$set": update_data})
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Unit not found")
+        raise HTTPException(status_code=404, detail="Vivienda no encontrada")
     
-    unit = serialize_doc(await db.units.find_one({"id": unit_id}))
-    if isinstance(unit.get('created_at'), str):
-        unit['created_at'] = datetime.fromisoformat(unit['created_at'])
+    vivienda = serialize_doc(await db.viviendas.find_one({"id": vivienda_id}))
+    if isinstance(vivienda.get('created_at'), str):
+        vivienda['created_at'] = datetime.fromisoformat(vivienda['created_at'])
     
-    return Unit(**unit)
+    return Vivienda(**vivienda)
 
-@api_router.delete("/buildings/my/units/{unit_id}")
-async def delete_unit(unit_id: str, current_user: User = Depends(get_building_admin_or_super)):
-    filter_query = {"id": unit_id}
-    if current_user.role == UserRole.BUILDING_ADMIN:
-        filter_query["building_id"] = current_user.building_id
+@api_router.delete("/edificios/my/viviendas/{vivienda_id}")
+async def delete_vivienda(vivienda_id: str, current_user: User = Depends(get_edificio_admin_or_super)):
+    filter_query = {"id": vivienda_id}
+    if current_user.role == UserRole.EDIFICIO_ADMIN:
+        filter_query["edificio_id"] = current_user.edificio_id
     
-    result = await db.units.delete_one(filter_query)
+    # Get vivienda info before deletion
+    vivienda_to_delete = await db.viviendas.find_one(filter_query)
+    if not vivienda_to_delete:
+        raise HTTPException(status_code=404, detail="Vivienda no encontrada")
+    
+    result = await db.viviendas.delete_one(filter_query)
     if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Unit not found")
+        raise HTTPException(status_code=404, detail="Vivienda no encontrada")
     
-    return {"message": "Unit deleted successfully"}
+    # Renumber remaining viviendas
+    remaining_viviendas = await db.viviendas.find(
+        {"edificio_id": vivienda_to_delete["edificio_id"]}, 
+        sort=[("numero", 1)]
+    ).to_list(None)
+    
+    for i, vivienda in enumerate(remaining_viviendas, 1):
+        await db.viviendas.update_one(
+            {"id": vivienda["id"]}, 
+            {"$set": {"numero": i}}
+        )
+    
+    return {"message": "Vivienda eliminada exitosamente"}
 
 # Public endpoint (no auth required)
-@api_router.get("/public/buildings/{slug}", response_model=BuildingPublic)
-async def get_public_building(slug: str):
-    building = serialize_doc(await db.buildings.find_one({"slug": slug, "is_active": True}))
-    if not building:
-        raise HTTPException(status_code=404, detail="Building not found")
+@api_router.get("/public/edificios/{slug}", response_model=EdificioPublic)
+async def get_public_edificio(slug: str):
+    edificio = serialize_doc(await db.edificios.find_one({"slug": slug, "is_active": True}))
+    if not edificio:
+        raise HTTPException(status_code=404, detail="Edificio no encontrado")
     
-    units = serialize_docs(await db.units.find({"building_id": building["id"], "is_active": True}).to_list(None))
+    viviendas = serialize_docs(await db.viviendas.find(
+        {"edificio_id": edificio["id"], "is_active": True}
+    ).sort("numero", 1).to_list(None))
     
-    return BuildingPublic(
-        name=building["name"],
-        units=[{"id": unit["id"], "name": unit["name"], "phone": unit["phone"]} for unit in units]
+    # Filter viviendas based on publicar_nombre setting
+    viviendas_publicas = []
+    for vivienda in viviendas:
+        vivienda_data = {
+            "id": vivienda["id"],
+            "numero": vivienda["numero"],
+            "phone": vivienda["phone"]
+        }
+        
+        if vivienda.get("publicar_nombre", True):
+            vivienda_data["nombre_familia"] = vivienda["nombre_familia"]
+        else:
+            vivienda_data["nombre_familia"] = "Residente"  # Default name when private
+        
+        viviendas_publicas.append(vivienda_data)
+    
+    return EdificioPublic(
+        nombre=edificio["nombre"],
+        viviendas=viviendas_publicas
     )
 
 # Include router
@@ -385,7 +480,7 @@ app.add_middleware(
 # Startup event
 @app.on_event("startup")
 async def startup_event():
-    await create_super_admin()
+    await create_initial_users()
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
