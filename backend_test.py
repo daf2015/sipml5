@@ -139,6 +139,89 @@ class BuildingIntercomTester:
         )
         return success
 
+    def test_building_admin_full_flow(self):
+        """Test building admin with known credentials"""
+        # Using credentials from backend logs: admin161646@test.com / wYGZMrbm
+        success, response = self.run_test(
+            "Building Admin Login (Real Credentials)",
+            "POST",
+            "auth/login",
+            200,
+            data={"email": "admin161646@test.com", "password": "wYGZMrbm"}
+        )
+        
+        if success and 'access_token' in response:
+            self.building_admin_token = response['access_token']
+            print(f"   Building admin role: {response.get('user', {}).get('role')}")
+            
+            # Test getting building data
+            success2, building_response = self.run_test(
+                "Get Building Admin Data",
+                "GET",
+                "buildings/my",
+                200,
+                token=self.building_admin_token
+            )
+            
+            if success2:
+                building_data = building_response.get('building', {})
+                print(f"   Building name: {building_data.get('name')}")
+                print(f"   Building slug: {building_data.get('slug')}")
+                print(f"   Units count: {len(building_response.get('units', []))}")
+                
+                # Test adding a unit
+                unit_data = {
+                    "name": "Familia Test",
+                    "phone": "+972501234567"
+                }
+                
+                success3, unit_response = self.run_test(
+                    "Add Unit to Building",
+                    "POST",
+                    "buildings/my/units",
+                    200,
+                    data=unit_data,
+                    token=self.building_admin_token
+                )
+                
+                if success3:
+                    self.unit_id = unit_response.get('id')
+                    print(f"   Unit ID: {self.unit_id}")
+                    print(f"   Unit name: {unit_response.get('name')}")
+                    print(f"   Unit phone: {unit_response.get('phone')}")
+                    
+                    # Test updating the unit
+                    updated_unit_data = {
+                        "name": "Familia Test Actualizada",
+                        "phone": "+972509876543"
+                    }
+                    
+                    success4, _ = self.run_test(
+                        "Update Unit",
+                        "PUT",
+                        f"buildings/my/units/{self.unit_id}",
+                        200,
+                        data=updated_unit_data,
+                        token=self.building_admin_token
+                    )
+                    
+                    # Test deleting the unit
+                    success5, _ = self.run_test(
+                        "Delete Unit",
+                        "DELETE",
+                        f"buildings/my/units/{self.unit_id}",
+                        200,
+                        token=self.building_admin_token
+                    )
+                    
+                    return success and success2 and success3 and success4 and success5
+                
+                return success and success2 and success3
+            
+            return success and success2
+        
+        return success
+
     def test_public_building_view(self):
         """Test public building view"""
         if not self.building_slug:
