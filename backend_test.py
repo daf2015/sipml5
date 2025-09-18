@@ -141,13 +141,13 @@ class BuildingIntercomTester:
 
     def test_building_admin_full_flow(self):
         """Test building admin with known credentials"""
-        # Using credentials from backend logs: admin161646@test.com / wYGZMrbm
+        # Using credentials from backend logs: testadmin161736@test.com / fQa8EpV6
         success, response = self.run_test(
             "Building Admin Login (Real Credentials)",
             "POST",
             "auth/login",
             200,
-            data={"email": "admin161646@test.com", "password": "wYGZMrbm"}
+            data={"email": "testadmin161736@test.com", "password": "fQa8EpV6"}
         )
         
         if success and 'access_token' in response:
