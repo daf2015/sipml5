@@ -273,11 +273,11 @@ async def get_my_building(current_user: User = Depends(get_building_admin_or_sup
     if current_user.role == UserRole.SUPER_ADMIN:
         raise HTTPException(status_code=400, detail="Super admin doesn't have a specific building")
     
-    building = await db.buildings.find_one({"id": current_user.building_id})
+    building = serialize_doc(await db.buildings.find_one({"id": current_user.building_id}))
     if not building:
         raise HTTPException(status_code=404, detail="Building not found")
     
-    units = await db.units.find({"building_id": current_user.building_id}).to_list(None)
+    units = serialize_docs(await db.units.find({"building_id": current_user.building_id}).to_list(None))
     
     # Convert datetime strings back if needed
     if isinstance(building.get('created_at'), str):
