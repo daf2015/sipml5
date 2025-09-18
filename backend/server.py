@@ -355,11 +355,11 @@ async def delete_unit(unit_id: str, current_user: User = Depends(get_building_ad
 # Public endpoint (no auth required)
 @api_router.get("/public/buildings/{slug}", response_model=BuildingPublic)
 async def get_public_building(slug: str):
-    building = await db.buildings.find_one({"slug": slug, "is_active": True})
+    building = serialize_doc(await db.buildings.find_one({"slug": slug, "is_active": True}))
     if not building:
         raise HTTPException(status_code=404, detail="Building not found")
     
-    units = await db.units.find({"building_id": building["id"], "is_active": True}).to_list(None)
+    units = serialize_docs(await db.units.find({"building_id": building["id"], "is_active": True}).to_list(None))
     
     return BuildingPublic(
         name=building["name"],
