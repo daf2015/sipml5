@@ -344,6 +344,33 @@ async def delete_edificio(edificio_id: str, current_user: User = Depends(get_sup
     return {"message": "Edificio eliminado exitosamente"}
 
 # Edificio Admin endpoints
+# Building Admin endpoints
+@api_router.get("/edificios/check-slug/{slug}")
+async def check_slug_availability(slug: str):
+    """Verificar si un slug está disponible"""
+    slug_lower = slug.lower()
+    existing = await db.edificios.find_one({"slug": slug_lower})
+    
+    if existing:
+        # Generar sugerencias
+        suggestions = []
+        for i in range(1, 4):
+            suggestion = f"{slug_lower}{i}"
+            suggestion_exists = await db.edificios.find_one({"slug": suggestion})
+            if not suggestion_exists:
+                suggestions.append(suggestion)
+        
+        return {
+            "available": False,
+            "message": f"El nombre '{slug}' ya está ocupado",
+            "suggestions": suggestions[:3]  # Máximo 3 sugerencias
+        }
+    
+    return {
+        "available": True,
+        "message": f"El nombre '{slug}' está disponible"
+    }
+
 @api_router.get("/edificios/my")
 async def get_my_edificio(current_user: User = Depends(get_edificio_admin_or_super)):
     if current_user.role == UserRole.SUPER_ADMIN:
