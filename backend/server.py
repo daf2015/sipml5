@@ -87,15 +87,25 @@ class Edificio(BaseModel):
 
 class EdificioCreate(BaseModel):
     nombre: str
-    admin_email: str
+    slug_personalizado: str  # El slug que el usuario quiere (ej: bai123)
     admin_nombre: str  # Nombre completo del administrador
-    cantidad_viviendas: int = Field(ge=1, le=20)  # Entre 1 y 20 viviendas
+    cantidad_viviendas: int = Field(ge=1, le=50)  # Entre 1 y 50 viviendas
     
     @validator('nombre')
     def validate_nombre(cls, v):
         if len(v) < 3:
             raise ValueError('El nombre del edificio debe tener al menos 3 caracteres')
         return v
+    
+    @validator('slug_personalizado')
+    def validate_slug_personalizado(cls, v):
+        if len(v) < 3:
+            raise ValueError('El nombre del link debe tener al menos 3 caracteres')
+        # Solo permitir letras, números y guiones
+        import re
+        if not re.match(r'^[a-zA-Z0-9-]+$', v):
+            raise ValueError('El nombre del link solo puede contener letras, números y guiones')
+        return v.lower()
     
     @validator('admin_nombre')
     def validate_admin_nombre(cls, v):
