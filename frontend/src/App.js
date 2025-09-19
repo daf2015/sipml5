@@ -372,8 +372,9 @@ const SuperAdminDashboard = () => {
                     <div key={edificio.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex-1">
                         <h3 className="font-medium">{edificio.nombre}</h3>
-                        <p className="text-sm text-gray-500">Admin: {edificio.admin_email}</p>
+                        <p className="text-sm text-gray-500">Admin: {edificio.admin_nombre || 'Sin nombre'} ({edificio.admin_email})</p>
                         <p className="text-sm text-gray-500">URL: /{edificio.slug}</p>
+                        <p className="text-sm text-gray-500">Viviendas planificadas: {edificio.cantidad_viviendas || 0}</p>
                         <Badge variant={edificio.is_active ? "default" : "secondary"}>
                           {edificio.is_active ? 'Activo' : 'Inactivo'}
                         </Badge>
