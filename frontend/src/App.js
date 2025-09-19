@@ -221,6 +221,110 @@ const SuperAdminDashboard = () => {
     }
   };
 
+  // Backup Functions
+  const downloadSistemaBackup = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/admin/backup/sistema`, {
+        responseType: 'blob'
+      });
+      
+      const blob = new Blob([response.data], { type: 'application/zip' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      const fechaStr = new Date().toISOString().split('T')[0];
+      link.download = `sistema_completo_${fechaStr}.zip`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Sistema completo descargado exitosamente');
+    } catch (error) {
+      toast.error('Error al descargar el sistema completo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadClientesBackup = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/admin/backup/clientes`, {
+        responseType: 'blob'
+      });
+      
+      const blob = new Blob([response.data], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      const fechaStr = new Date().toISOString().split('T')[0];
+      link.download = `datos_clientes_${fechaStr}.json`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Datos de clientes descargados exitosamente');
+    } catch (error) {
+      toast.error('Error al descargar los datos de clientes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/json') {
+      setSelectedFile(file);
+    } else {
+      toast.error('Por favor selecciona un archivo JSON válido');
+      setSelectedFile(null);
+    }
+  };
+
+  const restoreClientesData = async () => {
+    if (!selectedFile) {
+      toast.error('Por favor selecciona un archivo primero');
+      return;
+    }
+
+    const confirmMessage = '⚠️ ADVERTENCIA: Esta acción eliminará todos los datos existentes y los reemplazará con el backup.\n\n¿Estás seguro de continuar?';
+    
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('backup_file', selectedFile);
+      
+      const response = await axios.post(`${API}/admin/restore/clientes`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      toast.success('Datos restaurados exitosamente');
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      fetchDashboard();
+    } catch (error) {
+      const errorMessage = error.response?.data?.detail || 'Error al restaurar los datos';
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
