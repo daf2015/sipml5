@@ -86,11 +86,19 @@ class Edificio(BaseModel):
 class EdificioCreate(BaseModel):
     nombre: str
     admin_email: str
+    admin_nombre: str  # Nombre completo del administrador
+    cantidad_viviendas: int = Field(ge=1, le=20)  # Entre 1 y 20 viviendas
     
     @validator('nombre')
     def validate_nombre(cls, v):
         if len(v) < 3:
             raise ValueError('El nombre del edificio debe tener al menos 3 caracteres')
+        return v
+    
+    @validator('admin_nombre')
+    def validate_admin_nombre(cls, v):
+        if len(v) < 2:
+            raise ValueError('El nombre del administrador debe tener al menos 2 caracteres')
         return v
 
 class Vivienda(BaseModel):
