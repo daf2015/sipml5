@@ -457,6 +457,158 @@ class IntercomunicadorTester:
             print(f"   Updated publicar_nombre: {response.get('publicar_nombre')}")
         return success
 
+    def test_multiple_consecutive_viviendas(self):
+        """URGENT: Test multiple consecutive vivienda creations - USER REPORTED ISSUE"""
+        print("\n🚨 TESTING MULTIPLE CONSECUTIVE VIVIENDA CREATIONS")
+        print("User reports: Can add ONE vivienda but then 'Error al guardar vivienda'")
+        
+        viviendas_data = [
+            {"nombre_familia": "Test 1", "phone": "111111111", "publicar_nombre": True},
+            {"nombre_familia": "Test 2", "phone": "222222222", "publicar_nombre": True},
+            {"nombre_familia": "Test 3", "phone": "333333333", "publicar_nombre": True}
+        ]
+        
+        created_viviendas = []
+        all_success = True
+        
+        for i, vivienda_data in enumerate(viviendas_data, 1):
+            print(f"\n--- Creating Vivienda {i} ---")
+            success, response = self.run_test(
+                f"Create Vivienda {i} (Consecutive Test)",
+                "POST",
+                "edificios/my/viviendas",
+                200,
+                data=vivienda_data,
+                token=self.edificio_admin_token
+            )
+            
+            if success:
+                created_viviendas.append(response.get('id'))
+                print(f"   ✅ Vivienda {i} created successfully")
+                print(f"   ID: {response.get('id')}")
+                print(f"   Numero: {response.get('numero')}")
+                print(f"   Nombre: {response.get('nombre_familia')}")
+                print(f"   Phone: {response.get('phone')}")
+            else:
+                print(f"   ❌ FAILED to create Vivienda {i} - THIS IS THE USER'S ISSUE!")
+                all_success = False
+                break
+            
+            # Small delay between creations
+            time.sleep(1)
+        
+        # Check edificio state after creations
+        print(f"\n--- Checking Edificio State After Creations ---")
+        success, response = self.run_test(
+            "Get My Edificio (After Multiple Creations)",
+            "GET",
+            "edificios/my",
+            200,
+            token=self.edificio_admin_token
+        )
+        
+        if success:
+            edificio_data = response.get('edificio', {})
+            viviendas_list = response.get('viviendas', [])
+            print(f"   Edificio cantidad_viviendas: {edificio_data.get('cantidad_viviendas')}")
+            print(f"   Actual viviendas count: {len(viviendas_list)}")
+            print(f"   Viviendas created in this test: {len(created_viviendas)}")
+            
+            if edificio_data.get('cantidad_viviendas') and len(viviendas_list) >= edificio_data.get('cantidad_viviendas'):
+                print(f"   ⚠️  LIMIT REACHED: {len(viviendas_list)}/{edificio_data.get('cantidad_viviendas')}")
+        
+        # Store created IDs for cleanup
+        self.created_vivienda_ids = created_viviendas
+        
+        return all_success
+
+    def test_vivienda_limits_and_restrictions(self):
+        """Test vivienda limits and restrictions"""
+        print("\n🔍 TESTING VIVIENDA LIMITS AND RESTRICTIONS")
+        
+        # First get current edificio state
+        success, response = self.run_test(
+            "Get Current Edificio State",
+            "GET",
+            "edificios/my",
+            200,
+            token=self.edificio_admin_token
+        )
+        
+        if not success:
+            return False
+            
+        edificio_data = response.get('edificio', {})
+        viviendas_list = response.get('viviendas', [])
+        max_viviendas = edificio_data.get('cantidad_viviendas', 0)
+        current_count = len(viviendas_list)
+        
+        print(f"   Current viviendas: {current_count}/{max_viviendas}")
+        
+        # Test duplicate phone numbers
+        if viviendas_list:
+            existing_phone = viviendas_list[0].get('phone', '+972501111111')
+            duplicate_data = {
+                "nombre_familia": "Duplicate Phone Test",
+                "phone": existing_phone,
+                "publicar_nombre": True
+            }
+            
+            print(f"\n--- Testing Duplicate Phone: {existing_phone} ---")
+            success, response = self.run_test(
+                "Create Vivienda with Duplicate Phone",
+                "POST",
+                "edificios/my/viviendas",
+                400,  # Should fail or succeed depending on business rules
+                data=duplicate_data,
+                token=self.edificio_admin_token
+            )
+        
+        # Test if we're at the limit
+        if current_count >= max_viviendas:
+            print(f"\n--- Testing Limit Exceeded (Current: {current_count}, Max: {max_viviendas}) ---")
+            limit_test_data = {
+                "nombre_familia": "Limit Test",
+                "phone": "+972509999999",
+                "publicar_nombre": True
+            }
+            
+            success, response = self.run_test(
+                "Create Vivienda Beyond Limit",
+                "POST",
+                "edificios/my/viviendas",
+                400,  # Should fail with limit error
+                data=limit_test_data,
+                token=self.edificio_admin_token
+            )
+            
+            if not success:
+                print("   ✅ Limit properly enforced")
+                return True
+            else:
+                print("   ❌ Limit NOT enforced - this could be the issue!")
+                return False
+        
+        return True
+
+    def cleanup_test_viviendas(self):
+        """Clean up viviendas created during testing"""
+        if hasattr(self, 'created_vivienda_ids'):
+            print(f"\n🧹 CLEANING UP {len(self.created_vivienda_ids)} TEST VIVIENDAS")
+            for vivienda_id in self.created_vivienda_ids:
+                success, response = self.run_test(
+                    f"Delete Test Vivienda {vivienda_id[:8]}...",
+                    "DELETE",
+                    f"edificios/my/viviendas/{vivienda_id}",
+                    200,
+                    token=self.edificio_admin_token
+                )
+                if success:
+                    print(f"   ✅ Deleted vivienda {vivienda_id[:8]}...")
+                else:
+                    print(f"   ❌ Failed to delete vivienda {vivienda_id[:8]}...")
+        return True
+
 def main():
     print("🏢 Sistema Intercomunicador - URGENT VIVIENDA TESTING")
     print("🚨 User reports error saving vivienda data (name and number)")
