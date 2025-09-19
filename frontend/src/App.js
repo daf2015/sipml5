@@ -794,9 +794,9 @@ const EdificioAdminDashboard = () => {
                     
                     {isOccupied ? (
                       <div className="text-xs">
-                        <div className="font-medium text-green-800 truncate" title={vivienda.nombre_familia}>
-                          {vivienda.nombre_familia.length > 8 
-                            ? vivienda.nombre_familia.substring(0, 8) + '...' 
+                        <div className="font-medium text-green-800 break-words text-center leading-tight" title={vivienda.nombre_familia}>
+                          {vivienda.nombre_familia.length > 10 
+                            ? vivienda.nombre_familia.substring(0, 10) + '...' 
                             : vivienda.nombre_familia}
                         </div>
                       </div>
