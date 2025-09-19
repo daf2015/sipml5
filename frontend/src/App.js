@@ -855,7 +855,7 @@ const EdificioAdminDashboard = () => {
             </DialogContent>
           </Dialog>
         )}
-      </main>
+      </div>
     </div>
   );
 };
