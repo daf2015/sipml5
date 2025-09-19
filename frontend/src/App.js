@@ -1427,6 +1427,15 @@ function App() {
             />
             
             <Route 
+              path="/admin/cdr" 
+              element={
+                <ProtectedRoute requiredRole="super_admin">
+                  <CDRPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
               path="/dashboard" 
               element={
                 <ProtectedRoute>
