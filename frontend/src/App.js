@@ -784,26 +784,31 @@ const EdificioAdminDashboard = () => {
                   onClick={() => setSelectedVivienda(numeroVivienda)}
                 >
                   <div className={`
-                    rounded-xl p-4 text-center transition-all duration-200 border-2
+                    rounded-lg lg:rounded-xl p-2 lg:p-4 text-center transition-all duration-200 border-2 min-h-[80px] lg:min-h-[100px] flex flex-col justify-center
                     ${isOccupied 
                       ? 'bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-300' 
                       : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
                     }
                   `}>
-                    <div className="mb-2">
-                      <Home className={`h-8 w-8 mx-auto ${isOccupied ? 'text-green-600' : 'text-gray-400'}`} />
+                    <div className="mb-1 lg:mb-2">
+                      <Home className={`h-5 w-5 lg:h-8 lg:w-8 mx-auto ${isOccupied ? 'text-green-600' : 'text-gray-400'}`} />
                     </div>
                     
-                    <div className="text-sm font-semibold text-gray-900 mb-1">
+                    <div className="text-xs lg:text-sm font-semibold text-gray-900 mb-1">
                       {numeroVivienda}
                     </div>
                     
                     {isOccupied ? (
-                      <div className="text-xs">
-                        <div className="font-medium text-green-800 break-words text-center leading-tight" title={vivienda.nombre_familia}>
-                          {vivienda.nombre_familia.length > 10 
-                            ? vivienda.nombre_familia.substring(0, 10) + '...' 
-                            : vivienda.nombre_familia}
+                      <div className="text-xs px-1">
+                        <div className="font-medium text-green-800 break-words text-center leading-tight overflow-hidden" 
+                             title={vivienda.nombre_familia}
+                             style={{
+                               display: '-webkit-box',
+                               WebkitLineClamp: 2,
+                               WebkitBoxOrient: 'vertical',
+                               maxHeight: '2.4em'
+                             }}>
+                          {vivienda.nombre_familia}
                         </div>
                       </div>
                     ) : (
@@ -812,7 +817,7 @@ const EdificioAdminDashboard = () => {
                     
                     {isOccupied && (
                       <div className="absolute -top-1 -right-1">
-                        <div className="w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                        <div className="w-3 h-3 lg:w-4 lg:h-4 bg-green-500 rounded-full border-2 border-white"></div>
                       </div>
                     )}
                   </div>
