@@ -282,7 +282,9 @@ async def create_edificio(edificio_data: EdificioCreate, current_user: User = De
     edificio = Edificio(
         nombre=edificio_data.nombre,
         slug=slug,
-        admin_email=edificio_data.admin_email
+        admin_email=edificio_data.admin_email,
+        admin_nombre=edificio_data.admin_nombre,
+        cantidad_viviendas=edificio_data.cantidad_viviendas
     )
     
     edificio_dict = edificio.dict()
