@@ -77,9 +77,9 @@ class UserLogin(BaseModel):
 class Edificio(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     nombre: str
-    slug: str  # URL-friendly name
-    admin_email: str
+    slug: str  # URL-friendly name personalizado
     admin_nombre: str = ""  # Nombre del administrador
+    admin_email: str = ""  # Email del admin (se asigna después)
     cantidad_viviendas: int = 0  # Cantidad planificada de viviendas
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
