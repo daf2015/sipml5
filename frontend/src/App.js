@@ -675,263 +675,205 @@ const EdificioAdminDashboard = () => {
     );
   }
 
+  // Dashboard principal con vista moderna de viviendas
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <header className="bg-white shadow-lg border-b-2 border-indigo-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <Building2 className="h-8 w-8 text-indigo-600 mr-3" />
-              <h1 className="text-xl font-semibold text-gray-900">
-                {edificioData?.edificio?.nombre || 'Mi Edificio'}
-              </h1>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">{edificioData?.edificio?.nombre}</h1>
+                <p className="text-sm text-gray-500">intercum.com/{edificioData?.edificio?.slug}</p>
+              </div>
             </div>
-            <Button variant="outline" onClick={logout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Cerrar sesión
-            </Button>
+            <div className="flex items-center space-x-4">
+              <Button
+                onClick={() => window.open(edificioData?.url_publica, '_blank')}
+                variant="outline"
+                className="border-indigo-300 text-indigo-600 hover:bg-indigo-50"
+              >
+                <QrCode className="h-4 w-4 mr-2" />
+                Ver QR
+              </Button>
+              <Button variant="outline" onClick={logout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Salir
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Edificio Info */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">{edificioData?.edificio?.nombre}</h2>
-                <p className="text-gray-600">URL: /{edificioData?.edificio?.slug}</p>
-                <p className="text-gray-600">Viviendas: {edificioData?.viviendas?.length || 0}/20</p>
+        {/* Estadísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-emerald-100">Viviendas Ocupadas</p>
+                  <p className="text-3xl font-bold">{edificioData?.viviendas?.length || 0}</p>
+                </div>
+                <Home className="h-12 w-12 text-emerald-200" />
               </div>
-              <div className="text-right">
-                <Button
-                  onClick={() => window.open(edificioData?.url_publica, '_blank')}
-                  className="mb-2"
-                >
-                  <QrCode className="h-4 w-4 mr-2" />
-                  Ver Página Pública
-                </Button>
-                <p className="text-sm text-gray-500">Comparte este enlace con visitantes</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-amber-100">Viviendas Vacías</p>
+                  <p className="text-3xl font-bold">
+                    {(edificioData?.edificio?.cantidad_viviendas || 0) - (edificioData?.viviendas?.length || 0)}
+                  </p>
+                </div>
+                <Building2 className="h-12 w-12 text-amber-200" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white border-0 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-indigo-100">Total Viviendas</p>
+                  <p className="text-3xl font-bold">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
+                </div>
+                <BarChart3 className="h-12 w-12 text-indigo-200" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Vista Gráfica Moderna del Edificio */}
+        <Card className="shadow-xl border-0 mb-8">
+          <CardHeader className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
+            <CardTitle className="text-2xl flex items-center">
+              <Building2 className="mr-3 h-6 w-6" />
+              Vista del Edificio
+            </CardTitle>
+            <CardDescription className="text-slate-200">
+              Haz clic en cualquier vivienda para editarla
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-8">
+            <div className="grid grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-4">
+              {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 20}, (_, index) => {
+                const numeroVivienda = index + 1;
+                const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
+                const isOccupied = !!vivienda;
+                
+                return (
+                  <div
+                    key={numeroVivienda}
+                    className={`
+                      relative group cursor-pointer transition-all duration-300 transform hover:scale-105
+                      ${isOccupied 
+                        ? 'hover:shadow-lg' 
+                        : 'hover:shadow-md'
+                      }
+                    `}
+                    onClick={() => setSelectedVivienda(numeroVivienda)}
+                  >
+                    <div className={`
+                      p-4 rounded-xl border-2 text-center
+                      ${isOccupied 
+                        ? 'bg-gradient-to-br from-emerald-100 to-emerald-200 border-emerald-300' 
+                        : 'bg-gradient-to-br from-gray-100 to-gray-200 border-gray-300'
+                      }
+                    `}>
+                      {/* Icono de casita */}
+                      <div className={`
+                        mx-auto mb-2 p-2 rounded-lg
+                        ${isOccupied 
+                          ? 'bg-emerald-500 text-white' 
+                          : 'bg-gray-400 text-white'
+                        }
+                      `}>
+                        <Home className="h-6 w-6" />
+                      </div>
+                      
+                      {/* Número de vivienda */}
+                      <div className={`
+                        text-lg font-bold mb-1
+                        ${isOccupied ? 'text-emerald-800' : 'text-gray-600'}
+                      `}>
+                        {numeroVivienda}
+                      </div>
+                      
+                      {/* Información de la vivienda */}
+                      <div className="text-xs">
+                        {isOccupied ? (
+                          <div>
+                            <div className="font-medium text-emerald-800 truncate mb-1" title={vivienda.nombre_familia}>
+                              {vivienda.nombre_familia.length > 10 
+                                ? vivienda.nombre_familia.substring(0, 10) + '...' 
+                                : vivienda.nombre_familia}
+                            </div>
+                            <Badge 
+                              variant={vivienda.publicar_nombre ? "default" : "secondary"} 
+                              className="text-xs"
+                            >
+                              {vivienda.publicar_nombre ? 'Público' : 'Privado'}
+                            </Badge>
+                          </div>
+                        ) : (
+                          <span className="text-gray-500 font-medium">Vacía</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Indicador de ocupación */}
+                    {isOccupied && (
+                      <div className="absolute -top-1 -right-1">
+                        <div className="w-4 h-4 bg-emerald-500 rounded-full border-2 border-white shadow-md"></div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Leyenda */}
+            <div className="mt-6 flex items-center justify-center space-x-8 text-sm">
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-emerald-500 rounded-full"></div>
+                <span className="font-medium">Ocupada</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
+                <span className="font-medium">Vacía</span>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Add Vivienda */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Agregar Vivienda</CardTitle>
-              <CardDescription>
-                {(edificioData?.viviendas?.length || 0)}/20 viviendas agregadas
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={createVivienda} className="space-y-4">
-                <div>
-                  <Label htmlFor="nombreFamilia">Nombre de la familia/persona</Label>
-                  <Input
-                    id="nombreFamilia"
-                    value={nombreFamilia}
-                    onChange={(e) => setNombreFamilia(e.target.value)}
-                    placeholder="Familia García"
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Número de teléfono</Label>
-                  <Input
-                    id="phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+972501234567"
-                    required
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="publicarNombre"
-                    checked={publicarNombre}
-                    onCheckedChange={setPublicarNombre}
-                  />
-                  <Label htmlFor="publicarNombre" className="text-sm">
-                    Publicar nombre en el intercomunicador
-                  </Label>
-                </div>
-                <p className="text-xs text-gray-500">
-                  Si no publicas el nombre, aparecerá como "Residente" en la vista pública
-                </p>
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={createLoading || (edificioData?.viviendas?.length || 0) >= 20}
-                >
-                  {createLoading ? 'Agregando...' : 'Agregar Vivienda'}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Viviendas List */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Viviendas ({edificioData?.viviendas?.length || 0}/{edificioData?.edificio?.cantidad_viviendas || 20})</CardTitle>
-                <CardDescription>Gestiona las viviendas de tu edificio</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {/* Vista Gráfica de Viviendas */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Vista Gráfica del Edificio</h4>
-                  <div className="grid grid-cols-5 gap-3">
-                    {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 20}, (_, index) => {
-                      const numeroVivienda = index + 1;
-                      const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
-                      const isOccupied = !!vivienda;
-                      
-                      return (
-                        <div
-                          key={numeroVivienda}
-                          className={`
-                            relative p-4 border-2 rounded-lg cursor-pointer transition-all
-                            ${isOccupied 
-                              ? 'bg-green-100 border-green-300 hover:bg-green-200' 
-                              : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
-                            }
-                          `}
-                          onClick={() => {
-                            if (vivienda) {
-                              setEditingVivienda(vivienda);
-                            } else {
-                              // Auto-llenar formulario con este número
-                              setNombreFamilia('');
-                              setPhone('');
-                              setPublicarNombre(true);
-                            }
-                          }}
-                        >
-                          <div className="text-center">
-                            <div className={`
-                              w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold
-                              ${isOccupied ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}
-                            `}>
-                              {numeroVivienda}
-                            </div>
-                            <div className="text-xs">
-                              {isOccupied ? (
-                                <div>
-                                  <div className="font-medium truncate" title={vivienda.nombre_familia}>
-                                    {vivienda.nombre_familia}
-                                  </div>
-                                  <Badge variant={vivienda.publicar_nombre ? "default" : "secondary"} className="text-xs mt-1">
-                                    {vivienda.publicar_nombre ? 'Público' : 'Privado'}
-                                  </Badge>
-                                </div>
-                              ) : (
-                                <span className="text-gray-500">Vacía</span>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {isOccupied && (
-                            <div className="absolute top-1 right-1">
-                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="mt-3 flex items-center space-x-4 text-sm">
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span>Ocupada</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-                      <span>Vacía</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Lista Detallada */}
-                <div className="border-t pt-4">
-                  <h4 className="font-medium mb-3">Lista Detallada</h4>
-                  <div className="space-y-3">
-                    {edificioData?.viviendas?.map((vivienda) => (
-                      <div key={vivienda.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        {editingVivienda?.id === vivienda.id ? (
-                          <div className="flex-1 space-y-2">
-                            <Input
-                              value={editingVivienda.nombre_familia}
-                              onChange={(e) => setEditingVivienda({...editingVivienda, nombre_familia: e.target.value})}
-                              placeholder="Nombre de familia"
-                            />
-                            <Input
-                              value={editingVivienda.phone}
-                              onChange={(e) => setEditingVivienda({...editingVivienda, phone: e.target.value})}
-                              placeholder="Teléfono"
-                            />
-                            <div className="flex items-center space-x-2">
-                              <Checkbox
-                                checked={editingVivienda.publicar_nombre}
-                                onCheckedChange={(checked) => setEditingVivienda({...editingVivienda, publicar_nombre: checked})}
-                              />
-                              <Label className="text-sm">Publicar nombre</Label>
-                            </div>
-                            <div className="flex space-x-2">
-                              <Button size="sm" onClick={() => updateVivienda(vivienda.id)}>
-                                Guardar
-                              </Button>
-                              <Button size="sm" variant="outline" onClick={() => setEditingVivienda(null)}>
-                                Cancelar
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2">
-                                <Badge variant="outline">#{vivienda.numero}</Badge>
-                                <h3 className="font-medium">{vivienda.nombre_familia}</h3>
-                              </div>
-                              <p className="text-sm text-gray-500">{vivienda.phone}</p>
-                              <div className="flex items-center space-x-2 mt-1">
-                                <Badge variant={vivienda.publicar_nombre ? "default" : "secondary"}>
-                                  {vivienda.publicar_nombre ? 'Público' : 'Privado'}
-                                </Badge>
-                              </div>
-                            </div>
-                            <div className="flex space-x-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setEditingVivienda(vivienda)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => deleteVivienda(vivienda.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    ))}
-                    {(!edificioData?.viviendas || edificioData.viviendas.length === 0) && (
-                      <p className="text-center text-gray-500 py-8">No hay viviendas agregadas</p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+        
+        {/* Modal para editar vivienda */}
+        {selectedVivienda && (
+          <Dialog open={!!selectedVivienda} onOpenChange={() => setSelectedVivienda(null)}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center">
+                  <Home className="mr-2 h-5 w-5" />
+                  Vivienda #{selectedVivienda}
+                </DialogTitle>
+                <DialogDescription>
+                  Edita la información de esta vivienda
+                </DialogDescription>
+              </DialogHeader>
+              <ViviendaEditForm 
+                numeroVivienda={selectedVivienda}
+                vivienda={edificioData?.viviendas?.find(v => v.numero === selectedVivienda)}
+                onSave={(data) => updateViviendaData(selectedVivienda, data)}
+                onDelete={(viviendaId) => deleteVivienda(viviendaId)}
+                onCancel={() => setSelectedVivienda(null)}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </main>
     </div>
   );
