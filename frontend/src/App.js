@@ -941,7 +941,7 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
         <Input
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
-          placeholder="+972501234567"
+          placeholder="972501234567 o +972501234567"
           className="h-11"
         />
       </div>
