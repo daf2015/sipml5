@@ -679,6 +679,19 @@ const EdificioAdminDashboard = () => {
             <div className="flex items-center space-x-3">
               <Button
                 onClick={() => {
+                  setShowCreateForm(true);
+                  setEdificioData(null);
+                }}
+                variant="outline"
+                size="sm"
+                className="border-green-300 text-green-600 hover:bg-green-50"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Nuevo Edificio
+              </Button>
+              
+              <Button
+                onClick={() => {
                   const url = `intercum.com/${edificioData?.edificio?.slug}`;
                   navigator.clipboard.writeText(url);
                   toast.success('Link copiado al portapapeles!');
