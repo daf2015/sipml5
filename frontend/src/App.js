@@ -410,7 +410,107 @@ const SuperAdminDashboard = () => {
   );
 };
 
-// Componente para editar vivienda - MEJORADO SEGÚN REFERENCIA
+// Componente SIMPLE para editar vivienda
+const ViviendaEditFormSimple = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel }) => {
+  const [nombre, setNombre] = useState(vivienda?.nombre_familia || '');
+  const [telefono, setTelefono] = useState(vivienda?.phone || '');
+  const [publicar, setPublicar] = useState(vivienda?.publicar_nombre ?? true);
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    if (!nombre.trim() || !telefono.trim()) {
+      toast.error('Completa todos los campos');
+      return;
+    }
+    
+    if (!telefono.startsWith('+')) {
+      toast.error('El número debe empezar con +');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await onSave({
+        nombre_familia: nombre.trim(),
+        phone: telefono.trim(),
+        publicar_nombre: publicar
+      });
+      toast.success('Vivienda guardada');
+    } catch (error) {
+      toast.error('Error al guardar');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!vivienda) return;
+    
+    if (window.confirm(`¿Eliminar vivienda ${numeroVivienda}?`)) {
+      await onDelete(vivienda.id);
+      toast.success('Vivienda eliminada');
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label className="text-sm font-medium">Nombre de la familia</Label>
+        <Input
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          placeholder="Familia García"
+          className="mt-1"
+        />
+      </div>
+      
+      <div>
+        <Label className="text-sm font-medium">Teléfono</Label>
+        <Input
+          value={telefono}
+          onChange={(e) => setTelefono(e.target.value)}
+          placeholder="+972501234567"
+          className="mt-1"
+        />
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          checked={publicar}
+          onCheckedChange={setPublicar}
+        />
+        <Label className="text-sm">Mostrar nombre públicamente</Label>
+      </div>
+      
+      <div className="flex space-x-2 pt-2">
+        <Button 
+          onClick={handleSave} 
+          disabled={loading}
+          className="flex-1"
+        >
+          {loading ? 'Guardando...' : 'Guardar'}
+        </Button>
+        
+        <Button 
+          onClick={onCancel}
+          variant="outline"
+        >
+          Cancelar
+        </Button>
+        
+        {vivienda && (
+          <Button 
+            onClick={handleDelete}
+            variant="destructive"
+            size="sm"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
 const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel }) => {
   const [nombre, setNombre] = useState(vivienda?.nombre_familia || '');
   const [telefono, setTelefono] = useState(vivienda?.phone || '');
