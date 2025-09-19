@@ -513,7 +513,7 @@ const CDRPage = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await Promise.all([fetchCDRStats(), fetchCDRData()]);
+      await Promise.all([fetchCDRStats(), fetchCDRData(), fetchEdificiosSummary()]);
       setLoading(false);
     };
     
