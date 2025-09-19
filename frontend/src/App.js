@@ -1075,7 +1075,7 @@ const PublicEdificio = () => {
                         </div>
                         <div>
                           <h3 className="text-lg font-semibold text-gray-900">
-                            Vivienda #{vivienda.numero}
+                            Vivienda {vivienda.numero}
                           </h3>
                           <p className="text-gray-600">{vivienda.nombre_familia}</p>
                         </div>
