@@ -756,76 +756,9 @@ const EdificioAdminDashboard = () => {
                     )}
                   </div>
                 </div>
-                  {edificioData?.viviendas?.map((vivienda) => (
-                    <div key={vivienda.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      {editingVivienda?.id === vivienda.id ? (
-                        <div className="flex-1 space-y-2">
-                          <Input
-                            value={editingVivienda.nombre_familia}
-                            onChange={(e) => setEditingVivienda({...editingVivienda, nombre_familia: e.target.value})}
-                            placeholder="Nombre de familia"
-                          />
-                          <Input
-                            value={editingVivienda.phone}
-                            onChange={(e) => setEditingVivienda({...editingVivienda, phone: e.target.value})}
-                            placeholder="Teléfono"
-                          />
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              checked={editingVivienda.publicar_nombre}
-                              onCheckedChange={(checked) => setEditingVivienda({...editingVivienda, publicar_nombre: checked})}
-                            />
-                            <Label className="text-sm">Publicar nombre</Label>
-                          </div>
-                          <div className="flex space-x-2">
-                            <Button size="sm" onClick={() => updateVivienda(vivienda.id)}>
-                              Guardar
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={() => setEditingVivienda(null)}>
-                              Cancelar
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2">
-                              <Badge variant="outline">#{vivienda.numero}</Badge>
-                              <h3 className="font-medium">{vivienda.nombre_familia}</h3>
-                            </div>
-                            <p className="text-sm text-gray-500">{vivienda.phone}</p>
-                            <div className="flex items-center space-x-2 mt-1">
-                              <Badge variant={vivienda.publicar_nombre ? "default" : "secondary"}>
-                                {vivienda.publicar_nombre ? 'Público' : 'Privado'}
-                              </Badge>
-                            </div>
-                          </div>
-                          <div className="flex space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingVivienda(vivienda)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => deleteVivienda(vivienda.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                  {(!edificioData?.viviendas || edificioData.viviendas.length === 0) && (
-                    <p className="text-center text-gray-500 py-8">No hay viviendas agregadas</p>
-                  )}
-                </div>
               </CardContent>
             </Card>
+          </div>
         </div>
       </main>
     </div>
