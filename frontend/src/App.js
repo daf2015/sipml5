@@ -1013,12 +1013,13 @@ const PublicEdificio = () => {
     window.location.href = `tel:${phone}`;
   };
 
+  // Vista pública EXACTA como referencia
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-600">Cargando intercomunicador...</p>
+      <div className="min-h-screen bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white">Cargando...</p>
         </div>
       </div>
     );
@@ -1026,15 +1027,12 @@ const PublicEdificio = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md shadow-xl">
+      <div className="min-h-screen bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+        <Card className="max-w-md w-full mx-4 shadow-xl border-0 bg-white">
           <CardContent className="p-8 text-center">
             <Building2 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Edificio no encontrado</h3>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={() => window.location.reload()} className="bg-blue-600 hover:bg-blue-700">
-              Intentar de nuevo
-            </Button>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Edificio no encontrado</h2>
+            <p className="text-gray-600">Este enlace no corresponde a ningún edificio activo.</p>
           </CardContent>
         </Card>
       </div>
@@ -1042,72 +1040,75 @@ const PublicEdificio = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          {/* Header estético */}
-          <Card className="mb-8 shadow-xl border-0 bg-white/90 backdrop-blur-sm">
-            <CardHeader className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center">
-                <Building2 className="h-8 w-8 text-white" />
-              </div>
-              <div>
-                <CardTitle className="text-3xl font-bold text-gray-900 mb-2">
-                  {edificio?.nombre}
-                </CardTitle>
-                <CardDescription className="text-lg text-gray-600">
-                  Selecciona la vivienda que deseas contactar
-                </CardDescription>
-              </div>
-            </CardHeader>
-          </Card>
-
-          {/* Lista de viviendas estética */}
-          <div className="space-y-4">
-            {edificio?.viviendas?.map((vivienda) => (
-              <Card 
-                key={vivienda.id} 
-                className="hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-white/90 backdrop-blur-sm group"
-                onClick={() => callResident(vivienda.phone)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <Home className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            Vivienda {vivienda.numero}
-                          </h3>
-                          <p className="text-gray-600">{vivienda.nombre_familia}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg shadow-lg group-hover:shadow-xl transition-all duration-300"
-                    >
-                      <Phone className="h-5 w-5 mr-2" />
-                      Llamar
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {(!edificio?.viviendas || edificio.viviendas.length === 0) && (
-            <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
-              <CardContent className="p-12 text-center">
-                <Home className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Sin contactos disponibles</h3>
-                <p className="text-gray-600">No hay viviendas con información de contacto en este edificio.</p>
-              </CardContent>
-            </Card>
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 to-purple-600 p-4">
+      {/* Header EXACTO como referencia */}
+      <header className="text-center mb-8">
+        <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <Building2 className="h-10 w-10 text-white" />
         </div>
-      </div>
+        <h1 className="text-white text-lg font-medium mb-2">Intercomunicador Digital</h1>
+        <h2 className="text-white text-3xl font-bold mb-4">{edificio?.nombre}</h2>
+        <p className="text-white/80 text-lg">Selecciona la vivienda que deseas contactar</p>
+      </header>
+
+      {/* Grid EXACTO como referencia */}
+      <main className="max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {edificio?.viviendas?.map((vivienda) => (
+            <div
+              key={vivienda.numero}
+              className="bg-white rounded-2xl p-4 text-center shadow-lg cursor-pointer transform transition-all duration-200 hover:scale-105 active:scale-95"
+              onClick={() => {
+                const phoneNumber = vivienda.phone.replace(/[^\d+]/g, '');
+                window.open(`tel:${phoneNumber}`, '_self');
+              }}
+            >
+              {/* Punto verde */}
+              <div className="relative mb-4">
+                <div className="w-16 h-16 mx-auto bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center">
+                  <div className="text-2xl">🏠</div>
+                </div>
+                <div className="absolute -top-1 -right-6 w-4 h-4 bg-green-400 rounded-full"></div>
+              </div>
+              
+              {/* Título */}
+              <h3 className="text-lg font-bold text-gray-900 mb-2">
+                Vivienda {vivienda.numero}
+              </h3>
+              
+              {/* Nombre */}
+              <p className="text-gray-600 text-sm">
+                {vivienda.nombre_familia}
+              </p>
+            </div>
+          ))}
+          
+          {/* Viviendas vacías */}
+          {Array.from({length: Math.max(0, (edificio?.cantidad_viviendas || 0) - (edificio?.viviendas?.length || 0))}, (_, index) => {
+            const numeroVivienda = (edificio?.viviendas?.length || 0) + index + 1;
+            return (
+              <div
+                key={`empty-${numeroVivienda}`}
+                className="bg-white rounded-2xl p-4 text-center shadow-lg opacity-50"
+              >
+                <div className="mb-4">
+                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
+                    <div className="text-2xl">🏠</div>
+                  </div>
+                </div>
+                
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  Vivienda {numeroVivienda}
+                </h3>
+                
+                <p className="text-gray-400 text-sm">
+                  Sin contacto
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </main>
     </div>
   );
 };
