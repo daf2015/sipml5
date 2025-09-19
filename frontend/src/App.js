@@ -410,15 +410,27 @@ const SuperAdminDashboard = () => {
   );
 };
 
-// Edificio Admin Dashboard
+// Edificio Admin Dashboard - NUEVA VERSIÓN MODERNA
 const EdificioAdminDashboard = () => {
   const [edificioData, setEdificioData] = useState(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  
+  // Formulario creación edificio
+  const [edificioNombre, setEdificioNombre] = useState('');
+  const [slugPersonalizado, setSlugPersonalizado] = useState('');
+  const [adminNombre, setAdminNombre] = useState('');
+  const [cantidadViviendas, setCantidadViviendas] = useState(10);
+  const [slugStatus, setSlugStatus] = useState({ available: null, suggestions: [] });
+  const [createLoading, setCreateLoading] = useState(false);
+  
+  // Gestión viviendas
   const [nombreFamilia, setNombreFamilia] = useState('');
   const [phone, setPhone] = useState('');
   const [publicarNombre, setPublicarNombre] = useState(true);
   const [editingVivienda, setEditingVivienda] = useState(null);
-  const [createLoading, setCreateLoading] = useState(false);
+  const [selectedVivienda, setSelectedVivienda] = useState(null);
+  
   const { logout } = useAuth();
 
   useEffect(() => {
@@ -429,78 +441,238 @@ const EdificioAdminDashboard = () => {
     try {
       const response = await axios.get(`${API}/edificios/my`);
       setEdificioData(response.data);
+      setShowCreateForm(false);
     } catch (error) {
-      const errorMessage = typeof error.response?.data?.detail === 'string' 
-        ? error.response.data.detail 
-        : 'Error al cargar datos del edificio';
-      toast.error(errorMessage);
+      if (error.response?.status === 400) {
+        // Usuario no tiene edificio, mostrar formulario de creación
+        setShowCreateForm(true);
+      } else {
+        const errorMessage = typeof error.response?.data?.detail === 'string' 
+          ? error.response.data.detail 
+          : 'Error al cargar datos del edificio';
+        toast.error(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const createVivienda = async (e) => {
+  const checkSlugAvailability = async (slug) => {
+    if (slug.length < 3) {
+      setSlugStatus({ available: false, message: 'Mínimo 3 caracteres', suggestions: [] });
+      return;
+    }
+    
+    try {
+      const response = await axios.get(`${API}/edificios/check-slug/${slug}`);
+      setSlugStatus(response.data);
+    } catch (error) {
+      setSlugStatus({ available: false, message: 'Error al verificar', suggestions: [] });
+    }
+  };
+
+  const createEdificio = async (e) => {
     e.preventDefault();
+    if (!slugStatus.available) {
+      toast.error('El nombre del link no está disponible');
+      return;
+    }
+    
     setCreateLoading(true);
     
     try {
-      await axios.post(`${API}/edificios/my/viviendas`, {
-        nombre_familia: nombreFamilia,
-        phone: phone,
-        publicar_nombre: publicarNombre
+      await axios.post(`${API}/edificios/create-my`, {
+        nombre: edificioNombre,
+        slug_personalizado: slugPersonalizado,
+        admin_nombre: adminNombre,
+        cantidad_viviendas: cantidadViviendas
       });
       
-      toast.success('Vivienda agregada exitosamente');
-      setNombreFamilia('');
-      setPhone('');
-      setPublicarNombre(true);
+      toast.success('¡Edificio creado exitosamente!');
       fetchEdificioData();
     } catch (error) {
       const errorMessage = typeof error.response?.data?.detail === 'string' 
         ? error.response.data.detail 
-        : 'Error al agregar vivienda';
+        : 'Error al crear edificio';
       toast.error(errorMessage);
     } finally {
       setCreateLoading(false);
     }
   };
 
-  const updateVivienda = async (viviendaId) => {
+  const updateViviendaData = async (numeroVivienda, data) => {
     try {
-      await axios.put(`${API}/edificios/my/viviendas/${viviendaId}`, {
-        nombre_familia: editingVivienda.nombre_familia,
-        phone: editingVivienda.phone,
-        publicar_nombre: editingVivienda.publicar_nombre
-      });
+      const existingVivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
       
-      toast.success('Vivienda actualizada');
-      setEditingVivienda(null);
+      if (existingVivienda) {
+        // Actualizar vivienda existente
+        await axios.put(`${API}/edificios/my/viviendas/${existingVivienda.id}`, data);
+        toast.success('Vivienda actualizada');
+      } else {
+        // Crear nueva vivienda
+        await axios.post(`${API}/edificios/my/viviendas`, data);
+        toast.success('Vivienda agregada');
+      }
+      
       fetchEdificioData();
+      setSelectedVivienda(null);
     } catch (error) {
       const errorMessage = typeof error.response?.data?.detail === 'string' 
         ? error.response.data.detail 
-        : 'Error al actualizar vivienda';
+        : 'Error al guardar vivienda';
       toast.error(errorMessage);
     }
   };
 
   const deleteVivienda = async (viviendaId) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta vivienda? Los números se reorganizarán automáticamente.')) return;
+    if (!window.confirm('¿Estás seguro de eliminar esta vivienda?')) return;
     
     try {
       await axios.delete(`${API}/edificios/my/viviendas/${viviendaId}`);
-      toast.success('Vivienda eliminada y números reorganizados');
+      toast.success('Vivienda eliminada');
       fetchEdificioData();
     } catch (error) {
-      const errorMessage = typeof error.response?.data?.detail === 'string' 
-        ? error.response.data.detail 
-        : 'Error al eliminar vivienda';
-      toast.error(errorMessage);
+      toast.error('Error al eliminar vivienda');
     }
   };
 
   if (loading) {
-    return <div className="p-8">Cargando datos del edificio...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-indigo-600 font-medium">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Formulario de creación de edificio
+  if (showCreateForm) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            <Card className="shadow-xl border-0">
+              <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg">
+                <CardTitle className="text-2xl flex items-center">
+                  <Building2 className="mr-3 h-8 w-8" />
+                  Crear Tu Edificio
+                </CardTitle>
+                <CardDescription className="text-indigo-100">
+                  Configura tu sistema de intercomunicación personalizado
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-8">
+                <form onSubmit={createEdificio} className="space-y-6">
+                  <div>
+                    <Label htmlFor="adminNombre">Tu nombre completo</Label>
+                    <Input
+                      id="adminNombre"
+                      value={adminNombre}
+                      onChange={(e) => setAdminNombre(e.target.value)}
+                      placeholder="Juan Pérez García"
+                      required
+                      className="h-12 text-lg"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="edificioNombre">Nombre del edificio</Label>
+                    <Input
+                      id="edificioNombre"
+                      value={edificioNombre}
+                      onChange={(e) => setEdificioNombre(e.target.value)}
+                      placeholder="Edificio Las Torres"
+                      required
+                      className="h-12 text-lg"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="slugPersonalizado">Nombre para el link (mínimo 3 caracteres)</Label>
+                    <div className="relative">
+                      <Input
+                        id="slugPersonalizado"
+                        value={slugPersonalizado}
+                        onChange={(e) => {
+                          const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                          setSlugPersonalizado(value);
+                          if (value.length >= 3) checkSlugAvailability(value);
+                        }}
+                        placeholder="bai123"
+                        required
+                        className="h-12 text-lg pr-12"
+                      />
+                      {slugStatus.available === true && (
+                        <div className="absolute right-3 top-3 text-green-500">✓</div>
+                      )}
+                      {slugStatus.available === false && (
+                        <div className="absolute right-3 top-3 text-red-500">✗</div>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Tu link será: <strong>intercum.com/{slugPersonalizado}</strong>
+                    </p>
+                    {slugStatus.message && (
+                      <p className={`text-sm mt-1 ${slugStatus.available ? 'text-green-600' : 'text-red-600'}`}>
+                        {slugStatus.message}
+                      </p>
+                    )}
+                    {slugStatus.suggestions && slugStatus.suggestions.length > 0 && (
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600">Sugerencias disponibles:</p>
+                        <div className="flex gap-2 mt-1">
+                          {slugStatus.suggestions.map(suggestion => (
+                            <Button
+                              key={suggestion}
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSlugPersonalizado(suggestion);
+                                checkSlugAvailability(suggestion);
+                              }}
+                            >
+                              {suggestion}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="cantidadViviendas">Cantidad de viviendas</Label>
+                    <Input
+                      id="cantidadViviendas"
+                      type="number"
+                      min="1"
+                      max="50"
+                      value={cantidadViviendas}
+                      onChange={(e) => setCantidadViviendas(parseInt(e.target.value))}
+                      required
+                      className="h-12 text-lg"
+                    />
+                    <p className="text-sm text-gray-600 mt-1">
+                      Entre 1 y 50 viviendas
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full h-12 text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700" 
+                    disabled={createLoading || !slugStatus.available}
+                  >
+                    {createLoading ? 'Creando...' : 'Crear Mi Edificio'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
