@@ -453,7 +453,10 @@ const EdificioAdminDashboard = () => {
       toast.success('Vivienda eliminada y números reorganizados');
       fetchEdificioData();
     } catch (error) {
-      toast.error('Error al eliminar vivienda');
+      const errorMessage = typeof error.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : 'Error al eliminar vivienda';
+      toast.error(errorMessage);
     }
   };
 
