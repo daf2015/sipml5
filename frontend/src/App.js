@@ -769,9 +769,9 @@ const EdificioAdminDashboard = () => {
           <p className="text-sm lg:text-base text-gray-600">Toca cualquier vivienda para editarla</p>
         </div>
 
-        {/* Grid de Casitas MODERNO Y RESPONSIVE */}
-        <div className="bg-white rounded-xl shadow-sm border p-3 lg:p-6">
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-2 lg:gap-4">
+        {/* Grid de Viviendas MODERNO - Como las referencias */}
+        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg border-0 p-6 lg:p-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-6 lg:gap-8">
             {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 12}, (_, index) => {
               const numeroVivienda = index + 1;
               const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
@@ -780,44 +780,53 @@ const EdificioAdminDashboard = () => {
               return (
                 <div
                   key={numeroVivienda}
-                  className="relative cursor-pointer group"
+                  className="relative cursor-pointer group transform transition-all duration-300 hover:scale-105"
                   onClick={() => setSelectedVivienda(numeroVivienda)}
                 >
                   <div className={`
-                    rounded-lg lg:rounded-xl p-2 lg:p-4 text-center transition-all duration-200 border-2 min-h-[80px] lg:min-h-[100px] flex flex-col justify-center
+                    rounded-3xl p-6 text-center shadow-lg border-0 min-h-[140px] lg:min-h-[160px] flex flex-col justify-center relative overflow-hidden
                     ${isOccupied 
-                      ? 'bg-green-50 border-green-200 hover:bg-green-100 hover:border-green-300' 
-                      : 'bg-gray-50 border-gray-200 hover:bg-gray-100 hover:border-gray-300'
+                      ? 'bg-white shadow-green-200/50 hover:shadow-green-300/60' 
+                      : 'bg-white/80 hover:bg-white shadow-gray-200/50 hover:shadow-gray-300/60'
                     }
                   `}>
-                    <div className="mb-1 lg:mb-2">
-                      <Home className={`h-5 w-5 lg:h-8 lg:w-8 mx-auto ${isOccupied ? 'text-green-600' : 'text-gray-400'}`} />
+                    
+                    {/* Fondo decorativo */}
+                    <div className={`absolute inset-0 opacity-5 ${isOccupied ? 'bg-green-400' : 'bg-gray-300'}`}></div>
+                    
+                    {/* Ícono de casa moderno */}
+                    <div className="mb-3 relative z-10">
+                      <div className={`
+                        w-12 h-12 lg:w-16 lg:h-16 mx-auto rounded-2xl flex items-center justify-center
+                        ${isOccupied 
+                          ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-200' 
+                          : 'bg-gradient-to-br from-gray-300 to-gray-500 shadow-lg shadow-gray-200'
+                        }
+                      `}>
+                        <Home className="h-6 w-6 lg:h-8 lg:w-8 text-white" />
+                      </div>
                     </div>
                     
-                    <div className="text-xs lg:text-sm font-semibold text-gray-900 mb-1">
-                      {numeroVivienda}
+                    {/* Título "Vivienda X" */}
+                    <div className="text-lg lg:text-xl font-bold text-gray-900 mb-2 relative z-10">
+                      Vivienda {numeroVivienda}
                     </div>
                     
-                    {isOccupied ? (
-                      <div className="text-xs px-1">
-                        <div className="font-medium text-green-800 break-words text-center leading-tight overflow-hidden" 
-                             title={vivienda.nombre_familia}
-                             style={{
-                               display: '-webkit-box',
-                               WebkitLineClamp: 2,
-                               WebkitBoxOrient: 'vertical',
-                               maxHeight: '2.4em'
-                             }}>
+                    {/* Nombre de familia o "Libre" */}
+                    <div className="text-sm lg:text-base relative z-10">
+                      {isOccupied ? (
+                        <div className="font-medium text-gray-700 leading-tight px-2">
                           {vivienda.nombre_familia}
                         </div>
-                      </div>
-                    ) : (
-                      <div className="text-xs text-gray-500">Libre</div>
-                    )}
+                      ) : (
+                        <div className="text-gray-500 font-medium">Libre</div>
+                      )}
+                    </div>
                     
+                    {/* Indicator dot */}
                     {isOccupied && (
-                      <div className="absolute -top-1 -right-1">
-                        <div className="w-3 h-3 lg:w-4 lg:h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                      <div className="absolute top-3 right-3 z-20">
+                        <div className="w-4 h-4 bg-green-500 rounded-full border-3 border-white shadow-lg animate-pulse"></div>
                       </div>
                     )}
                   </div>
