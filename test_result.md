@@ -90,8 +90,8 @@
 ##   test_priority: "high_first"
 ##
 ## agent_communication:
-##     -agent: "main"  # or "testing" or "user"
-##     -message: "Communication message between agents"
+##     -agent: "main"
+##     -message: "Fixed user reported issues: 1) Added delete building button with confirmation dialog 2) Added new building creation option 3) Simplified UI header. Backend endpoints were already working correctly. All functionality tested via API and browser automation."
 
 # Protocol Guidelines for Main agent
 #
