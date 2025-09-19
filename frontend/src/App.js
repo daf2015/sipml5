@@ -789,16 +789,17 @@ function App() {
               } 
             />
             
-            <Route path="/:slug" element={<PublicEdificio />} />
-            
             <Route 
               path="/" 
+              exact
               element={
                 <ProtectedRoute>
                   <Navigate to={localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role === 'super_admin' ? '/admin' : '/dashboard'} replace />
                 </ProtectedRoute>
               } 
             />
+            
+            <Route path="/:slug" element={<PublicEdificio />} />
           </Routes>
           <Toaster />
         </div>
