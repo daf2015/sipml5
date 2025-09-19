@@ -827,7 +827,6 @@ async def backup_clientes_data(current_user: User = Depends(get_super_admin)):
     """
     Descargar backup completo de datos de clientes
     """
-    import json
     import io
     from fastapi.responses import Response
     
