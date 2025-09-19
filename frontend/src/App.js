@@ -394,7 +394,10 @@ const EdificioAdminDashboard = () => {
       const response = await axios.get(`${API}/edificios/my`);
       setEdificioData(response.data);
     } catch (error) {
-      toast.error('Error al cargar datos del edificio');
+      const errorMessage = typeof error.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : 'Error al cargar datos del edificio';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
