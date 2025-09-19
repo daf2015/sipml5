@@ -848,19 +848,16 @@ const EdificioAdminDashboard = () => {
           </Card>
         </div>
 
-        {/* Vista Gráfica Moderna del Edificio */}
-        <Card className="shadow-xl border-0 mb-8">
-          <CardHeader className="bg-gradient-to-r from-slate-700 to-slate-800 text-white">
-            <CardTitle className="text-2xl flex items-center">
-              <Building2 className="mr-3 h-6 w-6" />
-              Vista del Edificio
+        {/* Vista del Edificio - DISEÑO SEGÚN REFERENCIAS */}
+        <Card className="shadow-lg border-0 mb-8">
+          <CardHeader className="bg-white border-b">
+            <CardTitle className="text-xl text-gray-800 flex items-center">
+              <Building2 className="mr-2 h-5 w-5 text-indigo-600" />
+              Unidades - {edificioData?.edificio?.nombre}
             </CardTitle>
-            <CardDescription className="text-slate-200">
-              Haz clic en cualquier vivienda para editarla
-            </CardDescription>
           </CardHeader>
-          <CardContent className="p-8">
-            <div className="grid grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-4">
+          <CardContent className="p-6 bg-gray-50">
+            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
               {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 20}, (_, index) => {
                 const numeroVivienda = index + 1;
                 const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
@@ -869,84 +866,51 @@ const EdificioAdminDashboard = () => {
                 return (
                   <div
                     key={numeroVivienda}
-                    className={`
-                      relative group cursor-pointer transition-all duration-300 transform hover:scale-105
-                      ${isOccupied 
-                        ? 'hover:shadow-lg' 
-                        : 'hover:shadow-md'
-                      }
-                    `}
+                    className="relative cursor-pointer group"
                     onClick={() => setSelectedVivienda(numeroVivienda)}
                   >
-                    <div className={`
-                      p-4 rounded-xl border-2 text-center
-                      ${isOccupied 
-                        ? 'bg-gradient-to-br from-emerald-100 to-emerald-200 border-emerald-300' 
-                        : 'bg-gradient-to-br from-gray-100 to-gray-200 border-gray-300'
-                      }
-                    `}>
-                      {/* Icono de casita */}
-                      <div className={`
-                        mx-auto mb-2 p-2 rounded-lg
-                        ${isOccupied 
-                          ? 'bg-emerald-500 text-white' 
-                          : 'bg-gray-400 text-white'
-                        }
-                      `}>
-                        <Home className="h-6 w-6" />
-                      </div>
-                      
-                      {/* Número de vivienda */}
-                      <div className={`
-                        text-lg font-bold mb-1
-                        ${isOccupied ? 'text-emerald-800' : 'text-gray-600'}
-                      `}>
-                        {numeroVivienda}
-                      </div>
-                      
-                      {/* Información de la vivienda */}
-                      <div className="text-xs">
-                        {isOccupied ? (
-                          <div>
-                            <div className="font-medium text-emerald-800 truncate mb-1" title={vivienda.nombre_familia}>
-                              {vivienda.nombre_familia.length > 10 
-                                ? vivienda.nombre_familia.substring(0, 10) + '...' 
-                                : vivienda.nombre_familia}
+                    {/* Vivienda Card - DISEÑO COMO REFERENCIA */}
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                      <div className="text-center">
+                        {/* Icono de casita */}
+                        <div className="mx-auto mb-2 w-8 h-8 flex items-center justify-center">
+                          <Home className="h-6 w-6 text-gray-600" />
+                        </div>
+                        
+                        {/* Número de vivienda */}
+                        <div className="text-sm font-medium text-gray-700 mb-1">
+                          Vivienda {numeroVivienda}
+                        </div>
+                        
+                        {/* Información de ocupación */}
+                        <div className="text-xs">
+                          {isOccupied ? (
+                            <div>
+                              <div className="font-medium text-gray-800 truncate" title={vivienda.nombre_familia}>
+                                {vivienda.nombre_familia.length > 12 
+                                  ? vivienda.nombre_familia.substring(0, 12) + '...' 
+                                  : vivienda.nombre_familia}
+                              </div>
+                              <div className="text-gray-500 text-xs mt-1">
+                                {vivienda.phone}
+                              </div>
                             </div>
-                            <Badge 
-                              variant={vivienda.publicar_nombre ? "default" : "secondary"} 
-                              className="text-xs"
-                            >
-                              {vivienda.publicar_nombre ? 'Público' : 'Privado'}
-                            </Badge>
-                          </div>
-                        ) : (
-                          <span className="text-gray-500 font-medium">Vacía</span>
-                        )}
+                          ) : (
+                            <span className="text-gray-400">Sin contacto</span>
+                          )}
+                        </div>
                       </div>
+                      
+                      {/* PUNTO VERDE - IGUAL QUE EN LA REFERENCIA */}
+                      {isOccupied && (
+                        <div className="absolute top-2 right-2">
+                          <div className="w-3 h-3 bg-green-500 rounded-full border border-white shadow-sm"></div>
+                        </div>
+                      )}
                     </div>
-                    
-                    {/* Indicador de ocupación */}
-                    {isOccupied && (
-                      <div className="absolute -top-1 -right-1">
-                        <div className="w-4 h-4 bg-emerald-500 rounded-full border-2 border-white shadow-md"></div>
-                      </div>
-                    )}
                   </div>
                 );
               })}
-            </div>
-            
-            {/* Leyenda */}
-            <div className="mt-6 flex items-center justify-center space-x-8 text-sm">
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-emerald-500 rounded-full"></div>
-                <span className="font-medium">Ocupada</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
-                <span className="font-medium">Vacía</span>
-              </div>
             </div>
           </CardContent>
         </Card>
