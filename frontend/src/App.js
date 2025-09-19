@@ -788,7 +788,17 @@ const EdificioAdminDashboard = () => {
               <span className="hidden lg:inline">Eliminar Edificio</span>
             </Button>
             
-            <div className="hidden lg:block pt-4 border-t border-gray-200 w-full">
+            <div className="hidden lg:block pt-4 border-t border-gray-200 w-full space-y-2">
+              {isSuperAdminManaging && (
+                <Button
+                  onClick={() => window.location.href = '/admin'}
+                  variant="outline"
+                  className="w-full justify-start text-gray-600 hover:text-gray-800 hover:bg-gray-100 text-sm lg:text-base rounded-xl"
+                >
+                  <Building2 className="h-4 w-4 mr-3" />
+                  Volver a Panel Super Admin
+                </Button>
+              )}
               <Button
                 onClick={logout}
                 variant="ghost"
