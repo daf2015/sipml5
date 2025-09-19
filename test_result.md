@@ -101,3 +101,95 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Necesito probar urgentemente los endpoints de creación y eliminación de edificios ya que el usuario reporta que 'no deja crear' y 'no se elimina el edificio'. Específicamente necesito que pruebes: 1. Creación de edificio desde admin - POST /api/edificios/create-my, 2. Eliminación de edificio - DELETE /api/edificios/my/{edificio_id}, 3. Verificación de disponibilidad de slug - GET /api/edificios/check-slug/{slug}, 4. Obtener edificios del admin - GET /api/edificios/my"
+
+backend:
+  - task: "Creación de edificio desde admin"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "TESTED SUCCESSFULLY - POST /api/edificios/create-my endpoint working correctly. Tested with exact user data: nombre='Edificio Test', slug_personalizado='test-edificio', admin_nombre='Diego Test', cantidad_viviendas=10. User diego@daf-il.net can create edificios successfully. Backend logs confirm: 'Edificio creado por admin: diego@daf-il.net - Edificio Test'"
+
+  - task: "Eliminación de edificio"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "TESTED SUCCESSFULLY - DELETE /api/edificios/my/{edificio_id} endpoint working correctly. Successfully deleted edificio and associated viviendas. Backend logs confirm: 'Edificio eliminado: Edificio Test - Viviendas eliminadas: 0'. Returns proper response with message and count of deleted viviendas."
+
+  - task: "Verificación de disponibilidad de slug"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "TESTED SUCCESSFULLY - GET /api/edificios/check-slug/{slug} endpoint working correctly. Returns proper availability status, messages, and suggestions for unavailable slugs. Tested with various slug formats and all validations work as expected."
+
+  - task: "Obtener edificios del admin"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "TESTED SUCCESSFULLY - GET /api/edificios/my endpoint working correctly. Returns edificio data, viviendas list, and public URL for user diego@daf-il.net. Response includes all expected fields: edificio details, viviendas array, and properly formatted public URL."
+
+  - task: "Validaciones de slug y límites"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "TESTED SUCCESSFULLY - All slug validations working correctly: duplicate slug rejection, invalid format rejection, length limits enforced. Vivienda limits (max 100) properly enforced. Slug normalization (uppercase to lowercase) working as designed."
+
+  - task: "Autenticación de usuario"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "TESTED SUCCESSFULLY - Authentication working correctly for user diego@daf-il.net with password tangotango. Returns proper JWT token and user role (edificio_admin). Invalid credentials properly rejected with 401 status."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "All user-reported endpoints tested and working"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "testing"
+      message: "COMPREHENSIVE TESTING COMPLETED - All user-reported endpoints are working correctly. The user's issues with 'no deja crear' and 'no se elimina el edificio' appear to be resolved or were not reproducible in the current system state. All 4 critical endpoints tested successfully: 1) POST /api/edificios/create-my ✅, 2) DELETE /api/edificios/my/{edificio_id} ✅, 3) GET /api/edificios/check-slug/{slug} ✅, 4) GET /api/edificios/my ✅. Backend logs confirm successful operations. Edge case testing also passed with proper validation handling."
