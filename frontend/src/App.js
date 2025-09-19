@@ -539,7 +539,10 @@ const EdificioAdminDashboard = () => {
         setEdificioData(null);
         setShowCreateForm(true);
       } catch (error) {
-        toast.error(error.response?.data?.detail || 'Error al eliminar edificio');
+        const errorMessage = typeof error.response?.data?.detail === 'string' 
+          ? error.response.data.detail 
+          : 'Error al eliminar edificio';
+        toast.error(errorMessage);
       }
     }
   };
