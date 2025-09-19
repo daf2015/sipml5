@@ -604,6 +604,264 @@ class IntercomunicadorTester:
         
         return True
 
+    def find_baitzman_edificio(self):
+        """Find the Baitzman 163 edificio ID for super admin testing"""
+        success, response = self.run_test(
+            "Get All Edificios (Super Admin)",
+            "GET",
+            "admin/dashboard",
+            200,
+            token=self.super_admin_token
+        )
+        
+        if success:
+            edificios_recientes = response.get('edificios_recientes', [])
+            for edificio in edificios_recientes:
+                if 'baitzman' in edificio.get('nombre', '').lower() and '163' in edificio.get('nombre', ''):
+                    self.baitzman_edificio_id = edificio.get('id')
+                    print(f"   Found Baitzman 163 edificio ID: {self.baitzman_edificio_id}")
+                    return True
+            
+            # If not found in recent, try to get edificio admin's edificio
+            print("   Baitzman 163 not found in recent edificios, checking admin's edificio...")
+            success2, response2 = self.run_test(
+                "Get Admin Edificio",
+                "GET",
+                "edificios/my",
+                200,
+                token=self.edificio_admin_token
+            )
+            
+            if success2:
+                edificio_data = response2.get('edificio', {})
+                if edificio_data.get('id'):
+                    self.baitzman_edificio_id = edificio_data.get('id')
+                    print(f"   Using admin's edificio ID: {self.baitzman_edificio_id}")
+                    print(f"   Edificio name: {edificio_data.get('nombre')}")
+                    return True
+        
+        return False
+
+    def test_admin_update_cantidad_viviendas(self):
+        """URGENT: Test admin updating cantidad de viviendas - USER REPORTED ISSUE"""
+        print("\n🚨 TESTING ADMIN CANTIDAD VIVIENDAS UPDATE")
+        print("User: diego@daf-il.net / tangotango")
+        print("Data: {\"cantidad_viviendas\": 30}")
+        
+        # First get current state
+        success, response = self.run_test(
+            "Get Current Edificio State (Before Update)",
+            "GET",
+            "edificios/my",
+            200,
+            token=self.edificio_admin_token
+        )
+        
+        if success:
+            edificio_data = response.get('edificio', {})
+            current_cantidad = edificio_data.get('cantidad_viviendas', 0)
+            current_viviendas_count = len(response.get('viviendas', []))
+            print(f"   Current cantidad_viviendas: {current_cantidad}")
+            print(f"   Current actual viviendas: {current_viviendas_count}")
+        
+        # Test the update
+        update_data = {"cantidad_viviendas": 30}
+        success, response = self.run_test(
+            "Admin Update Cantidad Viviendas",
+            "PUT",
+            "edificios/my/cantidad-viviendas",
+            200,
+            data=update_data,
+            token=self.edificio_admin_token
+        )
+        
+        if success:
+            print(f"   Update response: {response.get('message')}")
+            
+            # Verify the change was applied
+            success2, response2 = self.run_test(
+                "Verify Update Applied",
+                "GET",
+                "edificios/my",
+                200,
+                token=self.edificio_admin_token
+            )
+            
+            if success2:
+                edificio_data = response2.get('edificio', {})
+                new_cantidad = edificio_data.get('cantidad_viviendas', 0)
+                print(f"   New cantidad_viviendas: {new_cantidad}")
+                
+                if new_cantidad == 30:
+                    print("   ✅ UPDATE SUCCESSFUL - cantidad_viviendas changed to 30")
+                    return True
+                else:
+                    print(f"   ❌ UPDATE FAILED - Expected 30, got {new_cantidad}")
+                    return False
+        
+        return success
+
+    def test_super_admin_update_cantidad_viviendas(self):
+        """URGENT: Test super admin updating cantidad de viviendas - USER REPORTED ISSUE"""
+        print("\n🚨 TESTING SUPER ADMIN CANTIDAD VIVIENDAS UPDATE")
+        print("User: diegofridman@gmail.com / tangotango")
+        print("Edificio: Baitzman 163")
+        print("Data: {\"cantidad_viviendas\": 35}")
+        
+        if not self.baitzman_edificio_id:
+            print("❌ No Baitzman edificio ID found")
+            return False
+        
+        # First get current state
+        success, response = self.run_test(
+            "Get Edificio State (Super Admin - Before Update)",
+            "GET",
+            f"admin/edificios/{self.baitzman_edificio_id}",
+            200,
+            token=self.super_admin_token
+        )
+        
+        if success:
+            edificio_data = response.get('edificio', {})
+            current_cantidad = edificio_data.get('cantidad_viviendas', 0)
+            current_viviendas_count = len(response.get('viviendas', []))
+            print(f"   Current cantidad_viviendas: {current_cantidad}")
+            print(f"   Current actual viviendas: {current_viviendas_count}")
+        
+        # Test the update
+        update_data = {"cantidad_viviendas": 35}
+        success, response = self.run_test(
+            "Super Admin Update Cantidad Viviendas",
+            "PUT",
+            f"admin/edificios/{self.baitzman_edificio_id}/cantidad-viviendas",
+            200,
+            data=update_data,
+            token=self.super_admin_token
+        )
+        
+        if success:
+            print(f"   Update response: {response.get('message')}")
+            
+            # Verify the change was applied
+            success2, response2 = self.run_test(
+                "Verify Super Admin Update Applied",
+                "GET",
+                f"admin/edificios/{self.baitzman_edificio_id}",
+                200,
+                token=self.super_admin_token
+            )
+            
+            if success2:
+                edificio_data = response2.get('edificio', {})
+                new_cantidad = edificio_data.get('cantidad_viviendas', 0)
+                print(f"   New cantidad_viviendas: {new_cantidad}")
+                
+                if new_cantidad == 35:
+                    print("   ✅ SUPER ADMIN UPDATE SUCCESSFUL - cantidad_viviendas changed to 35")
+                    return True
+                else:
+                    print(f"   ❌ SUPER ADMIN UPDATE FAILED - Expected 35, got {new_cantidad}")
+                    return False
+        
+        return success
+
+    def test_data_structure_validation(self):
+        """Test what data structure the backend expects vs what frontend might be sending"""
+        print("\n🔍 TESTING DATA STRUCTURE VALIDATION")
+        
+        # Test various data formats that frontend might send
+        test_cases = [
+            ("Correct format", {"cantidad_viviendas": 25}, 200),
+            ("String number", {"cantidad_viviendas": "25"}, 400),
+            ("Missing field", {"cantidad": 25}, 400),
+            ("Wrong field name", {"cantidad_vivienda": 25}, 400),
+            ("Null value", {"cantidad_viviendas": None}, 400),
+            ("Zero value", {"cantidad_viviendas": 0}, 400),
+            ("Negative value", {"cantidad_viviendas": -5}, 400),
+            ("Too high value", {"cantidad_viviendas": 100}, 400),
+            ("Float value", {"cantidad_viviendas": 25.5}, 400),
+        ]
+        
+        all_passed = True
+        
+        for test_name, data, expected_status in test_cases:
+            print(f"\n--- Testing {test_name}: {data} ---")
+            success, response = self.run_test(
+                f"Data Structure Test: {test_name}",
+                "PUT",
+                "edificios/my/cantidad-viviendas",
+                expected_status,
+                data=data,
+                token=self.edificio_admin_token
+            )
+            
+            if not success:
+                all_passed = False
+                print(f"   ❌ {test_name} failed validation test")
+            else:
+                print(f"   ✅ {test_name} behaved as expected")
+        
+        return all_passed
+
+    def test_edge_cases_cantidad_viviendas(self):
+        """Test edge cases for cantidad viviendas updates"""
+        print("\n🔍 TESTING EDGE CASES FOR CANTIDAD VIVIENDAS")
+        
+        # Get current state first
+        success, response = self.run_test(
+            "Get Current State for Edge Cases",
+            "GET",
+            "edificios/my",
+            200,
+            token=self.edificio_admin_token
+        )
+        
+        if not success:
+            return False
+        
+        edificio_data = response.get('edificio', {})
+        current_viviendas_count = len(response.get('viviendas', []))
+        print(f"   Current viviendas count: {current_viviendas_count}")
+        
+        # Test reducing below current viviendas count
+        if current_viviendas_count > 0:
+            print(f"\n--- Testing Reduce Below Current Count ({current_viviendas_count}) ---")
+            reduce_data = {"cantidad_viviendas": max(1, current_viviendas_count - 1)}
+            success, response = self.run_test(
+                "Reduce Below Current Viviendas Count",
+                "PUT",
+                "edificios/my/cantidad-viviendas",
+                400,  # Should fail
+                data=reduce_data,
+                token=self.edificio_admin_token
+            )
+            
+            if success:
+                print("   ❌ Should have failed - reducing below current count")
+                return False
+            else:
+                print("   ✅ Correctly prevented reducing below current count")
+        
+        # Test boundary values
+        boundary_tests = [
+            ("Minimum valid", {"cantidad_viviendas": 1}, 200 if current_viviendas_count <= 1 else 400),
+            ("Maximum valid", {"cantidad_viviendas": 50}, 200),
+            ("Above maximum", {"cantidad_viviendas": 51}, 400),
+        ]
+        
+        for test_name, data, expected_status in boundary_tests:
+            print(f"\n--- Testing {test_name}: {data} ---")
+            success, response = self.run_test(
+                f"Boundary Test: {test_name}",
+                "PUT",
+                "edificios/my/cantidad-viviendas",
+                expected_status,
+                data=data,
+                token=self.edificio_admin_token
+            )
+        
+        return True
+
     def cleanup_test_viviendas(self):
         """Clean up viviendas created during testing"""
         if hasattr(self, 'created_vivienda_ids'):
