@@ -515,9 +515,18 @@ const EdificioAdminDashboard = () => {
     } catch (error) {
       console.error('Error al guardar vivienda:', error);
       console.error('Response:', error.response?.data);
-      const errorMessage = typeof error.response?.data?.detail === 'string' 
-        ? error.response.data.detail 
-        : 'Error al guardar vivienda';
+      
+      let errorMessage = 'Error al guardar vivienda';
+      
+      if (error.response?.status === 400) {
+        const detail = error.response.data?.detail || '';
+        if (detail.includes('Límite máximo') || detail.includes('limite')) {
+          errorMessage = 'Has llegado al límite máximo de viviendas para este edificio';
+        } else if (typeof detail === 'string') {
+          errorMessage = detail;
+        }
+      }
+      
       toast.error(errorMessage);
     }
   };
