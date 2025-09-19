@@ -690,7 +690,7 @@ const EdificioAdminDashboard = () => {
 
   // Dashboard MODERNO MÓVIL
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
       {/* SIDEBAR - Compacto en móvil */}
       <div className="w-full lg:w-80 bg-white shadow-sm border-b lg:border-r lg:border-b-0">
         <div className="p-4 lg:p-6">
