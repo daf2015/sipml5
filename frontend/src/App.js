@@ -766,7 +766,7 @@ const EdificioAdminDashboard = () => {
 
         {/* Grid de Viviendas MODERNO - Como las referencias */}
         <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg border-0 p-6 lg:p-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-6 lg:gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
             {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 12}, (_, index) => {
               const numeroVivienda = index + 1;
               const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
