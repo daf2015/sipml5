@@ -563,24 +563,84 @@ async def update_nombre_edificio_admin(
 @api_router.get("/admin/cdr")
 async def get_call_detail_records(
     edificio_id: Optional[str] = None,
+    vivienda_numero: Optional[int] = None,
+    familia_nombre: Optional[str] = None,
+    fecha_desde: Optional[str] = None,
+    fecha_hasta: Optional[str] = None,
+    formato: Optional[str] = None,  # 'csv' para descarga
     limit: int = 100,
     offset: int = 0,
     current_user: User = Depends(get_super_admin)
 ):
     """
     Obtener registros detallados de llamadas (CDR)
-    Filtros: edificio_id, paginación
-    Por defecto: último mes, máximo 3 meses de retención
+    Filtros: edificio_id, vivienda_numero, familia_nombre, fecha_desde, fecha_hasta
+    Por defecto: último mes, máximo 3 meses de retención automática
     """
-    # Filtro de fecha - último mes por defecto
-    one_month_ago = datetime.now(timezone.utc) - timedelta(days=30)
+    # Filtros de fecha
+    if fecha_desde and fecha_hasta:
+        try:
+            fecha_desde_dt = datetime.fromisoformat(fecha_desde.replace('Z', '+00:00'))
+            fecha_hasta_dt = datetime.fromisoformat(fecha_hasta.replace('Z', '+00:00'))
+            query = {"call_timestamp": {"$gte": fecha_desde_dt, "$lte": fecha_hasta_dt}}
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Formato de fecha inválido. Use ISO format.")
+    else:
+        # Por defecto: último mes
+        one_month_ago = datetime.now(timezone.utc) - timedelta(days=30)
+        query = {"call_timestamp": {"$gte": one_month_ago}}
     
-    # Query de filtros
-    query = {"call_timestamp": {"$gte": one_month_ago}}
+    # Filtros adicionales
     if edificio_id:
         query["edificio_id"] = edificio_id
+    if vivienda_numero:
+        query["vivienda_numero"] = vivienda_numero
+    if familia_nombre:
+        query["vivienda_nombre_familia"] = {"$regex": familia_nombre, "$options": "i"}
     
-    # Obtener CDRs con paginación
+    # Para CSV, obtener todos los registros sin paginación
+    if formato == "csv":
+        cdrs = serialize_docs(
+            await db.call_detail_records.find(query)
+            .sort("call_timestamp", -1)
+            .to_list(length=None)
+        )
+        
+        # Generar CSV
+        import csv
+        import io
+        
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Encabezados CSV
+        writer.writerow([
+            "Fecha", "Hora", "Edificio", "Vivienda", "Familia", "Timestamp"
+        ])
+        
+        # Datos CSV
+        for cdr in cdrs:
+            timestamp = datetime.fromisoformat(cdr["call_timestamp"].replace('Z', '+00:00'))
+            writer.writerow([
+                timestamp.strftime("%d/%m/%Y"),
+                timestamp.strftime("%H:%M:%S"),
+                cdr["edificio_nombre"],
+                f"Vivienda {cdr['vivienda_numero']}",
+                cdr["vivienda_nombre_familia"],
+                cdr["call_timestamp"]
+            ])
+        
+        csv_content = output.getvalue()
+        output.close()
+        
+        from fastapi.responses import Response
+        return Response(
+            content=csv_content,
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=cdr_report.csv"}
+        )
+    
+    # Obtener CDRs con paginación para vista normal
     cdrs = serialize_docs(
         await db.call_detail_records.find(query)
         .sort("call_timestamp", -1)
@@ -592,17 +652,35 @@ async def get_call_detail_records(
     # Estadísticas
     total_records = await db.call_detail_records.count_documents(query)
     
-    # Obtener lista de edificios para filtros
+    # Obtener opciones para filtros
     edificios = serialize_docs(
         await db.edificios.find({}, {"id": 1, "nombre": 1}).to_list(None)
     )
+    
+    # Obtener viviendas únicas (solo números)
+    viviendas_pipeline = [
+        {"$group": {"_id": "$vivienda_numero"}},
+        {"$sort": {"_id": 1}}
+    ]
+    viviendas_result = await db.call_detail_records.aggregate(viviendas_pipeline).to_list(None)
+    viviendas_disponibles = [v["_id"] for v in viviendas_result]
+    
+    # Obtener familias únicas
+    familias_pipeline = [
+        {"$group": {"_id": "$vivienda_nombre_familia"}},
+        {"$sort": {"_id": 1}}
+    ]
+    familias_result = await db.call_detail_records.aggregate(familias_pipeline).to_list(None)
+    familias_disponibles = [f["_id"] for f in familias_result if f["_id"]]
     
     return {
         "cdrs": cdrs,
         "total_records": total_records,
         "has_more": (offset + limit) < total_records,
         "edificios_disponibles": edificios,
-        "periodo": "último_mes"
+        "viviendas_disponibles": viviendas_disponibles,
+        "familias_disponibles": familias_disponibles,
+        "periodo": "filtrado" if any([edificio_id, vivienda_numero, familia_nombre, fecha_desde]) else "último_mes"
     }
 
 @api_router.get("/admin/cdr/stats")
