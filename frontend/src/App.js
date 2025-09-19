@@ -694,27 +694,27 @@ const EdificioAdminDashboard = () => {
       {/* SIDEBAR - Compacto en móvil */}
       <div className="w-full lg:w-80 bg-white shadow-sm border-b lg:border-r lg:border-b-0">
         <div className="p-4 lg:p-6">
-          {/* Info del Admin - RESPONSIVE */}
-          <div className="mb-6 lg:mb-8">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <Building2 className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
+          {/* Info del Admin - MÓVIL COMPACTO */}
+          <div className="mb-4 lg:mb-8">
+            <div className="flex items-center space-x-3 mb-3 lg:mb-4">
+              <div className="w-8 h-8 lg:w-12 lg:h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                <Building2 className="h-4 w-4 lg:h-6 lg:w-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-base lg:text-lg font-bold text-gray-900 truncate">{edificioData?.edificio?.nombre}</h2>
-                <p className="text-xs lg:text-sm text-gray-600 truncate">{edificioData?.edificio?.admin_nombre}</p>
+                <h2 className="text-sm lg:text-lg font-bold text-gray-900 truncate">{edificioData?.edificio?.nombre}</h2>
+                <p className="text-xs text-gray-500 truncate">{edificioData?.edificio?.admin_nombre}</p>
               </div>
             </div>
             
-            {/* Estadísticas Modernas - RESPONSIVE */}
-            <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-4 lg:mb-6">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 lg:p-4 rounded-2xl text-center shadow-sm border border-blue-200/50">
-                <p className="text-xl lg:text-2xl font-bold text-blue-700">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
-                <p className="text-xs text-blue-600 font-medium">Total</p>
+            {/* Estadísticas COMPACTAS - MÓVIL */}
+            <div className="grid grid-cols-2 gap-2 lg:gap-4 mb-3 lg:mb-6">
+              <div className="bg-blue-50 p-2 lg:p-4 rounded-xl text-center">
+                <p className="text-lg lg:text-2xl font-bold text-blue-600">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
+                <p className="text-xs text-blue-600">Total</p>
               </div>
-              <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 lg:p-4 rounded-2xl text-center shadow-sm border border-green-200/50">
-                <p className="text-xl lg:text-2xl font-bold text-green-700">{edificioData?.viviendas?.length || 0}</p>
-                <p className="text-xs text-green-600 font-medium">Ocupadas</p>
+              <div className="bg-green-50 p-2 lg:p-4 rounded-xl text-center">
+                <p className="text-lg lg:text-2xl font-bold text-green-600">{edificioData?.viviendas?.length || 0}</p>
+                <p className="text-xs text-green-600">Ocupadas</p>
               </div>
             </div>
           </div>
