@@ -710,16 +710,15 @@ const EdificioAdminDashboard = () => {
             </div>
           </div>
 
-          {/* Funciones - RESPONSIVE */}
-          <div className="space-y-2 lg:space-y-3">
+          {/* Funciones Modernas - RESPONSIVE */}
+          <div className="space-y-3 lg:space-y-4">
             <Button
               onClick={() => {
                 const url = `${window.location.origin}/${edificioData?.edificio?.slug}`;
                 navigator.clipboard.writeText(url);
                 toast.success('Link copiado');
               }}
-              className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-sm lg:text-base"
-              size="sm"
+              className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg text-sm lg:text-base rounded-xl"
             >
               <Copy className="h-4 w-4 mr-2 lg:mr-3" />
               <span className="hidden sm:inline">Copiar Link Público</span>
@@ -729,8 +728,7 @@ const EdificioAdminDashboard = () => {
             <Button
               onClick={() => window.open(`/${edificioData?.edificio?.slug}`, '_blank')}
               variant="outline"
-              className="w-full justify-start text-sm lg:text-base"
-              size="sm"
+              className="w-full justify-start text-sm lg:text-base border-2 border-blue-200 hover:bg-blue-50 rounded-xl"
             >
               <ExternalLink className="h-4 w-4 mr-2 lg:mr-3" />
               <span className="hidden sm:inline">Ver Página Pública</span>
@@ -739,20 +737,17 @@ const EdificioAdminDashboard = () => {
             
             <Button
               onClick={deleteEdificio}
-              variant="destructive"
-              className="w-full justify-start text-sm lg:text-base"
-              size="sm"
+              className="w-full justify-start text-sm lg:text-base bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white rounded-xl shadow-lg"
             >
               <Trash2 className="h-4 w-4 mr-2 lg:mr-3" />
               Eliminar Edificio
             </Button>
             
-            <div className="pt-3 lg:pt-4 border-t">
+            <div className="pt-4 lg:pt-6 border-t border-gray-200">
               <Button
                 onClick={logout}
                 variant="ghost"
-                className="w-full justify-start text-gray-600 text-sm lg:text-base"
-                size="sm"
+                className="w-full justify-start text-gray-600 hover:text-gray-800 hover:bg-gray-100 text-sm lg:text-base rounded-xl"
               >
                 <LogOut className="h-4 w-4 mr-2 lg:mr-3" />
                 Cerrar Sesión
