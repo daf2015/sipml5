@@ -441,6 +441,7 @@ const SuperAdminDashboard = () => {
 const CDRPage = () => {
   const [cdrs, setCdrs] = useState([]);
   const [stats, setStats] = useState(null);
+  const [edificiosSummary, setEdificiosSummary] = useState([]);
   const [edificios, setEdificios] = useState([]);
   const [viviendas, setViviendas] = useState([]);
   const [familias, setFamilias] = useState([]);
@@ -453,6 +454,7 @@ const CDRPage = () => {
   const [downloading, setDownloading] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
+  const [showEdificiosSummary, setShowEdificiosSummary] = useState(true);
   const navigate = useNavigate();
 
   const fetchCDRStats = async () => {
