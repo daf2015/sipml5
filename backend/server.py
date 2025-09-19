@@ -1031,8 +1031,27 @@ async def update_edificio_analytics(edificio_id: str):
     )
 
 async def update_call_analytics(edificio_id: str, vivienda_id: str):
-    """Actualizar analytics de llamadas"""
+    """Actualizar analytics de llamadas y crear registro CDR"""
     now = datetime.now(timezone.utc)
+    
+    # Obtener datos del edificio y vivienda para el CDR
+    edificio = await db.edificios.find_one({"id": edificio_id})
+    vivienda = await db.viviendas.find_one({"id": vivienda_id})
+    
+    if edificio and vivienda:
+        # Crear registro CDR
+        cdr_record = {
+            "id": str(uuid.uuid4()),
+            "edificio_id": edificio_id,
+            "edificio_nombre": edificio["nombre"],
+            "vivienda_id": vivienda_id,
+            "vivienda_numero": vivienda["numero"],
+            "vivienda_nombre_familia": vivienda["nombre_familia"],
+            "call_timestamp": now,
+            "created_at": now
+        }
+        
+        await db.call_detail_records.insert_one(cdr_record)
     
     # Actualizar edificio
     await db.edificios.update_one(
