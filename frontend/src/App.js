@@ -932,11 +932,11 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
         <Input
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
-          placeholder="972501234567"
+          placeholder="Ej: +1234567890, ext.123, https://wa.me/123456"
           className="h-10 lg:h-11 text-base"
-          type="tel"
+          type="text"
         />
-        <p className="text-xs text-gray-500">Con o sin el signo +</p>
+        <p className="text-xs text-gray-500">Cualquier formato: números, extensiones, URLs, etc.</p>
       </div>
       
       <div className="flex items-center space-x-3 py-2">
