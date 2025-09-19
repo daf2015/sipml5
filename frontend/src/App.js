@@ -12,6 +12,8 @@ import { Badge } from './components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './components/ui/dialog';
 import { Alert, AlertDescription } from './components/ui/alert';
 import { Checkbox } from './components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './components/ui/table';
 import { Toaster } from './components/ui/sonner';
 import { toast } from 'sonner';
 
