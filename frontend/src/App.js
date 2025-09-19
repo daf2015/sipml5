@@ -688,6 +688,90 @@ const CDRPage = () => {
           </div>
         )}
 
+        {/* Resumen por Edificios */}
+        {edificiosSummary.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Building2 className="h-5 w-5" />
+                  <span>Resumen por Edificios</span>
+                </div>
+                <Button
+                  onClick={() => setShowEdificiosSummary(!showEdificiosSummary)}
+                  variant="ghost"
+                  size="sm"
+                >
+                  {showEdificiosSummary ? 'Ocultar' : 'Mostrar'}
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            {showEdificiosSummary && (
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {edificiosSummary.map((edificio, index) => (
+                    <div
+                      key={edificio.edificio_id}
+                      className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => {
+                        setSelectedEdificio(edificio.edificio_id);
+                        applyFilters();
+                      }}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-bold text-blue-600">#{index + 1}</span>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{edificio.edificio_nombre}</h4>
+                            <p className="text-xs text-gray-500">{edificio.admin_email}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-center">
+                        <div className="bg-white rounded-lg p-2">
+                          <p className="text-lg font-bold text-blue-600">{edificio.total_llamadas}</p>
+                          <p className="text-xs text-gray-600">Llamadas</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-2">
+                          <p className="text-lg font-bold text-green-600">{edificio.viviendas_activas}</p>
+                          <p className="text-xs text-gray-600">Viviendas Activas</p>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3 pt-2 border-t border-blue-200">
+                        <div className="flex justify-between text-xs text-gray-600">
+                          <span>Ocupación:</span>
+                          <span className="font-semibold">{edificio.ocupacion_porcentaje}%</span>
+                        </div>
+                        <div className="flex justify-between text-xs text-gray-600 mt-1">
+                          <span>Total Viviendas:</span>
+                          <span>{edificio.total_viviendas}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-2 text-center">
+                        <Badge variant="outline" className="text-xs">
+                          Click para filtrar
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {edificiosSummary.length === 0 && (
+                  <div className="text-center py-8">
+                    <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">No hay edificios con llamadas en el período seleccionado</p>
+                  </div>
+                )}
+              </CardContent>
+            )}
+          </Card>
+        )}
+
         {/* Filtros */}
         <Card className="mb-6">
           <CardHeader>
