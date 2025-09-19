@@ -507,7 +507,10 @@ const EdificioAdminDashboard = () => {
       fetchEdificioData();
       setSelectedVivienda(null);
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al guardar vivienda');
+      const errorMessage = typeof error.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : 'Error al guardar vivienda';
+      toast.error(errorMessage);
     }
   };
 
