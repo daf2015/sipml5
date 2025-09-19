@@ -135,70 +135,99 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "URGENTE: El usuario reporta que puede agregar UNA vivienda pero después aparece 'Error al guardar vivienda' y no puede agregar más. Necesito debugging completo del endpoint POST /api/edificios/my/viviendas con múltiples creaciones consecutivas usando user diego@daf-il.net."
+user_problem_statement: "Realizar QA completo del sistema después de los cambios implementados. Funcionalidades críticas a probar: Login/Autenticación, CRUD de Viviendas, Responsive Design (Desktop/Mobile/Tablet), UI/UX Moderna, Funciones del Sidebar, Manejo de Errores. Límite de viviendas aumentado a 24. Verificar diseño responsive en móvil (2 columnas exactas)."
 
-backend:
-  - task: "Creación múltiple de viviendas consecutivas"
+frontend:
+  - task: "Login y Autenticación"
     implemented: true
-    working: true
-    file: "backend/server.py"
+    working: "NA"
+    file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        - working: true
-          agent: "testing"
-          comment: "ISSUE IDENTIFIED - POST /api/edificios/my/viviendas endpoint working correctly. Multiple consecutive vivienda creations tested successfully (Test 1, Test 2, Test 3 with phones 111111111, 222222222, 333333333). User's issue is NOT a backend bug but a BUSINESS RULE: User diego@daf-il.net has reached the vivienda limit for edificio 'Baitzman 163' (12/12 viviendas). When limit is reached, API correctly returns 400 status with message 'Límite máximo de 12 viviendas para este edificio'. This explains why user can add 'ONE vivienda but then Error al guardar vivienda'."
+        - working: "NA"
+          agent: "main"
+          comment: "Login component implemented with diego@daf-il.net / tangotango credentials. Needs comprehensive testing to verify authentication flow and dashboard loading."
 
-  - task: "Validación de límites de viviendas"
+  - task: "CRUD de Viviendas"
     implemented: true
-    working: true
-    file: "backend/server.py"
+    working: "NA"
+    file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        - working: true
-          agent: "testing"
-          comment: "TESTED SUCCESSFULLY - Vivienda limits properly enforced. Edificio 'Baitzman 163' has cantidad_viviendas=12. When attempting to create vivienda #13, API correctly returns 400 error: 'Límite máximo de 12 viviendas para este edificio'. Limit enforcement working as designed. User needs to either delete existing viviendas or increase the edificio's cantidad_viviendas limit."
+        - working: "NA"
+          agent: "main"
+          comment: "CRUD operations implemented: Create (with auto + prefix for phone), Edit, Delete viviendas. Needs testing with real data like 'QA Family' / '123456789'. Límite aumentado a 24 viviendas."
 
-  - task: "Autenticación de usuario diego@daf-il.net"
+  - task: "Responsive Design"
     implemented: true
-    working: true
-    file: "backend/server.py"
+    working: "NA"
+    file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        - working: true
-          agent: "testing"
-          comment: "TESTED SUCCESSFULLY - Authentication working correctly for user diego@daf-il.net with password tangotango. Returns proper JWT token and user role (edificio_admin). User has access to edificio 'Baitzman 163' with 12 viviendas (at limit)."
+        - working: "NA"
+          agent: "main"
+          comment: "Responsive grid implemented: Desktop (sidebar + grid), Mobile (2 casitas por línea exactas), Tablet (adaptive grid). Modal responsive. Needs verification across all screen sizes."
 
-  - task: "Estado del edificio del usuario"
+  - task: "UI/UX Moderna"
     implemented: true
-    working: true
-    file: "backend/server.py"
+    working: "NA"
+    file: "/app/frontend/src/App.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        - working: true
-          agent: "testing"
-          comment: "TESTED SUCCESSFULLY - GET /api/edificios/my endpoint working correctly. Returns edificio 'Baitzman 163' with cantidad_viviendas=12 and current viviendas count matching the limit. User's edificio is at maximum capacity, which explains the 'Error al guardar vivienda' when trying to add more."
+        - working: "NA"
+          agent: "main"
+          comment: "Modern UI implemented: Títulos 'Vivienda 1', 'Vivienda 2', nombres de familia debajo, colores verde (ocupadas) vs gris (libres), estadísticas Total 24/Ocupadas X. Needs visual verification."
+
+  - task: "Funciones del Sidebar"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Sidebar functions implemented: Copiar Link Público, Ver Página Pública, Eliminar Edificio (with confirmation), Cerrar Sesión. Needs functional testing."
+
+  - task: "Manejo de Errores"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Error handling implemented with toast notifications for success/error messages. Needs verification of clear error messages and success feedback."
 
 metadata:
   created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 1
-  run_ui: false
+  version: "2.0"
+  test_sequence: 2
+  run_ui: true
 
 test_plan:
   current_focus:
-    - "User's vivienda creation issue - RESOLVED"
+    - "Login y Autenticación"
+    - "CRUD de Viviendas"
+    - "Responsive Design"
+    - "UI/UX Moderna"
+    - "Funciones del Sidebar"
+    - "Manejo de Errores"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
     - agent: "testing"
-      message: "🚨 USER ISSUE IDENTIFIED AND RESOLVED - The user's problem 'Error al guardar vivienda' after adding one vivienda is NOT a backend bug. DIAGNOSIS: User diego@daf-il.net has reached the vivienda limit for their edificio 'Baitzman 163' (12/12 viviendas). The backend correctly enforces business rules and returns proper error message 'Límite máximo de 12 viviendas para este edificio' when limit is exceeded. SOLUTION: User needs to either: 1) Delete existing viviendas to make space, or 2) Increase the cantidad_viviendas limit for their edificio. Backend API POST /api/edificios/my/viviendas is working perfectly - tested multiple consecutive creations successfully until hitting the configured limit."
+      message: "🔄 COMPREHENSIVE QA TESTING INITIATED - Starting full system testing after recent changes. Focus areas: 1) Login/Auth with diego@daf-il.net, 2) CRUD operations with real data (QA Family/123456789), 3) Responsive design verification (Desktop/Mobile/Tablet), 4) Modern UI elements verification, 5) Sidebar functionality, 6) Error handling. Límite de viviendas increased to 24. Will test systematically across all device sizes."
