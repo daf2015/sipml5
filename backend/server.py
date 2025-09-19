@@ -199,8 +199,9 @@ class ViviendaCreate(BaseModel):
     @validator('phone')
     def validate_phone(cls, v):
         v = v.strip()
+        # Auto-agregar + si no está presente
         if not v.startswith('+'):
-            raise ValueError('El número de teléfono debe empezar con +')
+            v = '+' + v
         if len(v) < 8 or len(v) > 20:
             raise ValueError('Formato de número telefónico inválido')
         # Validación más estricta para números internacionales
