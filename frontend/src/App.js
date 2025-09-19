@@ -438,7 +438,10 @@ const EdificioAdminDashboard = () => {
       setEditingVivienda(null);
       fetchEdificioData();
     } catch (error) {
-      toast.error('Error al actualizar vivienda');
+      const errorMessage = typeof error.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : 'Error al actualizar vivienda';
+      toast.error(errorMessage);
     }
   };
 
