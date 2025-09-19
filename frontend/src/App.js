@@ -790,27 +790,27 @@ const EdificioAdminDashboard = () => {
                     <div className={`absolute inset-0 opacity-5 ${isOccupied ? 'bg-green-400' : 'bg-gray-300'}`}></div>
                     
                     {/* Ícono de casa moderno */}
-                    <div className="mb-3 relative z-10">
+                    <div className="mb-2 lg:mb-3 relative z-10">
                       <div className={`
-                        w-12 h-12 lg:w-16 lg:h-16 mx-auto rounded-2xl flex items-center justify-center
+                        w-8 h-8 sm:w-10 sm:h-10 lg:w-16 lg:h-16 mx-auto rounded-xl lg:rounded-2xl flex items-center justify-center
                         ${isOccupied 
                           ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-200' 
                           : 'bg-gradient-to-br from-gray-300 to-gray-500 shadow-lg shadow-gray-200'
                         }
                       `}>
-                        <Home className="h-6 w-6 lg:h-8 lg:w-8 text-white" />
+                        <Home className="h-4 w-4 sm:h-5 sm:w-5 lg:h-8 lg:w-8 text-white" />
                       </div>
                     </div>
                     
                     {/* Título "Vivienda X" */}
-                    <div className="text-lg lg:text-xl font-bold text-gray-900 mb-2 relative z-10">
+                    <div className="text-sm sm:text-base lg:text-xl font-bold text-gray-900 mb-1 lg:mb-2 relative z-10">
                       Vivienda {numeroVivienda}
                     </div>
                     
                     {/* Nombre de familia o "Libre" */}
-                    <div className="text-sm lg:text-base relative z-10">
+                    <div className="text-xs sm:text-sm lg:text-base relative z-10">
                       {isOccupied ? (
-                        <div className="font-medium text-gray-700 leading-tight px-2">
+                        <div className="font-medium text-gray-700 leading-tight px-1 lg:px-2">
                           {vivienda.nombre_familia}
                         </div>
                       ) : (
