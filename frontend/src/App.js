@@ -688,7 +688,7 @@ const EdificioAdminDashboard = () => {
     );
   }
 
-  // Dashboard MODERNO MÓVIL
+  // Dashboard EXACTO como imagen
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
       {/* SIDEBAR - Compacto en móvil */}
