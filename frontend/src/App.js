@@ -811,7 +811,10 @@ const EdificioAdminDashboard = () => {
               <div className="flex-1 min-w-0">
                 <h2 
                   className="text-sm lg:text-lg font-bold text-gray-900 truncate cursor-pointer hover:text-blue-600" 
-                  onClick={() => setEditandoNombre(true)}
+                  onClick={() => {
+                    setNuevoNombre(edificioData?.edificio?.nombre || '');
+                    setEditandoNombre(true);
+                  }}
                   title="Haz clic para editar el nombre"
                 >
                   {editandoNombre ? (
