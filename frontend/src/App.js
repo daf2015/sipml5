@@ -960,6 +960,63 @@ const EdificioAdminDashboard = () => {
             </DialogContent>
           </Dialog>
         )}
+
+        {/* Modal para editar cantidad de viviendas */}
+        {showEditCantidad && (
+          <Dialog open={showEditCantidad} onOpenChange={setShowEditCantidad}>
+            <DialogContent className="w-[95vw] max-w-md mx-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center space-x-2 text-lg">
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                  <span>Editar Cantidad de Viviendas</span>
+                </DialogTitle>
+                <DialogDescription className="text-sm">
+                  Cantidad actual: {edificioData?.edificio?.cantidad_viviendas} viviendas
+                  <br />
+                  Viviendas ocupadas: {edificioData?.viviendas?.length || 0}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-gray-700">Nueva cantidad total</Label>
+                  <Input
+                    type="number"
+                    value={nuevaCantidad}
+                    onChange={(e) => setNuevaCantidad(e.target.value)}
+                    placeholder={edificioData?.edificio?.cantidad_viviendas?.toString()}
+                    min="1"
+                    max="50"
+                    className="h-10 lg:h-11 text-base"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Mínimo: {edificioData?.viviendas?.length || 0} (no puedes reducir por debajo de las viviendas ocupadas)
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                  <Button 
+                    onClick={updateCantidadViviendas}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 h-10 lg:h-11"
+                  >
+                    Actualizar Cantidad
+                  </Button>
+                  
+                  <Button 
+                    onClick={() => {
+                      setShowEditCantidad(false);
+                      setNuevaCantidad('');
+                    }}
+                    variant="outline"
+                    className="border-gray-300 h-10 lg:h-11"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   );
