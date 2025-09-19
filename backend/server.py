@@ -1091,7 +1091,18 @@ async def create_indexes():
         await db.viviendas.create_index("edificio_id")
         await db.viviendas.create_index("is_active")
         
-        logger.info("Índices empresariales creados exitosamente")
+        # Índices para CDR
+        await db.call_detail_records.create_index("call_timestamp")
+        await db.call_detail_records.create_index("edificio_id")
+        await db.call_detail_records.create_index([("edificio_id", 1), ("call_timestamp", -1)])
+        
+        # Índice TTL para auto-eliminación después de 3 meses (90 días)
+        await db.call_detail_records.create_index(
+            "call_timestamp", 
+            expireAfterSeconds=90 * 24 * 60 * 60  # 90 días en segundos
+        )
+        
+        logger.info("Índices empresariales y CDR creados exitosamente")
     except Exception as e:
         logger.error(f"Error creando índices: {e}")
 
