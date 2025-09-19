@@ -786,6 +786,152 @@ async def get_edificios_summary(
         "periodo": "filtrado" if fecha_desde and fecha_hasta else "último_mes"
     }
 
+# SISTEMA DE BACKUP Y RESTORE
+@api_router.get("/admin/backup/sistema")
+async def backup_sistema_completo(current_user: User = Depends(get_super_admin)):
+    """
+    Descargar backup completo del sistema (código fuente)
+    """
+    import zipfile
+    import os
+    from fastapi.responses import FileResponse
+    
+    try:
+        # Crear ZIP del sistema completo
+        zip_path = "/tmp/db_sistema_backup.zip"
+        
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # Agregar archivos del sistema
+            for root, dirs, files in os.walk("/app"):
+                # Excluir archivos temporales y logs
+                dirs[:] = [d for d in dirs if d not in ['.git', '__pycache__', 'node_modules', '.ruff_cache']]
+                
+                for file in files:
+                    if not file.endswith(('.pyc', '.log', '.csv', '.zip')):
+                        file_path = os.path.join(root, file)
+                        arc_path = os.path.relpath(file_path, "/app")
+                        zipf.write(file_path, arc_path)
+        
+        return FileResponse(
+            path=zip_path,
+            media_type="application/zip",
+            filename=f"db_sistema_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+        )
+    except Exception as e:
+        logger.error(f"Error creating sistema backup: {e}")
+        raise HTTPException(status_code=500, detail="Error creating sistema backup")
+
+@api_router.get("/admin/backup/clientes")
+async def backup_clientes_data(current_user: User = Depends(get_super_admin)):
+    """
+    Descargar backup completo de datos de clientes
+    """
+    import json
+    import io
+    from fastapi.responses import Response
+    
+    try:
+        # Obtener todos los datos de clientes
+        usuarios = serialize_docs(await db.users.find().to_list(None))
+        edificios = serialize_docs(await db.edificios.find().to_list(None))
+        viviendas = serialize_docs(await db.viviendas.find().to_list(None))
+        cdrs = serialize_docs(await db.call_detail_records.find().to_list(None))
+        
+        # Crear estructura de backup
+        backup_data = {
+            "timestamp": datetime.now().isoformat(),
+            "version": "1.0",
+            "collections": {
+                "users": usuarios,
+                "edificios": edificios,
+                "viviendas": viviendas,
+                "call_detail_records": cdrs
+            },
+            "stats": {
+                "total_users": len(usuarios),
+                "total_edificios": len(edificios),
+                "total_viviendas": len(viviendas),
+                "total_cdrs": len(cdrs)
+            }
+        }
+        
+        # Convertir a JSON
+        json_data = json.dumps(backup_data, indent=2, ensure_ascii=False)
+        
+        return Response(
+            content=json_data,
+            media_type="application/json",
+            headers={
+                "Content-Disposition": f"attachment; filename=db_clientes_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error creating clientes backup: {e}")
+        raise HTTPException(status_code=500, detail="Error creating clientes backup")
+
+@api_router.post("/admin/restore/clientes")
+async def restore_clientes_data(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_super_admin)
+):
+    """
+    Restaurar datos de clientes desde backup JSON
+    """
+    try:
+        # Leer archivo JSON
+        content = await file.read()
+        backup_data = json.loads(content.decode('utf-8'))
+        
+        # Validar estructura
+        if "collections" not in backup_data:
+            raise HTTPException(status_code=400, detail="Formato de backup inválido")
+        
+        collections = backup_data["collections"]
+        
+        # IMPORTANTE: Hacer backup antes de restaurar
+        logger.info("Starting data restoration process")
+        
+        # Limpiar y restaurar cada colección
+        if "users" in collections:
+            await db.users.delete_many({})
+            if collections["users"]:
+                await db.users.insert_many(collections["users"])
+            logger.info(f"Restored {len(collections['users'])} users")
+        
+        if "edificios" in collections:
+            await db.edificios.delete_many({})
+            if collections["edificios"]:
+                await db.edificios.insert_many(collections["edificios"])
+            logger.info(f"Restored {len(collections['edificios'])} edificios")
+        
+        if "viviendas" in collections:
+            await db.viviendas.delete_many({})
+            if collections["viviendas"]:
+                await db.viviendas.insert_many(collections["viviendas"])
+            logger.info(f"Restored {len(collections['viviendas'])} viviendas")
+        
+        if "call_detail_records" in collections:
+            await db.call_detail_records.delete_many({})
+            if collections["call_detail_records"]:
+                await db.call_detail_records.insert_many(collections["call_detail_records"])
+            logger.info(f"Restored {len(collections['call_detail_records'])} CDRs")
+        
+        return {
+            "message": "Datos restaurados exitosamente",
+            "timestamp": datetime.now().isoformat(),
+            "restored": {
+                "users": len(collections.get("users", [])),
+                "edificios": len(collections.get("edificios", [])),
+                "viviendas": len(collections.get("viviendas", [])),
+                "call_detail_records": len(collections.get("call_detail_records", []))
+            }
+        }
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Archivo JSON inválido")
+    except Exception as e:
+        logger.error(f"Error restoring clientes data: {e}")
+        raise HTTPException(status_code=500, detail=f"Error restaurando datos: {str(e)}")
+
 # Actualizar cantidad de viviendas - Super admin
 @api_router.put("/admin/edificios/{edificio_id}/cantidad-viviendas")
 async def update_cantidad_viviendas_admin(
