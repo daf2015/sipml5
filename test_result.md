@@ -16,17 +16,28 @@
 # 
 ## user_problem_statement: "Usuario reporta 'no se elimina el edificio' y 'no deja crear'. Solicitó simplificar UI sin menú. Problemas identificados: faltaba UI para eliminar edificios y crear nuevos cuando ya se tiene uno."
 ## backend:
-##   - task: "Task name"
+##   - task: "Building deletion endpoint"
 ##     implemented: true
-##     working: true  # or false or "NA"
-##     file: "file_path.py"
+##     working: true
+##     file: "/app/backend/server.py"
 ##     stuck_count: 0
-##     priority: "high"  # or "medium" or "low"
+##     priority: "high"
 ##     needs_retesting: false
 ##     status_history:
-##         -working: true  # or false or "NA"
-##         -agent: "main"  # or "testing" or "user"
-##         -comment: "Detailed comment about status"
+##         -working: true
+##         -agent: "testing"
+##         -comment: "DELETE /api/edificios/my/{id} tested and working correctly"
+##   - task: "Building creation endpoint"
+##     implemented: true
+##     working: true
+##     file: "/app/backend/server.py"
+##     stuck_count: 0
+##     priority: "high"
+##     needs_retesting: false
+##     status_history:
+##         -working: true
+##         -agent: "testing"
+##         -comment: "POST /api/edificios/create-my tested and working correctly"
 ##
 ## frontend:
 ##   - task: "Task name"
