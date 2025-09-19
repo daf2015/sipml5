@@ -180,6 +180,17 @@ class Vivienda(BaseModel):
     last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
     # Analytics por vivienda
+    
+# MODELO CDR PARA CALL DETAIL RECORDS
+class CallDetailRecord(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    edificio_id: str
+    edificio_nombre: str
+    vivienda_id: str
+    vivienda_numero: int
+    vivienda_nombre_familia: str
+    call_timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     call_count: int = 0
     last_call: Optional[datetime] = None
 
