@@ -274,25 +274,15 @@ async def get_dashboard(current_user: User = Depends(get_super_admin)):
 
 @api_router.post("/admin/edificios", response_model=Edificio)
 async def create_edificio(edificio_data: EdificioCreate, current_user: User = Depends(get_super_admin)):
-    # Create slug from name
-    base_slug = create_slug_from_name(edificio_data.nombre)
-    slug = base_slug
-    counter = 1
-    
-    # Check for unique slug
-    while await db.edificios.find_one({"slug": slug}):
-        slug = f"{base_slug}-{counter}"
-        counter += 1
-    
-    # Check if admin email already has an edificio
-    existing_admin = await db.users.find_one({"email": edificio_data.admin_email, "role": UserRole.EDIFICIO_ADMIN})
-    if existing_admin and existing_admin.get("edificio_id"):
-        raise HTTPException(status_code=400, detail="El administrador ya tiene un edificio asignado")
+    # Verificar que el slug personalizado no esté ocupado
+    slug_lower = edificio_data.slug_personalizado.lower()
+    existing_edificio = await db.edificios.find_one({"slug": slug_lower})
+    if existing_edificio:
+        raise HTTPException(status_code=400, detail=f"El nombre '{edificio_data.slug_personalizado}' ya está ocupado")
     
     edificio = Edificio(
         nombre=edificio_data.nombre,
-        slug=slug,
-        admin_email=edificio_data.admin_email,
+        slug=slug_lower,
         admin_nombre=edificio_data.admin_nombre,
         cantidad_viviendas=edificio_data.cantidad_viviendas
     )
@@ -301,27 +291,6 @@ async def create_edificio(edificio_data: EdificioCreate, current_user: User = De
     edificio_dict["created_at"] = edificio_dict["created_at"].isoformat()
     
     await db.edificios.insert_one(edificio_dict)
-    
-    # Create or update admin user
-    if existing_admin:
-        await db.users.update_one(
-            {"email": edificio_data.admin_email},
-            {"$set": {"edificio_id": edificio.id}}
-        )
-    else:
-        # Generate random password for new admin
-        temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(8))
-        admin_user = {
-            "id": str(uuid.uuid4()),
-            "email": edificio_data.admin_email,
-            "password": hash_password(temp_password),
-            "role": UserRole.EDIFICIO_ADMIN,
-            "edificio_id": edificio.id,
-            "is_active": True,
-            "created_at": datetime.now(timezone.utc).isoformat()
-        }
-        await db.users.insert_one(admin_user)
-        print(f"Admin de edificio creado: {edificio_data.admin_email} / {temp_password}")
     
     return edificio
 
