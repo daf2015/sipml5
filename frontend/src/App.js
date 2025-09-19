@@ -387,6 +387,15 @@ const SuperAdminDashboard = () => {
                       </div>
                       <div className="flex space-x-2">
                         <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => window.location.href = `/dashboard?edificio=${edificio.id}`}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          <Settings className="h-4 w-4 mr-1" />
+                          Gestionar
+                        </Button>
+                        <Button
                           variant="outline"
                           size="sm"
                           onClick={() => window.open(`/${edificio.slug}`, '_blank')}
