@@ -140,6 +140,78 @@ class IntercomunicadorTester:
             print(f"   Admin Email: {response.get('admin_email')}")
         return success
 
+    def test_create_my_edificio(self):
+        """Test creating edificio as edificio admin - SPECIFIC USER ISSUE"""
+        edificio_data = {
+            "nombre": "Edificio Test",
+            "slug_personalizado": "test-edificio",
+            "admin_nombre": "Diego Test",
+            "cantidad_viviendas": 10
+        }
+        
+        success, response = self.run_test(
+            "Create My Edificio (Admin)",
+            "POST",
+            "edificios/create-my",
+            200,
+            data=edificio_data,
+            token=self.edificio_admin_token
+        )
+        if success:
+            self.edificio_id = response.get('id')
+            self.edificio_slug = response.get('slug')
+            print(f"   Edificio ID: {self.edificio_id}")
+            print(f"   Edificio Slug: {self.edificio_slug}")
+            print(f"   Admin Nombre: {response.get('admin_nombre')}")
+            print(f"   Cantidad Viviendas: {response.get('cantidad_viviendas')}")
+        return success
+
+    def test_check_slug_availability(self):
+        """Test slug availability check - SPECIFIC USER ISSUE"""
+        # Test available slug
+        success1, response1 = self.run_test(
+            "Check Available Slug",
+            "GET",
+            "edificios/check-slug/nuevo-edificio-test",
+            200
+        )
+        if success1:
+            print(f"   Available: {response1.get('available')}")
+            print(f"   Message: {response1.get('message')}")
+        
+        # Test unavailable slug (if we have one)
+        success2, response2 = self.run_test(
+            "Check Unavailable Slug",
+            "GET",
+            "edificios/check-slug/test-edificio",
+            200
+        )
+        if success2:
+            print(f"   Available: {response2.get('available')}")
+            print(f"   Message: {response2.get('message')}")
+            if not response2.get('available'):
+                print(f"   Suggestions: {response2.get('suggestions', [])}")
+        
+        return success1 and success2
+
+    def test_delete_my_edificio(self):
+        """Test deleting my edificio as edificio admin - SPECIFIC USER ISSUE"""
+        if not self.edificio_id:
+            print("❌ No edificio ID available for deletion test")
+            return False
+            
+        success, response = self.run_test(
+            "Delete My Edificio (Admin)",
+            "DELETE",
+            f"edificios/my/{self.edificio_id}",
+            200,
+            token=self.edificio_admin_token
+        )
+        if success:
+            print(f"   Message: {response.get('message')}")
+            print(f"   Viviendas eliminadas: {response.get('viviendas_eliminadas', 0)}")
+        return success
+
     def test_edificio_admin_my_edificio(self):
         """Test edificio admin getting their edificio data"""
         success, response = self.run_test(
