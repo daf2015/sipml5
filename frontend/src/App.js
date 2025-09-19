@@ -661,6 +661,23 @@ const EdificioAdminDashboard = () => {
     }
   };
 
+  const deleteEdificio = async () => {
+    try {
+      // Eliminar el edificio actual del admin
+      if (edificioData?.edificio?.id) {
+        await axios.delete(`${API}/edificios/my/${edificioData.edificio.id}`);
+        toast.success('Edificio eliminado exitosamente');
+        
+        // Logout después de eliminar el edificio
+        setTimeout(() => {
+          logout();
+        }, 1500);
+      }
+    } catch (error) {
+      toast.error('Error al eliminar edificio');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
