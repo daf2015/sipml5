@@ -822,8 +822,9 @@ const EdificioAdminDashboard = () => {
             </div>
           </div>
         </div>
+        </div>
         
-        {/* Modal ESTÉTICO */}
+        {/* Modal MODERNO */}
         {selectedVivienda && (
           <Dialog open={!!selectedVivienda} onOpenChange={() => setSelectedVivienda(null)}>
             <DialogContent className="sm:max-w-md">
