@@ -621,15 +621,24 @@ async def get_call_detail_records(
         
         # Datos CSV
         for cdr in cdrs:
-            timestamp = datetime.fromisoformat(cdr["call_timestamp"].replace('Z', '+00:00'))
-            writer.writerow([
-                timestamp.strftime("%d/%m/%Y"),
-                timestamp.strftime("%H:%M:%S"),
-                cdr["edificio_nombre"],
-                f"Vivienda {cdr['vivienda_numero']}",
-                cdr["vivienda_nombre_familia"],
-                cdr["call_timestamp"]
-            ])
+            try:
+                # Manejar timestamp si es string o datetime
+                if isinstance(cdr["call_timestamp"], str):
+                    timestamp = datetime.fromisoformat(cdr["call_timestamp"].replace('Z', '+00:00'))
+                else:
+                    timestamp = cdr["call_timestamp"]
+                
+                writer.writerow([
+                    timestamp.strftime("%d/%m/%Y"),
+                    timestamp.strftime("%H:%M:%S"),
+                    cdr["edificio_nombre"],
+                    f"Vivienda {cdr['vivienda_numero']}",
+                    cdr["vivienda_nombre_familia"],
+                    str(timestamp)
+                ])
+            except Exception as e:
+                logger.error(f"Error processing CDR record for CSV: {e}")
+                continue
         
         csv_content = output.getvalue()
         output.close()
