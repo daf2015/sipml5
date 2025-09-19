@@ -16,7 +16,7 @@ import { Toaster } from './components/ui/sonner';
 import { toast } from 'sonner';
 
 // Icons
-import { Building2, Users, Phone, Plus, Trash2, Edit, QrCode, LogOut, Home, Copy, ExternalLink } from 'lucide-react';
+import { Building2, Users, Phone, Plus, Trash2, Edit, QrCode, LogOut, Home, Copy, ExternalLink, Settings } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
