@@ -349,6 +349,27 @@ async def get_admin_dashboard(current_user: User = Depends(get_super_admin)):
         "edificios_recientes": edificios_recientes
     }
 
+# Super admin puede obtener datos de cualquier edificio para gestionarlo
+@api_router.get("/admin/edificios/{edificio_id}")
+async def get_edificio_for_admin(edificio_id: str, current_user: User = Depends(get_super_admin)):
+    # Buscar edificio por ID
+    edificio = await db.edificios.find_one({"id": edificio_id})
+    if not edificio:
+        raise HTTPException(status_code=404, detail="Edificio no encontrado")
+    
+    # Obtener viviendas
+    viviendas = serialize_docs(
+        await db.viviendas.find({"edificio_id": edificio_id}).sort("numero", 1).to_list(None)
+    )
+    
+    edificio_serialized = serialize_doc(edificio)
+    
+    return {
+        "edificio": edificio_serialized,
+        "viviendas": viviendas,
+        "url_publica": f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/{edificio['slug']}"
+    }
+
 # Crear edificio desde admin
 @api_router.post("/admin/edificios", response_model=Edificio)
 async def create_edificio_admin(edificio_data: EdificioCreate, current_user: User = Depends(get_super_admin)):
