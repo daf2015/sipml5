@@ -40,17 +40,39 @@
 ##         -comment: "POST /api/edificios/create-my tested and working correctly"
 ##
 ## frontend:
-##   - task: "Task name"
+##   - task: "Add delete building button"
 ##     implemented: true
-##     working: true  # or false or "NA"
-##     file: "file_path.js"
+##     working: true
+##     file: "/app/frontend/src/App.js"
 ##     stuck_count: 0
-##     priority: "high"  # or "medium" or "low"
+##     priority: "high"
 ##     needs_retesting: false
 ##     status_history:
-##         -working: true  # or false or "NA"
-##         -agent: "main"  # or "testing" or "user"
-##         -comment: "Detailed comment about status"
+##         -working: true
+##         -agent: "main"
+##         -comment: "Added delete building button in header, with confirmation dialog"
+##   - task: "Add create new building option"
+##     implemented: true
+##     working: true
+##     file: "/app/frontend/src/App.js"
+##     stuck_count: 0
+##     priority: "high"
+##     needs_retesting: false
+##     status_history:
+##         -working: true
+##         -agent: "main"
+##         -comment: "Added new building button and logic to switch to create form"
+##   - task: "Simplify UI header"
+##     implemented: true
+##     working: true
+##     file: "/app/frontend/src/App.js"
+##     stuck_count: 0
+##     priority: "medium"
+##     needs_retesting: false
+##     status_history:
+##         -working: true
+##         -agent: "main"
+##         -comment: "Simplified header design, removed excessive spacing and buttons"
 ##
 ## metadata:
 ##   created_by: "main_agent"
