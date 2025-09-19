@@ -417,7 +417,10 @@ const EdificioAdminDashboard = () => {
       setPublicarNombre(true);
       fetchEdificioData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al agregar vivienda');
+      const errorMessage = typeof error.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : 'Error al agregar vivienda';
+      toast.error(errorMessage);
     } finally {
       setCreateLoading(false);
     }
