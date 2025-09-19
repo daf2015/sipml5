@@ -489,6 +489,62 @@ async def update_cantidad_viviendas(
     
     return {"message": f"Cantidad de viviendas actualizada a {cantidad}"}
 
+# Actualizar nombre del edificio - Admin de edificio
+@api_router.put("/edificios/my/nombre")
+async def update_nombre_edificio(
+    nuevo_nombre: dict, 
+    current_user: User = Depends(get_edificio_admin_or_super)
+):
+    nombre = nuevo_nombre.get("nombre", "").strip()
+    if not nombre or len(nombre) < 2 or len(nombre) > 100:
+        raise HTTPException(status_code=400, detail="El nombre debe tener entre 2 y 100 caracteres")
+    
+    # Buscar edificio del admin
+    edificios = serialize_docs(
+        await db.edificios.find({"admin_id": current_user.id}).to_list(None)
+    )
+    
+    if not edificios:
+        raise HTTPException(status_code=404, detail="No tienes edificios asignados")
+    
+    edificio = edificios[0]
+    
+    # Actualizar
+    await db.edificios.update_one(
+        {"id": edificio["id"]},
+        {"$set": {"nombre": nombre}}
+    )
+    
+    logger.info(f"Admin {current_user.email} actualizó nombre del edificio a '{nombre}'")
+    
+    return {"message": f"Nombre actualizado a '{nombre}'"}
+
+# Actualizar nombre del edificio - Super admin
+@api_router.put("/admin/edificios/{edificio_id}/nombre")
+async def update_nombre_edificio_admin(
+    edificio_id: str,
+    nuevo_nombre: dict, 
+    current_user: User = Depends(get_super_admin)
+):
+    nombre = nuevo_nombre.get("nombre", "").strip()
+    if not nombre or len(nombre) < 2 or len(nombre) > 100:
+        raise HTTPException(status_code=400, detail="El nombre debe tener entre 2 y 100 caracteres")
+    
+    # Buscar edificio
+    edificio = await db.edificios.find_one({"id": edificio_id})
+    if not edificio:
+        raise HTTPException(status_code=404, detail="Edificio no encontrado")
+    
+    # Actualizar
+    await db.edificios.update_one(
+        {"id": edificio_id},
+        {"$set": {"nombre": nombre}}
+    )
+    
+    logger.info(f"Super admin actualizó nombre del edificio {edificio_id} a '{nombre}'")
+    
+    return {"message": f"Nombre actualizado a '{nombre}'"}
+
 # Actualizar cantidad de viviendas - Super admin
 @api_router.put("/admin/edificios/{edificio_id}/cantidad-viviendas")
 async def update_cantidad_viviendas_admin(
