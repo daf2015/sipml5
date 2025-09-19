@@ -826,9 +826,6 @@ const EdificioAdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
-            </Card>
-          </div>
         </div>
       </main>
     </div>
