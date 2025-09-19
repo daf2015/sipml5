@@ -893,18 +893,12 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
       toast.error('Completa todos los campos');
       return;
     }
-    
-    // Auto-agregar + si no está presente
-    let phoneNumber = telefono.trim();
-    if (!phoneNumber.startsWith('+')) {
-      phoneNumber = '+' + phoneNumber;
-    }
 
     setLoading(true);
     try {
       await onSave(numeroVivienda, {
         nombre_familia: nombre.trim(),
-        phone: phoneNumber,
+        phone: telefono.trim(), // Sin validaciones - acepta cualquier formato
         publicar_nombre: publicar
       });
     } finally {
