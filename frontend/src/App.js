@@ -186,12 +186,16 @@ const SuperAdminDashboard = () => {
     try {
       await axios.post(`${API}/admin/edificios`, {
         nombre: edificioNombre,
-        admin_email: adminEmail
+        admin_email: adminEmail,
+        admin_nombre: adminNombre,
+        cantidad_viviendas: cantidadViviendas
       });
       
       toast.success('Edificio creado exitosamente');
       setEdificioNombre('');
       setAdminEmail('');
+      setAdminNombre('');
+      setCantidadViviendas(5);
       fetchDashboard();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al crear edificio');
