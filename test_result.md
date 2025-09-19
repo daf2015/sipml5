@@ -135,7 +135,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Necesito probar urgentemente los endpoints de creación y eliminación de edificios ya que el usuario reporta que 'no deja crear' y 'no se elimina el edificio'. Específicamente necesito que pruebes: 1. Creación de edificio desde admin - POST /api/edificios/create-my, 2. Eliminación de edificio - DELETE /api/edificios/my/{edificio_id}, 3. Verificación de disponibilidad de slug - GET /api/edificios/check-slug/{slug}, 4. Obtener edificios del admin - GET /api/edificios/my"
+user_problem_statement: "URGENTE: El usuario reporta que puede agregar UNA vivienda pero después aparece 'Error al guardar vivienda' y no puede agregar más. Necesito debugging completo del endpoint POST /api/edificios/my/viviendas con múltiples creaciones consecutivas usando user diego@daf-il.net."
 
 backend:
   - task: "Creación de edificio desde admin"
