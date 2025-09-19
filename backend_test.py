@@ -9,7 +9,7 @@ class IntercomunicadorTester:
     def __init__(self):
         # Use the production URL from frontend/.env
         frontend_env_path = "/app/frontend/.env"
-        backend_url = "https://intercom-edificios.preview.emergentagent.com"
+        backend_url = "https://intercom-edificios-1.preview.emergentagent.com"
         
         if os.path.exists(frontend_env_path):
             with open(frontend_env_path, 'r') as f:

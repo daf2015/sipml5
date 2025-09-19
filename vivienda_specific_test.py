@@ -11,7 +11,7 @@ import requests
 import json
 
 def test_vivienda_endpoints():
-    base_url = "https://intercom-edificios.preview.emergentagent.com"
+    base_url = "https://intercom-edificios-1.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     print("🏠 URGENT VIVIENDA ENDPOINT TESTING")

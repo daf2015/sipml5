@@ -6,7 +6,7 @@ import requests
 import time
 import json
 
-BASE_URL = "https://intercom-edificios.preview.emergentagent.com/api"
+BASE_URL = "https://intercom-edificios-1.preview.emergentagent.com/api"
 
 def test_frontend_flow():
     print("🔍 Testing exact frontend flow...")
