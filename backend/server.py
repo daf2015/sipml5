@@ -634,7 +634,6 @@ async def get_call_detail_records(
         csv_content = output.getvalue()
         output.close()
         
-        from fastapi.responses import Response
         return Response(
             content=csv_content,
             media_type="text/csv",
