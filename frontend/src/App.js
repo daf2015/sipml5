@@ -464,16 +464,18 @@ const CDRPage = () => {
     }
   };
 
-  const fetchCDRData = async (edificioFilter = '', pageNum = 0) => {
+  const fetchCDRData = async (filters = {}, pageNum = 0) => {
     try {
       const params = new URLSearchParams({
         limit: '50',
         offset: (pageNum * 50).toString()
       });
       
-      if (edificioFilter) {
-        params.append('edificio_id', edificioFilter);
-      }
+      if (filters.edificio_id) params.append('edificio_id', filters.edificio_id);
+      if (filters.vivienda_numero) params.append('vivienda_numero', filters.vivienda_numero);
+      if (filters.familia_nombre) params.append('familia_nombre', filters.familia_nombre);
+      if (filters.fecha_desde) params.append('fecha_desde', filters.fecha_desde);
+      if (filters.fecha_hasta) params.append('fecha_hasta', filters.fecha_hasta);
 
       const response = await axios.get(`${API}/admin/cdr?${params}`);
       const data = response.data;
@@ -485,7 +487,9 @@ const CDRPage = () => {
       }
       
       setHasMore(data.has_more);
-      setEdificios(data.edificios_disponibles);
+      setEdificios(data.edificios_disponibles || []);
+      setViviendas(data.viviendas_disponibles || []);
+      setFamilias(data.familias_disponibles || []);
     } catch (error) {
       toast.error('Error al cargar registros CDR');
     }
