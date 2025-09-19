@@ -440,8 +440,6 @@ const EdificioAdminDashboard = () => {
   const [createLoading, setCreateLoading] = useState(false);
   
   const [selectedVivienda, setSelectedVivienda] = useState(null);
-  const [showEditCantidad, setShowEditCantidad] = useState(false);
-  const [nuevaCantidad, setNuevaCantidad] = useState('');
   const { logout } = useAuth();
   const navigate = useNavigate();
 
