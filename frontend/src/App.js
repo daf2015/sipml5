@@ -719,46 +719,44 @@ const EdificioAdminDashboard = () => {
             </div>
           </div>
 
-          {/* Funciones Modernas - RESPONSIVE */}
-          <div className="space-y-3 lg:space-y-4">
+          {/* Funciones MÓVIL COMPACTAS */}
+          <div className="flex lg:flex-col gap-2 lg:gap-3 lg:space-y-0">
             <Button
               onClick={() => {
                 const url = `${window.location.origin}/${edificioData?.edificio?.slug}`;
                 navigator.clipboard.writeText(url);
                 toast.success('Link copiado');
               }}
-              className="w-full justify-start bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg text-sm lg:text-base rounded-xl"
+              className="flex-1 lg:w-full justify-center lg:justify-start bg-blue-600 hover:bg-blue-700 text-white text-xs lg:text-base h-8 lg:h-auto rounded-lg lg:rounded-xl"
             >
-              <Copy className="h-4 w-4 mr-2 lg:mr-3" />
-              <span className="hidden sm:inline">Copiar Link Público</span>
-              <span className="sm:hidden">Copiar Link</span>
+              <Copy className="h-3 w-3 lg:h-4 lg:w-4 mr-0 lg:mr-3" />
+              <span className="hidden lg:inline">Copiar Link Público</span>
             </Button>
             
             <Button
               onClick={() => window.open(`/${edificioData?.edificio?.slug}`, '_blank')}
               variant="outline"
-              className="w-full justify-start text-sm lg:text-base border-2 border-blue-200 hover:bg-blue-50 rounded-xl"
+              className="flex-1 lg:w-full justify-center lg:justify-start text-xs lg:text-base h-8 lg:h-auto rounded-lg lg:rounded-xl"
             >
-              <ExternalLink className="h-4 w-4 mr-2 lg:mr-3" />
-              <span className="hidden sm:inline">Ver Página Pública</span>
-              <span className="sm:hidden">Ver Público</span>
+              <ExternalLink className="h-3 w-3 lg:h-4 lg:w-4 mr-0 lg:mr-3" />
+              <span className="hidden lg:inline">Ver Página Pública</span>
             </Button>
             
             <Button
               onClick={deleteEdificio}
-              className="w-full justify-start text-sm lg:text-base bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white rounded-xl shadow-lg"
+              className="flex-1 lg:w-full justify-center lg:justify-start bg-red-600 hover:bg-red-700 text-white text-xs lg:text-base h-8 lg:h-auto rounded-lg lg:rounded-xl"
             >
-              <Trash2 className="h-4 w-4 mr-2 lg:mr-3" />
-              Eliminar Edificio
+              <Trash2 className="h-3 w-3 lg:h-4 lg:w-4 mr-0 lg:mr-3" />
+              <span className="hidden lg:inline">Eliminar Edificio</span>
             </Button>
             
-            <div className="pt-4 lg:pt-6 border-t border-gray-200">
+            <div className="hidden lg:block pt-4 border-t border-gray-200 w-full">
               <Button
                 onClick={logout}
                 variant="ghost"
                 className="w-full justify-start text-gray-600 hover:text-gray-800 hover:bg-gray-100 text-sm lg:text-base rounded-xl"
               >
-                <LogOut className="h-4 w-4 mr-2 lg:mr-3" />
+                <LogOut className="h-4 w-4 mr-3" />
                 Cerrar Sesión
               </Button>
             </div>
