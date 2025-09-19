@@ -605,11 +605,88 @@ const EdificioAdminDashboard = () => {
           <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Viviendas</CardTitle>
-                <CardDescription>Gestiona las viviendas de tu edificio (ordenadas por número)</CardDescription>
+                <CardTitle>Viviendas ({edificioData?.viviendas?.length || 0}/{edificioData?.edificio?.cantidad_viviendas || 20})</CardTitle>
+                <CardDescription>Gestiona las viviendas de tu edificio</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                {/* Vista Gráfica de Viviendas */}
+                <div className="mb-6">
+                  <h4 className="font-medium mb-3">Vista Gráfica del Edificio</h4>
+                  <div className="grid grid-cols-5 gap-3">
+                    {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 20}, (_, index) => {
+                      const numeroVivienda = index + 1;
+                      const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
+                      const isOccupied = !!vivienda;
+                      
+                      return (
+                        <div
+                          key={numeroVivienda}
+                          className={`
+                            relative p-4 border-2 rounded-lg cursor-pointer transition-all
+                            ${isOccupied 
+                              ? 'bg-green-100 border-green-300 hover:bg-green-200' 
+                              : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
+                            }
+                          `}
+                          onClick={() => {
+                            if (vivienda) {
+                              setEditingVivienda(vivienda);
+                            } else {
+                              // Auto-llenar formulario con este número
+                              setNombreFamilia('');
+                              setPhone('');
+                              setPublicarNombre(true);
+                            }
+                          }}
+                        >
+                          <div className="text-center">
+                            <div className={`
+                              w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold
+                              ${isOccupied ? 'bg-green-500 text-white' : 'bg-gray-400 text-white'}
+                            `}>
+                              {numeroVivienda}
+                            </div>
+                            <div className="text-xs">
+                              {isOccupied ? (
+                                <div>
+                                  <div className="font-medium truncate" title={vivienda.nombre_familia}>
+                                    {vivienda.nombre_familia}
+                                  </div>
+                                  <Badge variant={vivienda.publicar_nombre ? "default" : "secondary"} className="text-xs mt-1">
+                                    {vivienda.publicar_nombre ? 'Público' : 'Privado'}
+                                  </Badge>
+                                </div>
+                              ) : (
+                                <span className="text-gray-500">Vacía</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {isOccupied && (
+                            <div className="absolute top-1 right-1">
+                              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-3 flex items-center space-x-4 text-sm">
+                    <div className="flex items-center space-x-1">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span>Ocupada</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                      <span>Vacía</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lista Detallada */}
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-3">Lista Detallada</h4>
+                  <div className="space-y-3">
                   {edificioData?.viviendas?.map((vivienda) => (
                     <div key={vivienda.id} className="flex items-center justify-between p-4 border rounded-lg">
                       {editingVivienda?.id === vivienda.id ? (
