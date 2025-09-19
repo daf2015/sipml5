@@ -697,15 +697,15 @@ const EdificioAdminDashboard = () => {
               </div>
             </div>
             
-            {/* Estadísticas Compactas - RESPONSIVE */}
-            <div className="grid grid-cols-2 gap-2 lg:gap-3 mb-4 lg:mb-6">
-              <div className="bg-blue-50 p-2 lg:p-3 rounded-lg text-center">
-                <p className="text-xl lg:text-2xl font-bold text-blue-600">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
-                <p className="text-xs text-gray-600">Total</p>
+            {/* Estadísticas Modernas - RESPONSIVE */}
+            <div className="grid grid-cols-2 gap-3 lg:gap-4 mb-4 lg:mb-6">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 lg:p-4 rounded-2xl text-center shadow-sm border border-blue-200/50">
+                <p className="text-xl lg:text-2xl font-bold text-blue-700">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
+                <p className="text-xs text-blue-600 font-medium">Total</p>
               </div>
-              <div className="bg-green-50 p-2 lg:p-3 rounded-lg text-center">
-                <p className="text-xl lg:text-2xl font-bold text-green-600">{edificioData?.viviendas?.length || 0}</p>
-                <p className="text-xs text-gray-600">Ocupadas</p>
+              <div className="bg-gradient-to-br from-green-50 to-green-100 p-3 lg:p-4 rounded-2xl text-center shadow-sm border border-green-200/50">
+                <p className="text-xl lg:text-2xl font-bold text-green-700">{edificioData?.viviendas?.length || 0}</p>
+                <p className="text-xs text-green-600 font-medium">Ocupadas</p>
               </div>
             </div>
           </div>
