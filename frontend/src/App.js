@@ -169,6 +169,7 @@ const SuperAdminDashboard = () => {
   const [cantidadViviendas, setCantidadViviendas] = useState(20);
   const [createLoading, setCreateLoading] = useState(false);
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboard();
