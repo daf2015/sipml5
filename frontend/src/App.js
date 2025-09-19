@@ -312,10 +312,7 @@ const SuperAdminDashboard = () => {
                   <p className="text-sm font-medium text-gray-600">Llamadas</p>
                   <p className="text-3xl font-bold text-gray-900">{dashboard?.total_llamadas || 0}</p>
                   <button 
-                    onClick={() => {
-                      fetchDetallesLlamadas();
-                      setShowDetallesLlamadas(true);
-                    }}
+                    onClick={() => navigate('/admin/cdr')}
                     className="mt-1 text-xs text-blue-600 hover:text-blue-800 underline"
                   >
                     Detalles
