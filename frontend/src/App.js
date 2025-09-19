@@ -770,7 +770,6 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/:slug" element={<PublicEdificio />} />
             
             <Route 
               path="/admin" 
@@ -798,6 +797,8 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            
+            <Route path="/:slug" element={<PublicEdificio />} />
           </Routes>
           <Toaster />
         </div>
