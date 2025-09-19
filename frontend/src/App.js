@@ -173,7 +173,6 @@ const SuperAdminDashboard = () => {
   // Modal states removed - now using CDR page
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboard();
