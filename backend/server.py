@@ -556,37 +556,77 @@ async def update_nombre_edificio_admin(
     
     return {"message": f"Nombre actualizado a '{nombre}'"}
 
-# Obtener detalles de llamadas para super admin
-@api_router.get("/admin/detalles-llamadas")
-async def get_detalles_llamadas(current_user: User = Depends(get_super_admin)):
-    # Obtener todos los edificios con sus estadísticas
-    edificios = serialize_docs(
-        await db.edificios.find({}).sort("total_calls", -1).to_list(None)
+# Sistema CDR - Call Detail Records
+@api_router.get("/admin/cdr")
+async def get_call_detail_records(
+    edificio_id: Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
+    current_user: User = Depends(get_super_admin)
+):
+    """
+    Obtener registros detallados de llamadas (CDR)
+    Filtros: edificio_id, paginación
+    Por defecto: último mes, máximo 3 meses de retención
+    """
+    # Filtro de fecha - último mes por defecto
+    one_month_ago = datetime.now(timezone.utc) - timedelta(days=30)
+    
+    # Query de filtros
+    query = {"call_timestamp": {"$gte": one_month_ago}}
+    if edificio_id:
+        query["edificio_id"] = edificio_id
+    
+    # Obtener CDRs con paginación
+    cdrs = serialize_docs(
+        await db.call_detail_records.find(query)
+        .sort("call_timestamp", -1)
+        .skip(offset)
+        .limit(limit)
+        .to_list(length=None)
     )
     
-    # Calcular totales
-    total_llamadas = sum(e.get("total_calls", 0) for e in edificios)
-    total_edificios = len(edificios)
+    # Estadísticas
+    total_records = await db.call_detail_records.count_documents(query)
     
-    # Obtener ranking de edificios por uso
-    ranking_edificios = []
-    for edificio in edificios:
-        viviendas_count = await db.viviendas.count_documents({"edificio_id": edificio["id"]})
-        ranking_edificios.append({
-            "nombre": edificio["nombre"],
-            "slug": edificio["slug"],
-            "total_calls": edificio.get("total_calls", 0),
-            "monthly_calls": edificio.get("monthly_calls", 0),
-            "total_viviendas": edificio.get("cantidad_viviendas", 0),
-            "viviendas_ocupadas": viviendas_count,
-            "admin_email": edificio.get("admin_email", ""),
-            "created_at": edificio.get("created_at", "")
-        })
+    # Obtener lista de edificios para filtros
+    edificios = serialize_docs(
+        await db.edificios.find({}, {"id": 1, "nombre": 1}).to_list(None)
+    )
     
     return {
-        "total_llamadas": total_llamadas,
-        "total_edificios": total_edificios,
-        "ranking_edificios": ranking_edificios
+        "cdrs": cdrs,
+        "total_records": total_records,
+        "has_more": (offset + limit) < total_records,
+        "edificios_disponibles": edificios,
+        "periodo": "último_mes"
+    }
+
+@api_router.get("/admin/cdr/stats")
+async def get_cdr_statistics(current_user: User = Depends(get_super_admin)):
+    """
+    Estadísticas generales del CDR para el dashboard
+    """
+    one_month_ago = datetime.now(timezone.utc) - timedelta(days=30)
+    
+    # Totales del último mes
+    total_calls_month = await db.call_detail_records.count_documents({
+        "call_timestamp": {"$gte": one_month_ago}
+    })
+    
+    # Total histórico (últimos 3 meses)
+    three_months_ago = datetime.now(timezone.utc) - timedelta(days=90)
+    total_calls_historic = await db.call_detail_records.count_documents({
+        "call_timestamp": {"$gte": three_months_ago}
+    })
+    
+    # Edificios activos
+    edificios_activos = await db.edificios.count_documents({"is_active": True})
+    
+    return {
+        "total_llamadas_mes": total_calls_month,
+        "total_llamadas_historico": total_calls_historic,
+        "edificios_activos": edificios_activos
     }
 
 # Actualizar cantidad de viviendas - Super admin
