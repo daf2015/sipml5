@@ -915,13 +915,12 @@ const EdificioAdminDashboard = () => {
           </CardContent>
         </Card>
         
-        {/* Modal para editar vivienda */}
+        {/* Modal para editar vivienda - DISEÑO SEGÚN REFERENCIA */}
         {selectedVivienda && (
           <Dialog open={!!selectedVivienda} onOpenChange={() => setSelectedVivienda(null)}>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle className="flex items-center">
-                  <Home className="mr-2 h-5 w-5" />
+                <DialogTitle className="text-lg font-semibold">
                   Vivienda #{selectedVivienda}
                 </DialogTitle>
                 <DialogDescription>
@@ -931,8 +930,18 @@ const EdificioAdminDashboard = () => {
               <ViviendaEditForm 
                 numeroVivienda={selectedVivienda}
                 vivienda={edificioData?.viviendas?.find(v => v.numero === selectedVivienda)}
-                onSave={(data) => updateViviendaData(selectedVivienda, data)}
-                onDelete={(viviendaId) => deleteVivienda(viviendaId)}
+                onSave={async (data) => {
+                  try {
+                    await updateViviendaData(selectedVivienda, data);
+                    setSelectedVivienda(null);
+                  } catch (error) {
+                    // El error ya se maneja en updateViviendaData
+                  }
+                }}
+                onDelete={(viviendaId) => {
+                  deleteVivienda(viviendaId);
+                  setSelectedVivienda(null);
+                }}
                 onCancel={() => setSelectedVivienda(null)}
               />
             </DialogContent>
