@@ -3,16 +3,29 @@ import sys
 import json
 from datetime import datetime
 import time
+import os
 
 class IntercomunicadorTester:
-    def __init__(self, base_url="http://localhost:8001"):
-        self.base_url = base_url
-        self.api_url = f"{base_url}/api"
+    def __init__(self):
+        # Use the production URL from frontend/.env
+        frontend_env_path = "/app/frontend/.env"
+        backend_url = "https://intercom-edificios.preview.emergentagent.com"
+        
+        if os.path.exists(frontend_env_path):
+            with open(frontend_env_path, 'r') as f:
+                for line in f:
+                    if line.startswith('REACT_APP_BACKEND_URL='):
+                        backend_url = line.split('=', 1)[1].strip()
+                        break
+        
+        self.base_url = backend_url
+        self.api_url = f"{backend_url}/api"
         self.super_admin_token = None
         self.edificio_admin_token = None
         self.edificio_id = None
         self.edificio_slug = None
         self.vivienda_id = None
+        self.baitzman_edificio_id = None
         self.tests_run = 0
         self.tests_passed = 0
 
