@@ -531,6 +531,8 @@ const CDRPage = () => {
   const applyFilters = () => {
     setPage(0);
     fetchCDRData(getCurrentFilters(), 0);
+    // También actualizar resumen de edificios con los mismos filtros de fecha
+    fetchEdificiosSummary(fechaDesde, fechaHasta);
   };
 
   const clearFilters = () => {
