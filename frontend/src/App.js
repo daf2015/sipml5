@@ -685,26 +685,26 @@ const EdificioAdminDashboard = () => {
       {/* SIDEBAR IZQUIERDO - Datos del Admin + Funciones - RESPONSIVE */}
       <div className="w-full lg:w-80 bg-white shadow-lg border-b lg:border-r lg:border-b-0">
         <div className="p-4 lg:p-6">
-          {/* Info del Admin */}
-          <div className="mb-8">
+          {/* Info del Admin - RESPONSIVE */}
+          <div className="mb-6 lg:mb-8">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Building2 className="h-6 w-6 text-white" />
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                <Building2 className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
               </div>
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">{edificioData?.edificio?.nombre}</h2>
-                <p className="text-sm text-gray-500">{edificioData?.edificio?.admin_nombre}</p>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-base lg:text-lg font-semibold text-gray-900 truncate">{edificioData?.edificio?.nombre}</h2>
+                <p className="text-xs lg:text-sm text-gray-500 truncate">{edificioData?.edificio?.admin_nombre}</p>
               </div>
             </div>
             
-            {/* Estadísticas Compactas */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="bg-blue-50 p-3 rounded-lg text-center">
-                <p className="text-2xl font-bold text-blue-600">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
+            {/* Estadísticas Compactas - RESPONSIVE */}
+            <div className="grid grid-cols-2 gap-2 lg:gap-3 mb-4 lg:mb-6">
+              <div className="bg-blue-50 p-2 lg:p-3 rounded-lg text-center">
+                <p className="text-xl lg:text-2xl font-bold text-blue-600">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
                 <p className="text-xs text-gray-600">Total</p>
               </div>
-              <div className="bg-green-50 p-3 rounded-lg text-center">
-                <p className="text-2xl font-bold text-green-600">{edificioData?.viviendas?.length || 0}</p>
+              <div className="bg-green-50 p-2 lg:p-3 rounded-lg text-center">
+                <p className="text-xl lg:text-2xl font-bold text-green-600">{edificioData?.viviendas?.length || 0}</p>
                 <p className="text-xs text-gray-600">Ocupadas</p>
               </div>
             </div>
