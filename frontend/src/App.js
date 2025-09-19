@@ -410,6 +410,106 @@ const SuperAdminDashboard = () => {
   );
 };
 
+// Componente para editar vivienda
+const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel }) => {
+  const [nombre, setNombre] = useState(vivienda?.nombre_familia || '');
+  const [telefono, setTelefono] = useState(vivienda?.phone || '');
+  const [publicar, setPublicar] = useState(vivienda?.publicar_nombre ?? true);
+  const [loading, setLoading] = useState(false);
+
+  const handleSave = async () => {
+    if (!nombre.trim() || !telefono.trim()) {
+      toast.error('Completa todos los campos');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await onSave({
+        nombre_familia: nombre,
+        phone: telefono,
+        publicar_nombre: publicar
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!vivienda) return;
+    
+    if (window.confirm('¿Estás seguro de eliminar esta vivienda?')) {
+      await onDelete(vivienda.id);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="nombre">Nombre de la familia</Label>
+        <Input
+          id="nombre"
+          value={nombre}
+          onChange={(e) => setNombre(e.target.value)}
+          placeholder="Familia García"
+          className="h-12"
+        />
+      </div>
+      
+      <div>
+        <Label htmlFor="telefono">Número de teléfono</Label>
+        <Input
+          id="telefono"
+          value={telefono}
+          onChange={(e) => setTelefono(e.target.value)}
+          placeholder="+972501234567"
+          className="h-12"
+        />
+      </div>
+      
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="publicar"
+          checked={publicar}
+          onCheckedChange={setPublicar}
+        />
+        <Label htmlFor="publicar">Publicar nombre en el intercomunicador</Label>
+      </div>
+      <p className="text-xs text-gray-500">
+        Si no publicas el nombre, aparecerá como "Residente" en la vista pública
+      </p>
+      
+      <div className="flex space-x-2 pt-4">
+        <Button 
+          onClick={handleSave} 
+          disabled={loading}
+          className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+        >
+          {loading ? 'Guardando...' : 'Guardar'}
+        </Button>
+        
+        {vivienda && (
+          <Button 
+            onClick={handleDelete}
+            variant="destructive"
+            className="px-4"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
+        
+        <Button 
+          onClick={onCancel}
+          variant="outline"
+          className="px-4"
+        >
+          Cancelar
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 // Edificio Admin Dashboard - NUEVA VERSIÓN MODERNA
 const EdificioAdminDashboard = () => {
   const [edificioData, setEdificioData] = useState(null);
