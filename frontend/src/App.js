@@ -853,7 +853,7 @@ const EdificioAdminDashboard = () => {
               <DialogHeader>
                 <DialogTitle className="flex items-center space-x-2 text-lg">
                   <Home className="h-5 w-5 text-blue-600" />
-                  <span>Vivienda #{selectedVivienda}</span>
+                  <span>Vivienda {selectedVivienda}</span>
                 </DialogTitle>
                 <DialogDescription className="text-sm">
                   {edificioData?.viviendas?.find(v => v.numero === selectedVivienda) 
