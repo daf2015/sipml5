@@ -466,6 +466,19 @@ const CDRPage = () => {
     }
   };
 
+  const fetchEdificiosSummary = async (fechaDesdeParam = '', fechaHastaParam = '') => {
+    try {
+      const params = new URLSearchParams();
+      if (fechaDesdeParam) params.append('fecha_desde', fechaDesdeParam);
+      if (fechaHastaParam) params.append('fecha_hasta', fechaHastaParam);
+      
+      const response = await axios.get(`${API}/admin/cdr/edificios-summary?${params}`);
+      setEdificiosSummary(response.data.edificios_summary || []);
+    } catch (error) {
+      toast.error('Error al cargar resumen de edificios');
+    }
+  };
+
   const fetchCDRData = async (filters = {}, pageNum = 0) => {
     try {
       const params = new URLSearchParams({
