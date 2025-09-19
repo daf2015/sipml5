@@ -771,9 +771,9 @@ const EdificioAdminDashboard = () => {
           <p className="text-sm lg:text-base text-gray-500">Toca cualquier vivienda para editarla</p>
         </div>
 
-        {/* Grid de Viviendas EXACTO COMO LA REFERENCIA */}
-        <div className="bg-transparent p-4 lg:p-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-6 lg:gap-8">
+        {/* Grid EXACTO como la imagen de referencia */}
+        <div className="bg-gray-100 p-6">
+          <div className="grid grid-cols-2 gap-8">
             {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 12}, (_, index) => {
               const numeroVivienda = index + 1;
               const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
@@ -782,49 +782,49 @@ const EdificioAdminDashboard = () => {
               return (
                 <div
                   key={numeroVivienda}
-                  className="relative cursor-pointer group transform transition-all duration-200 active:scale-95"
+                  className="relative cursor-pointer transform transition-all duration-200 active:scale-95"
                   onClick={() => setSelectedVivienda(numeroVivienda)}
                 >
-                  <div className="text-center py-4">
+                  <div className="text-center">
                     
-                    {/* Ícono casa SÚPER GIGANTE exacto como referencia */}
-                    <div className="mb-3 relative">
+                    {/* Ícono GIGANTE EXACTO como imagen */}
+                    <div className="mb-4 relative">
                       <div className={`
-                        w-20 h-20 mx-auto rounded-2xl flex items-center justify-center
+                        w-32 h-32 mx-auto rounded-3xl flex items-center justify-center shadow-lg
                         ${isOccupied 
                           ? 'bg-green-500' 
-                          : 'bg-gray-300'
+                          : 'bg-gray-400'
                         }
                       `}>
-                        <Home className="h-10 w-10 text-white" />
+                        <Home className="h-16 w-16 text-white" />
                       </div>
                       
-                      {/* Punto verde arriba derecha */}
+                      {/* Punto verde EXACTO posición */}
                       {isOccupied && (
-                        <div className="absolute -top-1 -right-1 z-10">
-                          <div className="w-4 h-4 bg-green-400 rounded-full"></div>
+                        <div className="absolute top-2 right-2">
+                          <div className="w-6 h-6 bg-green-300 rounded-full"></div>
                         </div>
                       )}
                     </div>
                     
-                    {/* "Vivienda" */}
-                    <div className="text-sm font-semibold text-gray-800 mb-1">
+                    {/* "Vivienda" EXACTO como imagen */}
+                    <div className="text-2xl font-bold text-gray-900 mb-2">
                       Vivienda
                     </div>
                     
-                    {/* Número GIGANTE */}
-                    <div className="text-3xl font-bold text-gray-900 mb-2">
+                    {/* Número GIGANTE EXACTO */}
+                    <div className="text-6xl font-bold text-gray-900 mb-4">
                       {numeroVivienda}
                     </div>
                     
-                    {/* Nombre familia pequeño */}
-                    <div className="text-xs px-1">
+                    {/* Nombre EXACTO */}
+                    <div className="text-lg text-gray-700">
                       {isOccupied ? (
-                        <div className="font-medium text-gray-600 leading-tight">
+                        <div className="font-medium">
                           {vivienda.nombre_familia}
                         </div>
                       ) : (
-                        <div className="text-gray-400">Libre</div>
+                        <div className="text-gray-500">Libre</div>
                       )}
                     </div>
                   </div>
