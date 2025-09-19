@@ -438,13 +438,26 @@ const EdificioAdminDashboard = () => {
   const [selectedVivienda, setSelectedVivienda] = useState(null);
   const { logout } = useAuth();
 
+  // Detectar si es super admin gestionando un edificio específico
+  const urlParams = new URLSearchParams(window.location.search);
+  const edificioIdFromUrl = urlParams.get('edificio');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isSuperAdminManaging = user.role === 'super_admin' && edificioIdFromUrl;
+
   useEffect(() => {
     fetchEdificioData();
   }, []);
 
   const fetchEdificioData = async () => {
     try {
-      const response = await axios.get(`${API}/edificios/my`);
+      let response;
+      if (isSuperAdminManaging) {
+        // Super admin gestionando edificio específico
+        response = await axios.get(`${API}/admin/edificios/${edificioIdFromUrl}`);
+      } else {
+        // Admin normal
+        response = await axios.get(`${API}/edificios/my`);
+      }
       setEdificioData(response.data);
       setShowCreateForm(false);
     } catch (error) {
