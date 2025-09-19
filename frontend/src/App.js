@@ -438,6 +438,76 @@ const SuperAdminDashboard = () => {
             </Card>
           </div>
         </div>
+        {/* Modal de Detalles de Llamadas */}
+        {showDetallesLlamadas && (
+          <Dialog open={showDetallesLlamadas} onOpenChange={setShowDetallesLlamadas}>
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center space-x-2">
+                  <Phone className="h-5 w-5 text-blue-600" />
+                  <span>Detalles de Llamadas - Control de Uso</span>
+                </DialogTitle>
+                <DialogDescription>
+                  Métricas y ranking de edificios por utilización del sistema
+                </DialogDescription>
+              </DialogHeader>
+
+              {detallesLlamadas ? (
+                <div className="space-y-6">
+                  {/* Resumen general */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-blue-50 p-4 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-blue-600">{detallesLlamadas.total_llamadas}</p>
+                      <p className="text-sm text-gray-600">Total Llamadas</p>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-lg text-center">
+                      <p className="text-2xl font-bold text-green-600">{detallesLlamadas.total_edificios}</p>
+                      <p className="text-sm text-gray-600">Edificios Activos</p>
+                    </div>
+                  </div>
+
+                  {/* Ranking de edificios */}
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">Ranking por Utilización</h3>
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {detallesLlamadas.ranking_edificios?.map((edificio, index) => (
+                        <div key={edificio.slug} className="bg-white border rounded-lg p-4 flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                              <span className="text-sm font-bold text-blue-600">#{index + 1}</span>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-gray-900">{edificio.nombre}</h4>
+                              <p className="text-xs text-gray-500">{edificio.admin_email}</p>
+                            </div>
+                          </div>
+                          <div className="flex space-x-6 text-center">
+                            <div>
+                              <p className="text-lg font-bold text-blue-600">{edificio.total_calls}</p>
+                              <p className="text-xs text-gray-500">Total</p>
+                            </div>
+                            <div>
+                              <p className="text-lg font-bold text-green-600">{edificio.monthly_calls}</p>
+                              <p className="text-xs text-gray-500">Este Mes</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-700">{edificio.viviendas_ocupadas}/{edificio.total_viviendas}</p>
+                              <p className="text-xs text-gray-500">Ocupación</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        )}
       </main>
     </div>
   );
