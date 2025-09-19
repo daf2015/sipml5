@@ -688,12 +688,12 @@ const EdificioAdminDashboard = () => {
           {/* Info del Admin - RESPONSIVE */}
           <div className="mb-6 lg:mb-8">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
                 <Building2 className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-base lg:text-lg font-semibold text-gray-900 truncate">{edificioData?.edificio?.nombre}</h2>
-                <p className="text-xs lg:text-sm text-gray-500 truncate">{edificioData?.edificio?.admin_nombre}</p>
+                <h2 className="text-base lg:text-lg font-bold text-gray-900 truncate">{edificioData?.edificio?.nombre}</h2>
+                <p className="text-xs lg:text-sm text-gray-600 truncate">{edificioData?.edificio?.admin_nombre}</p>
               </div>
             </div>
             
