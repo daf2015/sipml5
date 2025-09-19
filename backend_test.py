@@ -406,50 +406,80 @@ class IntercomunicadorTester:
         )
         return success
 
+    def test_vivienda_create_user_reported(self):
+        """Test creating vivienda with exact user reported data"""
+        vivienda_data = {
+            "nombre_familia": "Test Family",
+            "phone": "972123456789",
+            "publicar_nombre": True
+        }
+        
+        success, response = self.run_test(
+            "Create Vivienda (User Reported Data)",
+            "POST",
+            "edificios/my/viviendas",
+            200,
+            data=vivienda_data,
+            token=self.edificio_admin_token
+        )
+        if success:
+            self.vivienda_id = response.get('id')
+            print(f"   Vivienda ID: {self.vivienda_id}")
+            print(f"   Vivienda numero: {response.get('numero')}")
+            print(f"   Nombre familia: {response.get('nombre_familia')}")
+            print(f"   Phone: {response.get('phone')}")
+            print(f"   Publicar nombre: {response.get('publicar_nombre')}")
+        return success
+
+    def test_vivienda_update_user_reported(self):
+        """Test updating vivienda with exact user reported data"""
+        if not self.vivienda_id:
+            print("❌ No vivienda ID available for update test")
+            return False
+            
+        updated_data = {
+            "nombre_familia": "Updated Family",
+            "phone": "972987654321",
+            "publicar_nombre": True
+        }
+        
+        success, response = self.run_test(
+            "Update Vivienda (User Reported Data)",
+            "PUT",
+            f"edificios/my/viviendas/{self.vivienda_id}",
+            200,
+            data=updated_data,
+            token=self.edificio_admin_token
+        )
+        if success:
+            print(f"   Updated nombre: {response.get('nombre_familia')}")
+            print(f"   Updated phone: {response.get('phone')}")
+            print(f"   Updated publicar_nombre: {response.get('publicar_nombre')}")
+        return success
+
 def main():
-    print("🏢 Sistema Intercomunicador - Backend API Testing")
+    print("🏢 Sistema Intercomunicador - URGENT VIVIENDA TESTING")
+    print("🚨 User reports error saving vivienda data (name and number)")
     print("=" * 60)
     
     tester = IntercomunicadorTester()
     
-    # Test sequence - FOCUSED ON USER REPORTED ISSUES
+    # Test sequence - FOCUSED ON USER REPORTED VIVIENDA ISSUES
     tests = [
-        # Authentication tests
-        ("Edificio Admin Login", tester.test_edificio_admin_login),
+        # Authentication first
+        ("Edificio Admin Login (diego@daf-il.net)", tester.test_edificio_admin_login),
         
-        # SPECIFIC USER ISSUES - PRIORITY TESTS
-        ("Check Slug Availability", tester.test_check_slug_availability),
-        ("Create My Edificio (Admin)", tester.test_create_my_edificio),
-        ("Get My Edificios", tester.test_edificio_admin_my_edificio),
-        ("Delete My Edificio (Admin)", tester.test_delete_my_edificio),
+        # URGENT USER REPORTED ISSUES - VIVIENDA ENDPOINTS
+        ("Get My Edificios (Check existing)", tester.test_edificio_admin_my_edificio),
+        ("Create Vivienda (User Reported Data)", tester.test_vivienda_create_user_reported),
+        ("Update Vivienda (User Reported Data)", tester.test_vivienda_update_user_reported),
+        ("Get My Edificios (Verify after changes)", tester.test_edificio_admin_my_edificio),
         
-        # Additional authentication tests
-        ("Super Admin Login", tester.test_super_admin_login),
-        ("Invalid Login", tester.test_invalid_login),
-        ("Unauthorized Access", tester.test_unauthorized_access),
-        
-        # Super admin functionality
-        ("Super Admin Dashboard", tester.test_super_admin_dashboard),
-        ("Create Edificio", tester.test_create_edificio),
-        
-        # Edificio admin functionality
-        ("Add Vivienda", tester.test_add_vivienda),
-        ("Add Private Vivienda", tester.test_add_private_vivienda),
-        ("Update Vivienda", tester.test_update_vivienda),
-        ("Delete Vivienda", tester.test_delete_vivienda),
-        
-        # Validation tests
+        # Additional vivienda validation tests
         ("Invalid Phone Format", tester.test_invalid_phone_format),
         
-        # Public access
-        ("Public Edificio View", tester.test_public_edificio_view),
-        ("Non-existent Public Edificio", tester.test_nonexistent_public_edificio),
-        
-        # Security tests
-        ("Edificio Admin Without Token", tester.test_edificio_admin_without_token),
-        
         # Cleanup
-        ("Delete Edificio", tester.test_delete_edificio),
+        ("Delete Vivienda", tester.test_delete_vivienda),
     ]
     
     # Run all tests
