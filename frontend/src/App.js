@@ -204,7 +204,10 @@ const SuperAdminDashboard = () => {
       setCantidadViviendas(20);
       fetchDashboard();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al crear edificio');
+      const errorMessage = typeof error.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : 'Error al crear edificio';
+      toast.error(errorMessage);
     } finally {
       setCreateLoading(false);
     }
@@ -480,7 +483,10 @@ const EdificioAdminDashboard = () => {
       toast.success('¡Edificio creado exitosamente!');
       fetchEdificioData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al crear edificio');
+      const errorMessage = typeof error.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : 'Error al crear edificio';
+      toast.error(errorMessage);
     } finally {
       setCreateLoading(false);
     }
