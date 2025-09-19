@@ -442,7 +442,10 @@ const EdificioAdminDashboard = () => {
       if (error.response?.status === 400 || error.response?.data?.message === "No tienes edificios asignados") {
         setShowCreateForm(true);
       } else {
-        toast.error('Error al cargar datos del edificio');
+        const errorMessage = typeof error.response?.data?.detail === 'string' 
+          ? error.response.data.detail 
+          : 'Error al cargar datos del edificio';
+        toast.error(errorMessage);
       }
     } finally {
       setLoading(false);
