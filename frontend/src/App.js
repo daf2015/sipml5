@@ -679,12 +679,12 @@ const EdificioAdminDashboard = () => {
     );
   }
 
-  // Dashboard MODERNO con SIDEBAR
+  // Dashboard MODERNO con SIDEBAR RESPONSIVE
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* SIDEBAR IZQUIERDO - Datos del Admin + Funciones */}
-      <div className="w-80 bg-white shadow-lg border-r">
-        <div className="p-6">
+    <div className="min-h-screen bg-gray-100 flex flex-col lg:flex-row">
+      {/* SIDEBAR IZQUIERDO - Datos del Admin + Funciones - RESPONSIVE */}
+      <div className="w-full lg:w-80 bg-white shadow-lg border-b lg:border-r lg:border-b-0">
+        <div className="p-4 lg:p-6">
           {/* Info del Admin */}
           <div className="mb-8">
             <div className="flex items-center space-x-3 mb-4">
