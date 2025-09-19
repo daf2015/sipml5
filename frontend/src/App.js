@@ -662,66 +662,50 @@ const EdificioAdminDashboard = () => {
   // Dashboard principal ESTÉTICO BASADO EN REFERENCIAS
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Header elegante */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-6xl mx-auto px-6 py-4">
+      {/* Header simple */}
+      <header className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-6 py-3">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-white" />
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                <Building2 className="h-4 w-4 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">{edificioData?.edificio?.nombre}</h1>
-                <p className="text-sm text-gray-500">intercum.com/{edificioData?.edificio?.slug}</p>
+                <h1 className="text-lg font-medium text-gray-900">{edificioData?.edificio?.nombre}</h1>
               </div>
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <Button
                 onClick={() => {
-                  setShowCreateForm(true);
-                  setEdificioData(null);
-                }}
-                variant="outline"
-                size="sm"
-                className="border-green-300 text-green-600 hover:bg-green-50"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Edificio
-              </Button>
-              
-              <Button
-                onClick={() => {
-                  const url = `intercum.com/${edificioData?.edificio?.slug}`;
+                  const url = `${window.location.origin}/${edificioData?.edificio?.slug}`;
                   navigator.clipboard.writeText(url);
-                  toast.success('Link copiado al portapapeles!');
+                  toast.success('Link copiado');
                 }}
                 variant="outline"
                 size="sm"
-                className="border-gray-300"
               >
-                <Copy className="h-4 w-4 mr-2" />
+                <Copy className="h-4 w-4 mr-1" />
                 Copiar Link
               </Button>
               
               <Button
-                onClick={() => window.open(edificioData?.url_publica, '_blank')}
+                onClick={() => window.open(`/${edificioData?.edificio?.slug}`, '_blank')}
                 variant="outline"
                 size="sm"
-                className="border-blue-300 text-blue-600"
+                className="text-blue-600"
               >
-                <ExternalLink className="h-4 w-4 mr-2" />
+                <ExternalLink className="h-4 w-4 mr-1" />
                 Ver Público
               </Button>
               
               <Button
                 onClick={deleteEdificio}
-                variant="outline"
+                variant="destructive"
                 size="sm"
-                className="border-red-300 text-red-600 hover:bg-red-50"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Eliminar Edificio
+                <Trash2 className="h-4 w-4 mr-1" />
+                Eliminar
               </Button>
               
               <Button variant="ghost" size="sm" onClick={logout}>
