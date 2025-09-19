@@ -14,7 +14,7 @@
 # Main and testing agents must follow this exact format to maintain testing data. 
 # The testing data must be entered in yaml format Below is the data structure:
 # 
-## user_problem_statement: {problem_statement}
+## user_problem_statement: "Usuario reporta 'no se elimina el edificio' y 'no deja crear'. Solicitó simplificar UI sin menú. Problemas identificados: faltaba UI para eliminar edificios y crear nuevos cuando ya se tiene uno."
 ## backend:
 ##   - task: "Task name"
 ##     implemented: true
