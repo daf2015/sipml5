@@ -826,13 +826,13 @@ const EdificioAdminDashboard = () => {
             })}
           </div>
           
-          {/* Leyenda */}
-          <div className="mt-6 flex justify-center space-x-6 text-sm">
-            <div className="flex items-center space-x-2">
+          {/* Leyenda RESPONSIVE */}
+          <div className="mt-4 lg:mt-6 flex justify-center space-x-4 lg:space-x-6 text-xs lg:text-sm">
+            <div className="flex items-center space-x-1 lg:space-x-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               <span className="text-gray-600">Ocupada</span>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 lg:space-x-2">
               <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
               <span className="text-gray-600">Libre</span>
             </div>
