@@ -607,44 +607,34 @@ const EdificioAdminDashboard = () => {
     }
   };
 
-  const updateCantidadViviendas = async () => {
-    console.log('🔍 updateCantidadViviendas called with nuevaCantidad:', nuevaCantidad);
-    const cantidad = parseInt(nuevaCantidad);
-    console.log('🔍 Parsed cantidad:', cantidad, 'Type:', typeof cantidad);
+  const cambiarCantidadViviendas = async (cambio) => {
+    const cantidadActual = edificioData?.edificio?.cantidad_viviendas || 0;
+    const nuevaCantidad = cantidadActual + cambio;
+    const viviendasOcupadas = edificioData?.viviendas?.length || 0;
     
-    if (!cantidad || cantidad < 1 || cantidad > 50) {
+    // Validaciones simples
+    if (nuevaCantidad < 1 || nuevaCantidad > 50) {
       toast.error('La cantidad debe estar entre 1 y 50');
-      console.log('🔍 Validation failed - cantidad out of range');
+      return;
+    }
+    
+    if (nuevaCantidad < viviendasOcupadas) {
+      toast.error(`No puedes reducir a ${nuevaCantidad} porque tienes ${viviendasOcupadas} viviendas ocupadas`);
       return;
     }
 
-    console.log('🔍 isSuperAdminManaging:', isSuperAdminManaging);
-    console.log('🔍 edificioIdFromUrl:', edificioIdFromUrl);
-
     try {
-      const requestData = { cantidad_viviendas: cantidad };
-      console.log('🔍 Request data:', requestData);
+      const requestData = { cantidad_viviendas: nuevaCantidad };
       
       if (isSuperAdminManaging) {
-        const url = `${API}/admin/edificios/${edificioIdFromUrl}/cantidad-viviendas`;
-        console.log('🔍 Super admin URL:', url);
-        const response = await axios.put(url, requestData);
-        console.log('🔍 Super admin response:', response.data);
+        await axios.put(`${API}/admin/edificios/${edificioIdFromUrl}/cantidad-viviendas`, requestData);
       } else {
-        const url = `${API}/edificios/my/cantidad-viviendas`;
-        console.log('🔍 Admin URL:', url);
-        const response = await axios.put(url, requestData);
-        console.log('🔍 Admin response:', response.data);
+        await axios.put(`${API}/edificios/my/cantidad-viviendas`, requestData);
       }
       
-      toast.success(`Cantidad actualizada a ${cantidad} viviendas`);
-      setShowEditCantidad(false);
-      setNuevaCantidad('');
-      console.log('🔍 About to fetch updated data...');
+      toast.success(`${cambio > 0 ? 'Agregadas' : 'Eliminadas'} ${Math.abs(cambio)} vivienda${Math.abs(cambio) !== 1 ? 's' : ''}`);
       fetchEdificioData();
     } catch (error) {
-      console.error('🔍 Error updating cantidad:', error);
-      console.error('🔍 Error response:', error.response?.data);
       const errorMessage = typeof error.response?.data?.detail === 'string' 
         ? error.response.data.detail 
         : 'Error al actualizar cantidad';
