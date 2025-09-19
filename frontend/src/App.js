@@ -442,8 +442,15 @@ const CDRPage = () => {
   const [cdrs, setCdrs] = useState([]);
   const [stats, setStats] = useState(null);
   const [edificios, setEdificios] = useState([]);
+  const [viviendas, setViviendas] = useState([]);
+  const [familias, setFamilias] = useState([]);
   const [selectedEdificio, setSelectedEdificio] = useState('');
+  const [selectedVivienda, setSelectedVivienda] = useState('');
+  const [selectedFamilia, setSelectedFamilia] = useState('');
+  const [fechaDesde, setFechaDesde] = useState('');
+  const [fechaHasta, setFechaHasta] = useState('');
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const navigate = useNavigate();
