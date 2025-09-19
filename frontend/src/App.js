@@ -616,12 +616,12 @@ const CDRPage = () => {
             <div className="flex items-center space-x-4">
               <div className="flex-1 max-w-xs">
                 <Label htmlFor="edificio-filter">Filtrar por Edificio</Label>
-                <Select value={selectedEdificio} onValueChange={handleEdificioFilter}>
+                <Select value={selectedEdificio || "all"} onValueChange={(value) => handleEdificioFilter(value === "all" ? "" : value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Todos los edificios" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los edificios</SelectItem>
+                    <SelectItem value="all">Todos los edificios</SelectItem>
                     {edificios.map((edificio) => (
                       <SelectItem key={edificio.id} value={edificio.id}>
                         {edificio.nombre}
