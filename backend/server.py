@@ -910,8 +910,7 @@ async def get_public_edificio(slug: str, background_tasks: BackgroundTasks):
         
         viviendas_publicas.append(vivienda_data)
     
-    # Analytics en background (no bloquea la respuesta)
-    background_tasks.add_task(update_edificio_analytics, edificio["id"])
+    # NO registrar analytics aquí - solo se registra cuando hay llamada real
     
     return EdificioPublic(
         nombre=edificio["nombre"],
