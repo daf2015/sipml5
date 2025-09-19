@@ -833,14 +833,14 @@ const EdificioAdminDashboard = () => {
             })}
           </div>
           
-          {/* Leyenda SIMPLE Y MODERNA */}
-          <div className="mt-6 lg:mt-8 flex justify-center space-x-6 text-sm">
-            <div className="flex items-center space-x-2 bg-green-50 rounded-full px-3 py-1">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-green-700 font-medium">Ocupada</span>
+          {/* Leyenda minimalista */}
+          <div className="mt-8 lg:mt-12 flex justify-center space-x-8 text-sm">
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+              <span className="text-gray-700 font-medium">Ocupada</span>
             </div>
-            <div className="flex items-center space-x-2 bg-gray-50 rounded-full px-3 py-1">
-              <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 bg-gray-400 rounded-full"></div>
               <span className="text-gray-600 font-medium">Libre</span>
             </div>
           </div>
