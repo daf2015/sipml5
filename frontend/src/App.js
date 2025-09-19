@@ -515,6 +515,26 @@ const EdificioAdminDashboard = () => {
     }
   };
 
+  const deleteEdificio = async () => {
+    if (!edificioData?.edificio?.id) {
+      toast.error('No hay edificio para eliminar');
+      return;
+    }
+
+    const confirmMessage = `¿Estás seguro de eliminar el edificio "${edificioData.edificio.nombre}"?\n\nEsto eliminará:\n• El edificio completo\n• Todas las viviendas (${edificioData.viviendas?.length || 0})\n• El enlace público\n\nEsta acción no se puede deshacer.`;
+    
+    if (window.confirm(confirmMessage)) {
+      try {
+        await axios.delete(`${API}/edificios/my/${edificioData.edificio.id}`);
+        toast.success('Edificio eliminado exitosamente');
+        setEdificioData(null);
+        setShowCreateForm(true);
+      } catch (error) {
+        toast.error(error.response?.data?.detail || 'Error al eliminar edificio');
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
