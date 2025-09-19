@@ -565,7 +565,11 @@ const EdificioAdminDashboard = () => {
 
   const deleteVivienda = async (viviendaId) => {
     try {
-      await axios.delete(`${API}/edificios/my/viviendas/${viviendaId}`);
+      if (isSuperAdminManaging) {
+        await axios.delete(`${API}/admin/viviendas/${viviendaId}`);
+      } else {
+        await axios.delete(`${API}/edificios/my/viviendas/${viviendaId}`);
+      }
       toast.success('Vivienda eliminada');
       fetchEdificioData();
     } catch (error) {
