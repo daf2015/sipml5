@@ -303,7 +303,7 @@ const SuperAdminDashboard = () => {
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('backup_file', selectedFile);
+      formData.append('file', selectedFile);
       
       const response = await axios.post(`${API}/admin/restore/clientes`, formData, {
         headers: {
