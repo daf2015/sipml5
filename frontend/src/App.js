@@ -777,7 +777,25 @@ const EdificioAdminDashboard = () => {
                 <Building2 className="h-4 w-4 lg:h-6 lg:w-6 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-sm lg:text-lg font-bold text-gray-900 truncate">{edificioData?.edificio?.nombre}</h2>
+                <h2 
+                  className="text-sm lg:text-lg font-bold text-gray-900 truncate cursor-pointer hover:text-blue-600" 
+                  onClick={() => setEditandoNombre(true)}
+                  title="Haz clic para editar el nombre"
+                >
+                  {editandoNombre ? (
+                    <input
+                      type="text"
+                      value={nuevoNombre}
+                      onChange={(e) => setNuevoNombre(e.target.value)}
+                      onBlur={guardarNombre}
+                      onKeyPress={(e) => e.key === 'Enter' && guardarNombre()}
+                      className="bg-white border border-blue-300 rounded px-2 py-1 text-sm lg:text-lg font-bold w-full"
+                      autoFocus
+                    />
+                  ) : (
+                    edificioData?.edificio?.nombre
+                  )}
+                </h2>
                 <p className="text-xs text-gray-500 truncate">
                   {isSuperAdminManaging ? `Gestionando como Super Admin` : edificioData?.edificio?.admin_nombre}
                 </p>
