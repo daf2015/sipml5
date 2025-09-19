@@ -769,8 +769,10 @@ function App() {
       <Router>
         <div className="App">
           <Routes>
+            {/* Public routes - NO authentication required */}
             <Route path="/login" element={<Login />} />
             
+            {/* Protected admin routes */}
             <Route 
               path="/admin" 
               element={
@@ -791,7 +793,6 @@ function App() {
             
             <Route 
               path="/" 
-              exact
               element={
                 <ProtectedRoute>
                   <Navigate to={localStorage.getItem('user') && JSON.parse(localStorage.getItem('user')).role === 'super_admin' ? '/admin' : '/dashboard'} replace />
@@ -799,6 +800,7 @@ function App() {
               } 
             />
             
+            {/* Public edificio route - MUST be last to avoid conflicts */}
             <Route path="/:slug" element={<PublicEdificio />} />
           </Routes>
           <Toaster />
