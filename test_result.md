@@ -138,7 +138,7 @@
 user_problem_statement: "URGENTE: El usuario reporta que puede agregar UNA vivienda pero después aparece 'Error al guardar vivienda' y no puede agregar más. Necesito debugging completo del endpoint POST /api/edificios/my/viviendas con múltiples creaciones consecutivas usando user diego@daf-il.net."
 
 backend:
-  - task: "Creación de edificio desde admin"
+  - task: "Creación múltiple de viviendas consecutivas"
     implemented: true
     working: true
     file: "backend/server.py"
@@ -148,9 +148,9 @@ backend:
     status_history:
         - working: true
           agent: "testing"
-          comment: "TESTED SUCCESSFULLY - POST /api/edificios/create-my endpoint working correctly. Tested with exact user data: nombre='Edificio Test', slug_personalizado='test-edificio', admin_nombre='Diego Test', cantidad_viviendas=10. User diego@daf-il.net can create edificios successfully. Backend logs confirm: 'Edificio creado por admin: diego@daf-il.net - Edificio Test'"
+          comment: "ISSUE IDENTIFIED - POST /api/edificios/my/viviendas endpoint working correctly. Multiple consecutive vivienda creations tested successfully (Test 1, Test 2, Test 3 with phones 111111111, 222222222, 333333333). User's issue is NOT a backend bug but a BUSINESS RULE: User diego@daf-il.net has reached the vivienda limit for edificio 'Baitzman 163' (12/12 viviendas). When limit is reached, API correctly returns 400 status with message 'Límite máximo de 12 viviendas para este edificio'. This explains why user can add 'ONE vivienda but then Error al guardar vivienda'."
 
-  - task: "Eliminación de edificio"
+  - task: "Validación de límites de viviendas"
     implemented: true
     working: true
     file: "backend/server.py"
@@ -160,9 +160,9 @@ backend:
     status_history:
         - working: true
           agent: "testing"
-          comment: "TESTED SUCCESSFULLY - DELETE /api/edificios/my/{edificio_id} endpoint working correctly. Successfully deleted edificio and associated viviendas. Backend logs confirm: 'Edificio eliminado: Edificio Test - Viviendas eliminadas: 0'. Returns proper response with message and count of deleted viviendas."
+          comment: "TESTED SUCCESSFULLY - Vivienda limits properly enforced. Edificio 'Baitzman 163' has cantidad_viviendas=12. When attempting to create vivienda #13, API correctly returns 400 error: 'Límite máximo de 12 viviendas para este edificio'. Limit enforcement working as designed. User needs to either delete existing viviendas or increase the edificio's cantidad_viviendas limit."
 
-  - task: "Verificación de disponibilidad de slug"
+  - task: "Autenticación de usuario diego@daf-il.net"
     implemented: true
     working: true
     file: "backend/server.py"
@@ -172,9 +172,9 @@ backend:
     status_history:
         - working: true
           agent: "testing"
-          comment: "TESTED SUCCESSFULLY - GET /api/edificios/check-slug/{slug} endpoint working correctly. Returns proper availability status, messages, and suggestions for unavailable slugs. Tested with various slug formats and all validations work as expected."
+          comment: "TESTED SUCCESSFULLY - Authentication working correctly for user diego@daf-il.net with password tangotango. Returns proper JWT token and user role (edificio_admin). User has access to edificio 'Baitzman 163' with 12 viviendas (at limit)."
 
-  - task: "Obtener edificios del admin"
+  - task: "Estado del edificio del usuario"
     implemented: true
     working: true
     file: "backend/server.py"
@@ -184,31 +184,7 @@ backend:
     status_history:
         - working: true
           agent: "testing"
-          comment: "TESTED SUCCESSFULLY - GET /api/edificios/my endpoint working correctly. Returns edificio data, viviendas list, and public URL for user diego@daf-il.net. Response includes all expected fields: edificio details, viviendas array, and properly formatted public URL."
-
-  - task: "Validaciones de slug y límites"
-    implemented: true
-    working: true
-    file: "backend/server.py"
-    stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
-    status_history:
-        - working: true
-          agent: "testing"
-          comment: "TESTED SUCCESSFULLY - All slug validations working correctly: duplicate slug rejection, invalid format rejection, length limits enforced. Vivienda limits (max 100) properly enforced. Slug normalization (uppercase to lowercase) working as designed."
-
-  - task: "Autenticación de usuario"
-    implemented: true
-    working: true
-    file: "backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-        - working: true
-          agent: "testing"
-          comment: "TESTED SUCCESSFULLY - Authentication working correctly for user diego@daf-il.net with password tangotango. Returns proper JWT token and user role (edificio_admin). Invalid credentials properly rejected with 401 status."
+          comment: "TESTED SUCCESSFULLY - GET /api/edificios/my endpoint working correctly. Returns edificio 'Baitzman 163' with cantidad_viviendas=12 and current viviendas count matching the limit. User's edificio is at maximum capacity, which explains the 'Error al guardar vivienda' when trying to add more."
 
 metadata:
   created_by: "testing_agent"
