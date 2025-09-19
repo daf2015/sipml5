@@ -762,16 +762,16 @@ const EdificioAdminDashboard = () => {
         </div>
       </div>
 
-      {/* ÁREA PRINCIPAL - Casitas */}
-      <div className="flex-1 p-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Gestión de Viviendas</h1>
-          <p className="text-gray-600">Haz clic en cualquier vivienda para editarla</p>
+      {/* ÁREA PRINCIPAL - Casitas RESPONSIVE */}
+      <div className="flex-1 p-3 lg:p-6">
+        <div className="mb-4 lg:mb-6">
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1 lg:mb-2">Gestión de Viviendas</h1>
+          <p className="text-sm lg:text-base text-gray-600">Toca cualquier vivienda para editarla</p>
         </div>
 
-        {/* Grid de Casitas MODERNO */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-          <div className="grid grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-4">
+        {/* Grid de Casitas MODERNO Y RESPONSIVE */}
+        <div className="bg-white rounded-xl shadow-sm border p-3 lg:p-6">
+          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-2 lg:gap-4">
             {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 12}, (_, index) => {
               const numeroVivienda = index + 1;
               const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
