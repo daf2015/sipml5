@@ -451,6 +451,78 @@ async def delete_vivienda_admin(vivienda_id: str, current_user: User = Depends(g
     
     return {"message": "Vivienda eliminada exitosamente"}
 
+# Actualizar cantidad de viviendas - Admin de edificio
+@api_router.put("/edificios/my/cantidad-viviendas")
+async def update_cantidad_viviendas(
+    nueva_cantidad: dict, 
+    current_user: User = Depends(get_edificio_admin)
+):
+    cantidad = nueva_cantidad.get("cantidad_viviendas")
+    if not cantidad or cantidad < 1 or cantidad > 50:
+        raise HTTPException(status_code=400, detail="La cantidad de viviendas debe estar entre 1 y 50")
+    
+    # Buscar edificio del admin
+    edificios = serialize_docs(
+        await db.edificios.find({"admin_id": current_user.id}).to_list(None)
+    )
+    
+    if not edificios:
+        raise HTTPException(status_code=404, detail="No tienes edificios asignados")
+    
+    edificio = edificios[0]
+    
+    # Verificar que no se reduzca por debajo del número de viviendas existentes
+    viviendas_existentes = await db.viviendas.count_documents({"edificio_id": edificio["id"]})
+    if cantidad < viviendas_existentes:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"No puedes reducir a {cantidad} viviendas porque ya tienes {viviendas_existentes} viviendas creadas"
+        )
+    
+    # Actualizar
+    await db.edificios.update_one(
+        {"id": edificio["id"]},
+        {"$set": {"cantidad_viviendas": cantidad}}
+    )
+    
+    logger.info(f"Admin {current_user.email} actualizó cantidad de viviendas a {cantidad}")
+    
+    return {"message": f"Cantidad de viviendas actualizada a {cantidad}"}
+
+# Actualizar cantidad de viviendas - Super admin
+@api_router.put("/admin/edificios/{edificio_id}/cantidad-viviendas")
+async def update_cantidad_viviendas_admin(
+    edificio_id: str,
+    nueva_cantidad: dict, 
+    current_user: User = Depends(get_super_admin)
+):
+    cantidad = nueva_cantidad.get("cantidad_viviendas")
+    if not cantidad or cantidad < 1 or cantidad > 50:
+        raise HTTPException(status_code=400, detail="La cantidad de viviendas debe estar entre 1 y 50")
+    
+    # Buscar edificio
+    edificio = await db.edificios.find_one({"id": edificio_id})
+    if not edificio:
+        raise HTTPException(status_code=404, detail="Edificio no encontrado")
+    
+    # Verificar que no se reduzca por debajo del número de viviendas existentes
+    viviendas_existentes = await db.viviendas.count_documents({"edificio_id": edificio_id})
+    if cantidad < viviendas_existentes:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"No puedes reducir a {cantidad} viviendas porque ya tienes {viviendas_existentes} viviendas creadas"
+        )
+    
+    # Actualizar
+    await db.edificios.update_one(
+        {"id": edificio_id},
+        {"$set": {"cantidad_viviendas": cantidad}}
+    )
+    
+    logger.info(f"Super admin actualizó cantidad de viviendas del edificio {edificio_id} a {cantidad}")
+    
+    return {"message": f"Cantidad de viviendas actualizada a {cantidad}"}
+
 # Crear edificio desde admin
 @api_router.post("/admin/edificios", response_model=Edificio)
 async def create_edificio_admin(edificio_data: EdificioCreate, current_user: User = Depends(get_super_admin)):
