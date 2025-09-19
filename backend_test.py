@@ -610,49 +610,60 @@ class IntercomunicadorTester:
         return True
 
 def main():
-    print("🏢 Sistema Intercomunicador - URGENT VIVIENDA TESTING")
-    print("🚨 User reports error saving vivienda data (name and number)")
-    print("=" * 60)
+    print("🏢 Sistema Intercomunicador - URGENT VIVIENDA DEBUGGING")
+    print("🚨 USER REPORTS: Can add ONE vivienda but then 'Error al guardar vivienda'")
+    print("🔍 Testing multiple consecutive creations with user diego@daf-il.net")
+    print("=" * 70)
     
     tester = IntercomunicadorTester()
     
-    # Test sequence - FOCUSED ON USER REPORTED VIVIENDA ISSUES
+    # Test sequence - FOCUSED ON USER'S SPECIFIC ISSUE
     tests = [
         # Authentication first
-        ("Edificio Admin Login (diego@daf-il.net)", tester.test_edificio_admin_login),
+        ("🔐 Edificio Admin Login (diego@daf-il.net)", tester.test_edificio_admin_login),
         
-        # URGENT USER REPORTED ISSUES - VIVIENDA ENDPOINTS
-        ("Get My Edificios (Check existing)", tester.test_edificio_admin_my_edificio),
-        ("Create Vivienda (User Reported Data)", tester.test_vivienda_create_user_reported),
-        ("Update Vivienda (User Reported Data)", tester.test_vivienda_update_user_reported),
-        ("Get My Edificios (Verify after changes)", tester.test_edificio_admin_my_edificio),
+        # Check current state
+        ("📋 Get Current Edificio State", tester.test_edificio_admin_my_edificio),
         
-        # Additional vivienda validation tests
-        ("Invalid Phone Format", tester.test_invalid_phone_format),
+        # MAIN TEST: Multiple consecutive vivienda creations
+        ("🚨 MULTIPLE CONSECUTIVE VIVIENDA CREATIONS", tester.test_multiple_consecutive_viviendas),
+        
+        # Check limits and restrictions
+        ("🔍 Test Vivienda Limits and Restrictions", tester.test_vivienda_limits_and_restrictions),
+        
+        # Verify final state
+        ("📊 Final Edificio State Check", tester.test_edificio_admin_my_edificio),
         
         # Cleanup
-        ("Delete Vivienda", tester.test_delete_vivienda),
+        ("🧹 Cleanup Test Viviendas", tester.cleanup_test_viviendas),
     ]
     
     # Run all tests
     for test_name, test_func in tests:
+        print(f"\n{'='*70}")
+        print(f"🧪 {test_name}")
+        print('='*70)
         try:
             test_func()
         except Exception as e:
             print(f"❌ {test_name} - Exception: {str(e)}")
+            import traceback
+            traceback.print_exc()
         
         # Small delay between tests
-        time.sleep(0.5)
+        time.sleep(1)
     
     # Print results
-    print("\n" + "=" * 60)
-    print(f"📊 Test Results: {tester.tests_passed}/{tester.tests_run} tests passed")
+    print("\n" + "=" * 70)
+    print(f"📊 FINAL TEST RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
     
     if tester.tests_passed == tester.tests_run:
-        print("🎉 All tests passed!")
+        print("🎉 All tests passed! User issue may be resolved or not reproducible.")
         return 0
     else:
-        print(f"⚠️  {tester.tests_run - tester.tests_passed} tests failed")
+        failed_count = tester.tests_run - tester.tests_passed
+        print(f"⚠️  {failed_count} tests failed - USER ISSUE REPRODUCED!")
+        print("🔍 Check the failed tests above for the exact error causing the user's issue.")
         return 1
 
 if __name__ == "__main__":
