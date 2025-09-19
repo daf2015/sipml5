@@ -249,6 +249,7 @@ metadata:
 test_plan:
   current_focus:
     - "Página Pública"
+    - "Housing quantity validation improvements"
   stuck_tasks:
     - "Página Pública"
   test_all: false
