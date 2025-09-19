@@ -800,29 +800,55 @@ const EdificioAdminDashboard = () => {
     );
   }
 
-  // Dashboard principal con vista moderna de viviendas
+  // Dashboard principal REDISEÑADO - MODERNO Y FUNCIONAL
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <header className="bg-white shadow-lg border-b-2 border-indigo-200">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Moderno y Funcional */}
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Building2 className="h-8 w-8 text-indigo-600 mr-3" />
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{edificioData?.edificio?.nombre}</h1>
-                <p className="text-sm text-gray-500">intercum.com/{edificioData?.edificio?.slug}</p>
+            {/* Logo y Título */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Building2 className="h-8 w-8 text-blue-600" />
+                <div>
+                  <h1 className="text-lg font-semibold text-gray-900">
+                    {edificioData?.edificio?.nombre}
+                  </h1>
+                  <p className="text-sm text-gray-500">
+                    Admin: {edificioData?.edificio?.admin_nombre}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+
+            {/* Acciones Principales */}
+            <div className="flex items-center space-x-3">
               <Button
                 onClick={() => window.open(edificioData?.url_publica, '_blank')}
                 variant="outline"
-                className="border-indigo-300 text-indigo-600 hover:bg-indigo-50"
+                size="sm"
+                className="border-blue-300 text-blue-600 hover:bg-blue-50"
               >
                 <QrCode className="h-4 w-4 mr-2" />
-                Ver QR
+                Ver Público
               </Button>
-              <Button variant="outline" onClick={logout}>
+              
+              <Button
+                onClick={() => navigator.clipboard.writeText(edificioData?.url_publica)}
+                variant="outline" 
+                size="sm"
+                className="border-gray-300"
+              >
+                Copiar Link
+              </Button>
+              
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={logout}
+                className="text-gray-500 hover:text-gray-700"
+              >
                 <LogOut className="h-4 w-4 mr-2" />
                 Salir
               </Button>
@@ -831,58 +857,88 @@ const EdificioAdminDashboard = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white border-0 shadow-lg">
-            <CardContent className="p-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Estadísticas Corregidas */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card className="bg-white">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-emerald-100">Viviendas Ocupadas</p>
-                  <p className="text-3xl font-bold">{edificioData?.viviendas?.length || 0}</p>
+                  <p className="text-sm text-gray-600">Total Viviendas</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {edificioData?.edificio?.cantidad_viviendas || 0}
+                  </p>
                 </div>
-                <Home className="h-12 w-12 text-emerald-200" />
+                <Building2 className="h-8 w-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-r from-amber-500 to-amber-600 text-white border-0 shadow-lg">
-            <CardContent className="p-6">
+          <Card className="bg-white">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-amber-100">Viviendas Vacías</p>
-                  <p className="text-3xl font-bold">
+                  <p className="text-sm text-gray-600">Ocupadas</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {edificioData?.viviendas?.length || 0}
+                  </p>
+                </div>
+                <Home className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-white">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Vacías</p>
+                  <p className="text-2xl font-bold text-gray-500">
                     {(edificioData?.edificio?.cantidad_viviendas || 0) - (edificioData?.viviendas?.length || 0)}
                   </p>
                 </div>
-                <Building2 className="h-12 w-12 text-amber-200" />
+                <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
+                  <Home className="h-5 w-5 text-gray-400" />
+                </div>
               </div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600 text-white border-0 shadow-lg">
-            <CardContent className="p-6">
+          <Card className="bg-white">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-indigo-100">Total Viviendas</p>
-                  <p className="text-3xl font-bold">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
+                  <p className="text-sm text-gray-600">Link Público</p>
+                  <p className="text-sm font-medium text-blue-600 truncate">
+                    intercum.com/{edificioData?.edificio?.slug}
+                  </p>
                 </div>
-                <BarChart3 className="h-12 w-12 text-indigo-200" />
+                <QrCode className="h-8 w-8 text-blue-500" />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Vista del Edificio - DISEÑO SEGÚN REFERENCIAS */}
-        <Card className="shadow-lg border-0 mb-8">
-          <CardHeader className="bg-white border-b">
-            <CardTitle className="text-xl text-gray-800 flex items-center">
-              <Building2 className="mr-2 h-5 w-5 text-indigo-600" />
-              Unidades - {edificioData?.edificio?.nombre}
-            </CardTitle>
+        {/* Grid de Viviendas - DISEÑO MODERNO */}
+        <Card className="bg-white">
+          <CardHeader className="border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl text-gray-900">
+                  Gestión de Viviendas
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  Haz clic en cualquier vivienda para editarla
+                </CardDescription>
+              </div>
+              <Badge variant="outline" className="text-sm">
+                {edificioData?.viviendas?.length || 0} / {edificioData?.edificio?.cantidad_viviendas || 0} ocupadas
+              </Badge>
+            </div>
           </CardHeader>
-          <CardContent className="p-6 bg-gray-50">
-            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+          
+          <CardContent className="p-6">
+            <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
               {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 20}, (_, index) => {
                 const numeroVivienda = index + 1;
                 const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
@@ -891,45 +947,68 @@ const EdificioAdminDashboard = () => {
                 return (
                   <div
                     key={numeroVivienda}
-                    className="relative cursor-pointer group"
+                    className="relative group cursor-pointer"
                     onClick={() => setSelectedVivienda(numeroVivienda)}
                   >
-                    {/* Vivienda Card - DISEÑO COMO REFERENCIA */}
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+                    {/* Card de Vivienda Moderna */}
+                    <div className={`
+                      p-3 rounded-lg border-2 transition-all duration-200
+                      ${isOccupied 
+                        ? 'bg-green-50 border-green-200 hover:border-green-300 hover:shadow-md' 
+                        : 'bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                      }
+                      group-hover:scale-105
+                    `}>
                       <div className="text-center">
-                        {/* Icono de casita */}
-                        <div className="mx-auto mb-2 w-8 h-8 flex items-center justify-center">
-                          <Home className="h-6 w-6 text-gray-600" />
+                        {/* Icono Casa */}
+                        <div className={`
+                          mx-auto mb-2 w-8 h-8 rounded-lg flex items-center justify-center
+                          ${isOccupied 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-gray-100 text-gray-500'
+                          }
+                        `}>
+                          <Home className="h-5 w-5" />
                         </div>
                         
-                        {/* Número de vivienda */}
-                        <div className="text-sm font-medium text-gray-700 mb-1">
-                          Vivienda {numeroVivienda}
+                        {/* Número */}
+                        <div className={`
+                          text-xs font-semibold mb-1
+                          ${isOccupied ? 'text-green-800' : 'text-gray-600'}
+                        `}>
+                          {numeroVivienda}
                         </div>
                         
-                        {/* Información de ocupación */}
+                        {/* Info */}
                         <div className="text-xs">
                           {isOccupied ? (
-                            <div>
+                            <div className="space-y-1">
                               <div className="font-medium text-gray-800 truncate" title={vivienda.nombre_familia}>
-                                {vivienda.nombre_familia.length > 12 
-                                  ? vivienda.nombre_familia.substring(0, 12) + '...' 
+                                {vivienda.nombre_familia.length > 8 
+                                  ? vivienda.nombre_familia.substring(0, 8) + '...' 
                                   : vivienda.nombre_familia}
                               </div>
-                              <div className="text-gray-500 text-xs mt-1">
-                                {vivienda.phone}
+                              <div className="text-gray-500 text-xs">
+                                {vivienda.phone.replace('+972', '').substring(0, 6)}...
                               </div>
                             </div>
                           ) : (
-                            <span className="text-gray-400">Sin contacto</span>
+                            <span className="text-gray-400 text-xs">Disponible</span>
                           )}
                         </div>
                       </div>
                       
-                      {/* PUNTO VERDE - IGUAL QUE EN LA REFERENCIA */}
+                      {/* Punto Verde Ocupada */}
                       {isOccupied && (
-                        <div className="absolute top-2 right-2">
-                          <div className="w-3 h-3 bg-green-500 rounded-full border border-white shadow-sm"></div>
+                        <div className="absolute -top-1 -right-1">
+                          <div className="w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-sm"></div>
+                        </div>
+                      )}
+                      
+                      {/* Icono de Privacidad */}
+                      {isOccupied && !vivienda.publicar_nombre && (
+                        <div className="absolute -top-1 -left-1">
+                          <div className="w-3 h-3 bg-orange-500 rounded-full border-2 border-white shadow-sm" title="Privado"></div>
                         </div>
                       )}
                     </div>
@@ -937,19 +1016,39 @@ const EdificioAdminDashboard = () => {
                 );
               })}
             </div>
+            
+            {/* Leyenda */}
+            <div className="mt-6 flex items-center justify-center space-x-6 text-sm text-gray-600">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span>Ocupada</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
+                <span>Disponible</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <span>Privada</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
         
-        {/* Modal para editar vivienda - DISEÑO SEGÚN REFERENCIA */}
+        {/* Modal Mejorado */}
         {selectedVivienda && (
           <Dialog open={!!selectedVivienda} onOpenChange={() => setSelectedVivienda(null)}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-lg">
               <DialogHeader>
-                <DialogTitle className="text-lg font-semibold">
+                <DialogTitle className="text-xl font-semibold flex items-center">
+                  <Home className="mr-2 h-5 w-5 text-blue-600" />
                   Vivienda #{selectedVivienda}
                 </DialogTitle>
-                <DialogDescription>
-                  Edita la información de esta vivienda
+                <DialogDescription className="text-gray-600">
+                  {edificioData?.viviendas?.find(v => v.numero === selectedVivienda) 
+                    ? 'Edita la información de esta vivienda'
+                    : 'Agrega información para esta vivienda'
+                  }
                 </DialogDescription>
               </DialogHeader>
               <ViviendaEditForm 
@@ -960,7 +1059,7 @@ const EdificioAdminDashboard = () => {
                     await updateViviendaData(selectedVivienda, data);
                     setSelectedVivienda(null);
                   } catch (error) {
-                    // El error ya se maneja en updateViviendaData
+                    // Error handling in updateViviendaData
                   }
                 }}
                 onDelete={(viviendaId) => {
