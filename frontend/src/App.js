@@ -312,7 +312,10 @@ const SuperAdminDashboard = () => {
                 <p className="text-2xl font-bold text-gray-900">{dashboard?.total_llamadas || 0}</p>
                 <p className="text-sm text-gray-600">Llamadas</p>
                 <button 
-                  onClick={() => setShowDetallesLlamadas(true)}
+                  onClick={() => {
+                    fetchDetallesLlamadas();
+                    setShowDetallesLlamadas(true);
+                  }}
                   className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
                 >
                   Detalles
