@@ -779,7 +779,7 @@ const EdificioAdminDashboard = () => {
                   onClick={() => setSelectedVivienda(numeroVivienda)}
                 >
                   <div className={`
-                    rounded-3xl p-6 text-center shadow-lg border-0 min-h-[140px] lg:min-h-[160px] flex flex-col justify-center relative overflow-hidden
+                    rounded-2xl sm:rounded-3xl p-3 sm:p-4 lg:p-6 text-center shadow-lg border-0 min-h-[120px] sm:min-h-[140px] lg:min-h-[160px] flex flex-col justify-center relative overflow-hidden
                     ${isOccupied 
                       ? 'bg-white shadow-green-200/50 hover:shadow-green-300/60' 
                       : 'bg-white/80 hover:bg-white shadow-gray-200/50 hover:shadow-gray-300/60'
