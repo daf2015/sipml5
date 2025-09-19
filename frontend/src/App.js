@@ -827,7 +827,6 @@ const EdificioAdminDashboard = () => {
             </div>
           </div>
         </div>
-        </div>
         
         {/* Modal MODERNO */}
         {selectedVivienda && (
