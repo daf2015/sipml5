@@ -48,7 +48,7 @@ def main():
     
     print(f"\n🏠 Creando viviendas hasta el límite...")
     for i in range(current + 1, limit + 1):
-        status, result = create_vivienda(token, f"Test {i}", f"{i:09d}")
+        status, result = create_vivienda(token, f"Test {i}", f"50{i:07d}")
         if status == 200:
             created_ids.append(result['id'])
             print(f"   ✅ Vivienda {i} creada - ID: {result['id'][:8]}...")
