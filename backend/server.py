@@ -199,14 +199,11 @@ class ViviendaCreate(BaseModel):
     @validator('phone')
     def validate_phone(cls, v):
         v = v.strip()
-        # Auto-agregar + si no está presente
-        if not v.startswith('+'):
-            v = '+' + v
-        if len(v) < 8 or len(v) > 20:
-            raise ValueError('Formato de número telefónico inválido')
-        # Validación más estricta para números internacionales
-        if not re.match(r'^\+[1-9]\d{6,19}$', v):
-            raise ValueError('Formato de número telefónico inválido')
+        # Permitir cualquier formato: números, letras, símbolos, URLs, extensiones, etc.
+        if len(v) < 1:
+            raise ValueError('El teléfono no puede estar vacío')
+        if len(v) > 100:
+            raise ValueError('El teléfono es demasiado largo')
         return v
 
 class ViviendaUpdate(BaseModel):
