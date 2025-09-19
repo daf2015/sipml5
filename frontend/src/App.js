@@ -505,16 +505,71 @@ const CDRPage = () => {
     loadData();
   }, []);
 
-  const handleEdificioFilter = (edificioId) => {
-    setSelectedEdificio(edificioId);
+  const getCurrentFilters = () => ({
+    edificio_id: selectedEdificio || undefined,
+    vivienda_numero: selectedVivienda || undefined,
+    familia_nombre: selectedFamilia || undefined,
+    fecha_desde: fechaDesde || undefined,
+    fecha_hasta: fechaHasta || undefined
+  });
+
+  const applyFilters = () => {
     setPage(0);
-    fetchCDRData(edificioId, 0);
+    fetchCDRData(getCurrentFilters(), 0);
+  };
+
+  const clearFilters = () => {
+    setSelectedEdificio('');
+    setSelectedVivienda('');
+    setSelectedFamilia('');
+    setFechaDesde('');
+    setFechaHasta('');
+    setPage(0);
+    fetchCDRData({}, 0);
   };
 
   const loadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchCDRData(selectedEdificio, nextPage);
+    fetchCDRData(getCurrentFilters(), nextPage);
+  };
+
+  const downloadCSV = async () => {
+    setDownloading(true);
+    try {
+      const params = new URLSearchParams({ formato: 'csv' });
+      const filters = getCurrentFilters();
+      
+      if (filters.edificio_id) params.append('edificio_id', filters.edificio_id);
+      if (filters.vivienda_numero) params.append('vivienda_numero', filters.vivienda_numero);
+      if (filters.familia_nombre) params.append('familia_nombre', filters.familia_nombre);
+      if (filters.fecha_desde) params.append('fecha_desde', filters.fecha_desde);
+      if (filters.fecha_hasta) params.append('fecha_hasta', filters.fecha_hasta);
+
+      const response = await axios.get(`${API}/admin/cdr?${params}`, {
+        responseType: 'blob'
+      });
+
+      // Crear descarga
+      const blob = new Blob([response.data], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      const fechaStr = new Date().toISOString().split('T')[0];
+      link.download = `cdr_report_${fechaStr}.csv`;
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast.success('Reporte CSV descargado exitosamente');
+    } catch (error) {
+      toast.error('Error al descargar el reporte CSV');
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const formatDateTime = (dateString) => {
