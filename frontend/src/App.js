@@ -174,6 +174,7 @@ const SuperAdminDashboard = () => {
   const [detallesLlamadas, setDetallesLlamadas] = useState(null);
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDashboard();
