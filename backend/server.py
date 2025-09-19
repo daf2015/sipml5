@@ -467,6 +467,38 @@ async def create_my_edificio(edificio_data: EdificioCreate, current_user: User =
     
     return edificio
 
+# Eliminar edificio del admin
+@api_router.delete("/edificios/my/{edificio_id}")
+async def delete_my_edificio(edificio_id: str, current_user: User = Depends(get_edificio_admin_or_super)):
+    if current_user.role == UserRole.SUPER_ADMIN:
+        # Super admin puede eliminar cualquier edificio
+        edificio = await db.edificios.find_one({"id": edificio_id})
+    else:
+        # Admin de edificio solo puede eliminar sus propios edificios
+        edificio = await db.edificios.find_one({"id": edificio_id, "admin_id": current_user.id})
+    
+    if not edificio:
+        raise HTTPException(status_code=404, detail="Edificio no encontrado")
+    
+    # Eliminar todas las viviendas del edificio
+    viviendas_deleted = await db.viviendas.delete_many({"edificio_id": edificio_id})
+    
+    # Eliminar el edificio
+    await db.edificios.delete_one({"id": edificio_id})
+    
+    # Actualizar usuario removiendo el edificio de su lista
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$pull": {"edificios_ids": edificio_id}}
+    )
+    
+    logger.info(f"Edificio eliminado: {edificio['nombre']} - Viviendas eliminadas: {viviendas_deleted.deleted_count}")
+    
+    return {
+        "message": "Edificio eliminado exitosamente",
+        "viviendas_eliminadas": viviendas_deleted.deleted_count
+    }
+
 # Obtener edificios del admin
 @api_router.get("/edificios/my")
 async def get_my_edificios(current_user: User = Depends(get_edificio_admin_or_super)):
