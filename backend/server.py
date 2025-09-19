@@ -370,6 +370,87 @@ async def get_edificio_for_admin(edificio_id: str, current_user: User = Depends(
         "url_publica": f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/{edificio['slug']}"
     }
 
+# Super admin puede agregar vivienda a cualquier edificio
+@api_router.post("/admin/edificios/{edificio_id}/viviendas", response_model=Vivienda)
+async def add_vivienda_admin(edificio_id: str, vivienda_data: ViviendaCreate, current_user: User = Depends(get_super_admin)):
+    # Buscar edificio
+    edificio = serialize_doc(await db.edificios.find_one({"id": edificio_id}))
+    if not edificio:
+        raise HTTPException(status_code=404, detail="Edificio no encontrado")
+    
+    # Verificar límite de viviendas
+    viviendas_count = await db.viviendas.count_documents({"edificio_id": edificio_id})
+    if viviendas_count >= edificio["cantidad_viviendas"]:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Límite máximo de {edificio['cantidad_viviendas']} viviendas para este edificio"
+        )
+    
+    # Obtener siguiente número de vivienda
+    last_vivienda = await db.viviendas.find_one(
+        {"edificio_id": edificio_id}, 
+        sort=[("numero", -1)]
+    )
+    next_numero = (last_vivienda["numero"] + 1) if last_vivienda else 1
+    
+    vivienda = Vivienda(
+        edificio_id=edificio_id,
+        numero=next_numero,
+        nombre_familia=vivienda_data.nombre_familia,
+        phone=vivienda_data.phone,
+        publicar_nombre=vivienda_data.publicar_nombre
+    )
+    
+    vivienda_dict = vivienda.dict()
+    vivienda_dict["created_at"] = vivienda_dict["created_at"].isoformat()
+    vivienda_dict["last_updated"] = vivienda_dict["last_updated"].isoformat()
+    
+    await db.viviendas.insert_one(vivienda_dict)
+    
+    logger.info(f"Super admin agregó vivienda: {edificio['nombre']} - Vivienda {next_numero}")
+    
+    return vivienda
+
+# Super admin puede actualizar vivienda de cualquier edificio
+@api_router.put("/admin/viviendas/{vivienda_id}", response_model=Vivienda)
+async def update_vivienda_admin(vivienda_id: str, vivienda_data: ViviendaUpdate, current_user: User = Depends(get_super_admin)):
+    # Buscar vivienda
+    vivienda = await db.viviendas.find_one({"id": vivienda_id})
+    if not vivienda:
+        raise HTTPException(status_code=404, detail="Vivienda no encontrada")
+    
+    # Actualizar
+    update_data = {
+        "nombre_familia": vivienda_data.nombre_familia,
+        "phone": vivienda_data.phone,
+        "publicar_nombre": vivienda_data.publicar_nombre,
+        "last_updated": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.viviendas.update_one(
+        {"id": vivienda_id},
+        {"$set": update_data}
+    )
+    
+    # Retornar vivienda actualizada
+    updated_vivienda = serialize_doc(await db.viviendas.find_one({"id": vivienda_id}))
+    return Vivienda(**updated_vivienda)
+
+# Super admin puede eliminar vivienda de cualquier edificio
+@api_router.delete("/admin/viviendas/{vivienda_id}")
+async def delete_vivienda_admin(vivienda_id: str, current_user: User = Depends(get_super_admin)):
+    # Buscar vivienda
+    vivienda = await db.viviendas.find_one({"id": vivienda_id})
+    if not vivienda:
+        raise HTTPException(status_code=404, detail="Vivienda no encontrada")
+    
+    # Eliminar
+    await db.viviendas.delete_one({"id": vivienda_id})
+    
+    logger.info(f"Super admin eliminó vivienda: {vivienda_id}")
+    
+    return {"message": "Vivienda eliminada exitosamente"}
+
 # Crear edificio desde admin
 @api_router.post("/admin/edificios", response_model=Edificio)
 async def create_edificio_admin(edificio_data: EdificioCreate, current_user: User = Depends(get_super_admin)):
