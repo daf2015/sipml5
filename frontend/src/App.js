@@ -438,6 +438,7 @@ const EdificioAdminDashboard = () => {
   
   const [selectedVivienda, setSelectedVivienda] = useState(null);
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   // Detectar si es super admin gestionando un edificio específico
   const urlParams = new URLSearchParams(window.location.search);
