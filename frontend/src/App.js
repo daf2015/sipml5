@@ -642,6 +642,36 @@ const EdificioAdminDashboard = () => {
     }
   };
 
+  const guardarNombre = async () => {
+    if (!nuevoNombre.trim() || nuevoNombre.trim() === edificioData?.edificio?.nombre) {
+      setEditandoNombre(false);
+      setNuevoNombre('');
+      return;
+    }
+
+    try {
+      const requestData = { nombre: nuevoNombre.trim() };
+      
+      if (isSuperAdminManaging) {
+        await axios.put(`${API}/admin/edificios/${edificioIdFromUrl}/nombre`, requestData);
+      } else {
+        await axios.put(`${API}/edificios/my/nombre`, requestData);
+      }
+      
+      toast.success('Nombre del edificio actualizado');
+      setEditandoNombre(false);
+      setNuevoNombre('');
+      fetchEdificioData();
+    } catch (error) {
+      const errorMessage = typeof error.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : 'Error al actualizar nombre';
+      toast.error(errorMessage);
+      setEditandoNombre(false);
+      setNuevoNombre('');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
