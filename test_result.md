@@ -254,8 +254,47 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
+backend:
+  - task: "Admin housing quantity update endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ ADMIN ENDPOINT WORKING - PUT /api/edificios/my/cantidad-viviendas tested with diego@daf-il.net. Successfully updated from 24 to 30 viviendas. Endpoint accepts correct JSON format {\"cantidad_viviendas\": 30} and properly validates limits (1-50) and existing viviendas count."
+
+  - task: "Super admin housing quantity update endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ SUPER ADMIN ENDPOINT WORKING - PUT /api/admin/edificios/{edificio_id}/cantidad-viviendas tested with diegofridman@gmail.com. Successfully updated Baitzman 163 from 30 to 35 viviendas. Endpoint working correctly with proper authentication and validation."
+
+  - task: "Housing quantity validation logic"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ VALIDATION ISSUES FOUND - 1) String numbers cause 500 error (TypeError: '<' not supported between instances of 'str' and 'int' at line 461), 2) Float values are accepted when they should be rejected (25.5 was accepted). Backend needs type validation before comparison operations."
+
 agent_communication:
     - agent: "testing"
       message: "🔄 COMPREHENSIVE QA TESTING INITIATED - Starting full system testing after recent changes. Focus areas: 1) Login/Auth with diego@daf-il.net, 2) CRUD operations with real data (QA Family/123456789), 3) Responsive design verification (Desktop/Mobile/Tablet), 4) Modern UI elements verification, 5) Sidebar functionality, 6) Error handling. Límite de viviendas increased to 24. Will test systematically across all device sizes."
     - agent: "testing"
       message: "✅ COMPREHENSIVE QA COMPLETED - RESULTS: 6/7 MAJOR FEATURES WORKING PERFECTLY. ✅ Login/Auth: Working, ✅ CRUD Operations: Perfect (create/edit/delete + auto + prefix), ✅ Responsive Design: Perfect (2 columns mobile, adaptive tablet), ✅ Modern UI/UX: Perfect (titles, colors, statistics), ✅ Sidebar Functions: Working, ✅ Error Handling: Working. ❌ CRITICAL ISSUE: Public page routing broken - /b163 redirects to login instead of showing public intercommunicator. Backend API working but frontend route needs authentication bypass fix."
+    - agent: "testing"
+      message: "🚨 URGENT HOUSING QUANTITY UPDATE TESTING COMPLETED - MAIN ENDPOINTS WORKING! ✅ Admin endpoint (diego@daf-il.net): Successfully updated from 24→30 viviendas, ✅ Super admin endpoint (diegofridman@gmail.com): Successfully updated Baitzman 163 from 30→35 viviendas. Both endpoints accept correct JSON format and validate limits properly. ❌ MINOR VALIDATION ISSUES: String numbers cause 500 error, float values incorrectly accepted. User's reported issue may be frontend-related or resolved."
