@@ -390,7 +390,7 @@ const SuperAdminDashboard = () => {
                         <Button
                           variant="default"
                           size="sm"
-                          onClick={() => window.location.href = `/dashboard?edificio=${edificio.id}`}
+                          onClick={() => navigate(`/dashboard?edificio=${edificio.id}`)}
                           className="bg-blue-600 hover:bg-blue-700"
                         >
                           <Settings className="h-4 w-4 mr-1" />
