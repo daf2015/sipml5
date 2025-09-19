@@ -346,8 +346,11 @@ async def get_admin_dashboard(current_user: User = Depends(get_super_admin)):
         await db.edificios.find().sort("created_at", -1).limit(10).to_list(None)
     )
     
-    # Analytics de llamadas
-    total_llamadas = sum(e.get("total_calls", 0) for e in serialize_docs(await db.edificios.find().to_list(None)))
+    # Analytics de llamadas - usar datos reales del CDR
+    one_month_ago = datetime.now(timezone.utc) - timedelta(days=30)
+    total_llamadas = await db.call_detail_records.count_documents({
+        "call_timestamp": {"$gte": one_month_ago}
+    })
     
     return {
         "total_edificios": total_edificios,
