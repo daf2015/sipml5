@@ -410,26 +410,42 @@ const SuperAdminDashboard = () => {
   );
 };
 
-// Componente para editar vivienda
+// Componente para editar vivienda - MEJORADO SEGÚN REFERENCIA
 const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel }) => {
   const [nombre, setNombre] = useState(vivienda?.nombre_familia || '');
   const [telefono, setTelefono] = useState(vivienda?.phone || '');
   const [publicar, setPublicar] = useState(vivienda?.publicar_nombre ?? true);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSave = async () => {
-    if (!nombre.trim() || !telefono.trim()) {
-      toast.error('Completa todos los campos');
+    setError('');
+    
+    if (!nombre.trim()) {
+      setError('El nombre de la familia es requerido');
+      return;
+    }
+    
+    if (!telefono.trim()) {
+      setError('El número de teléfono es requerido');
+      return;
+    }
+    
+    if (!telefono.startsWith('+')) {
+      setError('El número debe empezar con +');
       return;
     }
 
     setLoading(true);
     try {
       await onSave({
-        nombre_familia: nombre,
-        phone: telefono,
+        nombre_familia: nombre.trim(),
+        phone: telefono.trim(),
         publicar_nombre: publicar
       });
+      // No cerramos aquí, lo hace el padre
+    } catch (error) {
+      setError('Error al guardar vivienda');
     } finally {
       setLoading(false);
     }
@@ -445,25 +461,35 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
 
   return (
     <div className="space-y-4">
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+      
       <div>
-        <Label htmlFor="nombre">Nombre de la familia</Label>
+        <Label htmlFor="nombre" className="text-sm font-medium">
+          Nombre de la familia
+        </Label>
         <Input
           id="nombre"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           placeholder="Familia García"
-          className="h-12"
+          className="mt-1"
         />
       </div>
       
       <div>
-        <Label htmlFor="telefono">Número de teléfono</Label>
+        <Label htmlFor="telefono" className="text-sm font-medium">
+          Número de teléfono
+        </Label>
         <Input
           id="telefono"
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
           placeholder="+972501234567"
-          className="h-12"
+          className="mt-1"
         />
       </div>
       
@@ -473,19 +499,26 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
           checked={publicar}
           onCheckedChange={setPublicar}
         />
-        <Label htmlFor="publicar">Publicar nombre en el intercomunicador</Label>
+        <Label htmlFor="publicar" className="text-sm">
+          Publicar nombre en el intercomunicador
+        </Label>
       </div>
-      <p className="text-xs text-gray-500">
-        Si no publicas el nombre, aparecerá como "Residente" en la vista pública
-      </p>
       
       <div className="flex space-x-2 pt-4">
         <Button 
           onClick={handleSave} 
           disabled={loading}
-          className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+          className="flex-1 bg-blue-600 hover:bg-blue-700"
         >
           {loading ? 'Guardando...' : 'Guardar'}
+        </Button>
+        
+        <Button 
+          onClick={onCancel}
+          variant="outline"
+          className="px-6"
+        >
+          Cancelar
         </Button>
         
         {vivienda && (
@@ -497,14 +530,6 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
             <Trash2 className="h-4 w-4" />
           </Button>
         )}
-        
-        <Button 
-          onClick={onCancel}
-          variant="outline"
-          className="px-4"
-        >
-          Cancelar
-        </Button>
       </div>
     </div>
   );
