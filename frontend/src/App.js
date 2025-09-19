@@ -1218,18 +1218,23 @@ const PublicEdificio = () => {
             <div
               key={vivienda.numero}
               className="bg-white rounded-2xl p-4 text-center shadow-lg cursor-pointer transform transition-all duration-200 hover:scale-105 active:scale-95"
-              onClick={() => {
+              onClick={async () => {
                 const phone = vivienda.phone.trim();
                 
-                // Si es una URL (empieza con http), abrir en nueva pestaña
+                // Registrar la llamada en analytics ANTES de hacer la llamada
+                try {
+                  await axios.post(`${API}/public/edificios/${slug}/call/${vivienda.id}`);
+                } catch (error) {
+                  console.error('Error registrando llamada:', error);
+                }
+                
+                // Hacer la llamada
                 if (phone.startsWith('http')) {
                   window.open(phone, '_blank');
                 }
-                // Si contiene solo números y símbolos de teléfono, usar tel:
                 else if (/^[\d\s\+\-\(\)\.ext]+$/i.test(phone)) {
                   window.open(`tel:${phone}`, '_self');
                 }
-                // Para cualquier otro formato, intentar tel: de todas formas
                 else {
                   window.open(`tel:${phone}`, '_self');
                 }
