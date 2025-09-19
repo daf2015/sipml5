@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 
 class IntercomunicadorTester:
-    def __init__(self, base_url="https://intercom-edificios.preview.emergentagent.com"):
+    def __init__(self, base_url="http://localhost:8001"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.super_admin_token = None
