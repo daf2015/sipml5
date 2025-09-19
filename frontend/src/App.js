@@ -897,16 +897,17 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
       return;
     }
     
-    if (!telefono.startsWith('+')) {
-      toast.error('El número debe empezar con +');
-      return;
+    // Auto-agregar + si no está presente
+    let phoneNumber = telefono.trim();
+    if (!phoneNumber.startsWith('+')) {
+      phoneNumber = '+' + phoneNumber;
     }
 
     setLoading(true);
     try {
       await onSave(numeroVivienda, {
         nombre_familia: nombre.trim(),
-        phone: telefono.trim(),
+        phone: phoneNumber,
         publicar_nombre: publicar
       });
     } finally {
