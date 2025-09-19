@@ -340,6 +340,44 @@ async def check_slug_availability(slug: str):
         "message": f"El nombre '{slug}' está disponible"
     }
 
+# Admin de edificio crea su propio edificio
+@api_router.post("/edificios/create-my", response_model=Edificio)
+async def create_my_edificio(edificio_data: EdificioCreate, current_user: User = Depends(get_edificio_admin_or_super)):
+    # Solo admins de edificio pueden crear su propio edificio
+    if current_user.role != UserRole.EDIFICIO_ADMIN:
+        raise HTTPException(status_code=403, detail="Solo administradores de edificio pueden crear edificios")
+    
+    # Verificar que no tenga ya un edificio
+    if current_user.edificio_id:
+        raise HTTPException(status_code=400, detail="Ya tienes un edificio asignado")
+    
+    # Verificar que el slug personalizado no esté ocupado
+    slug_lower = edificio_data.slug_personalizado.lower()
+    existing_edificio = await db.edificios.find_one({"slug": slug_lower})
+    if existing_edificio:
+        raise HTTPException(status_code=400, detail=f"El nombre '{edificio_data.slug_personalizado}' ya está ocupado")
+    
+    edificio = Edificio(
+        nombre=edificio_data.nombre,
+        slug=slug_lower,
+        admin_nombre=edificio_data.admin_nombre,
+        admin_email=current_user.email,
+        cantidad_viviendas=edificio_data.cantidad_viviendas
+    )
+    
+    edificio_dict = edificio.dict()
+    edificio_dict["created_at"] = edificio_dict["created_at"].isoformat()
+    
+    await db.edificios.insert_one(edificio_dict)
+    
+    # Asignar el edificio al usuario actual
+    await db.users.update_one(
+        {"email": current_user.email},
+        {"$set": {"edificio_id": edificio.id}}
+    )
+    
+    return edificio
+
 @api_router.get("/edificios/my")
 async def get_my_edificio(current_user: User = Depends(get_edificio_admin_or_super)):
     if current_user.role == UserRole.SUPER_ADMIN:
