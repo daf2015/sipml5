@@ -248,16 +248,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Login y Autenticación"
-    - "CRUD de Viviendas"
-    - "Responsive Design"
-    - "UI/UX Moderna"
-    - "Funciones del Sidebar"
-    - "Manejo de Errores"
-  stuck_tasks: []
-  test_all: true
+    - "Página Pública"
+  stuck_tasks:
+    - "Página Pública"
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
     - agent: "testing"
       message: "🔄 COMPREHENSIVE QA TESTING INITIATED - Starting full system testing after recent changes. Focus areas: 1) Login/Auth with diego@daf-il.net, 2) CRUD operations with real data (QA Family/123456789), 3) Responsive design verification (Desktop/Mobile/Tablet), 4) Modern UI elements verification, 5) Sidebar functionality, 6) Error handling. Límite de viviendas increased to 24. Will test systematically across all device sizes."
+    - agent: "testing"
+      message: "✅ COMPREHENSIVE QA COMPLETED - RESULTS: 6/7 MAJOR FEATURES WORKING PERFECTLY. ✅ Login/Auth: Working, ✅ CRUD Operations: Perfect (create/edit/delete + auto + prefix), ✅ Responsive Design: Perfect (2 columns mobile, adaptive tablet), ✅ Modern UI/UX: Perfect (titles, colors, statistics), ✅ Sidebar Functions: Working, ✅ Error Handling: Working. ❌ CRITICAL ISSUE: Public page routing broken - /b163 redirects to login instead of showing public intercommunicator. Backend API working but frontend route needs authentication bypass fix."
