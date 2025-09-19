@@ -455,7 +455,7 @@ async def delete_vivienda_admin(vivienda_id: str, current_user: User = Depends(g
 @api_router.put("/edificios/my/cantidad-viviendas")
 async def update_cantidad_viviendas(
     nueva_cantidad: dict, 
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_edificio_admin_or_super)
 ):
     cantidad = nueva_cantidad.get("cantidad_viviendas")
     if not cantidad or cantidad < 1 or cantidad > 50:
