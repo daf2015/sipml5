@@ -738,7 +738,9 @@ const EdificioAdminDashboard = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h2 className="text-sm lg:text-lg font-bold text-gray-900 truncate">{edificioData?.edificio?.nombre}</h2>
-                <p className="text-xs text-gray-500 truncate">{edificioData?.edificio?.admin_nombre}</p>
+                <p className="text-xs text-gray-500 truncate">
+                  {isSuperAdminManaging ? `Gestionando como Super Admin` : edificioData?.edificio?.admin_nombre}
+                </p>
               </div>
             </div>
             
