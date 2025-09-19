@@ -607,6 +607,35 @@ const EdificioAdminDashboard = () => {
     }
   };
 
+  const updateCantidadViviendas = async () => {
+    const cantidad = parseInt(nuevaCantidad);
+    if (!cantidad || cantidad < 1 || cantidad > 50) {
+      toast.error('La cantidad debe estar entre 1 y 50');
+      return;
+    }
+
+    try {
+      if (isSuperAdminManaging) {
+        await axios.put(`${API}/admin/edificios/${edificioIdFromUrl}/cantidad-viviendas`, {
+          cantidad_viviendas: cantidad
+        });
+      } else {
+        await axios.put(`${API}/edificios/my/cantidad-viviendas`, {
+          cantidad_viviendas: cantidad
+        });
+      }
+      
+      toast.success(`Cantidad actualizada a ${cantidad} viviendas`);
+      setShowEditCantidad(false);
+      fetchEdificioData();
+    } catch (error) {
+      const errorMessage = typeof error.response?.data?.detail === 'string' 
+        ? error.response.data.detail 
+        : 'Error al actualizar cantidad';
+      toast.error(errorMessage);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
