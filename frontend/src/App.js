@@ -517,6 +517,267 @@ const SuperAdminDashboard = () => {
   );
 };
 
+// CDR (Call Detail Records) Page
+const CDRPage = () => {
+  const [cdrs, setCdrs] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [edificios, setEdificios] = useState([]);
+  const [selectedEdificio, setSelectedEdificio] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const navigate = useNavigate();
+
+  const fetchCDRStats = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/cdr/stats`);
+      setStats(response.data);
+    } catch (error) {
+      toast.error('Error al cargar estadísticas CDR');
+    }
+  };
+
+  const fetchCDRData = async (edificioFilter = '', pageNum = 0) => {
+    try {
+      const params = new URLSearchParams({
+        limit: '50',
+        offset: (pageNum * 50).toString()
+      });
+      
+      if (edificioFilter) {
+        params.append('edificio_id', edificioFilter);
+      }
+
+      const response = await axios.get(`${API}/admin/cdr?${params}`);
+      const data = response.data;
+      
+      if (pageNum === 0) {
+        setCdrs(data.cdrs);
+      } else {
+        setCdrs(prev => [...prev, ...data.cdrs]);
+      }
+      
+      setHasMore(data.has_more);
+      setEdificios(data.edificios_disponibles);
+    } catch (error) {
+      toast.error('Error al cargar registros CDR');
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchCDRStats(), fetchCDRData()]);
+      setLoading(false);
+    };
+    
+    loadData();
+  }, []);
+
+  const handleEdificioFilter = (edificioId) => {
+    setSelectedEdificio(edificioId);
+    setPage(0);
+    fetchCDRData(edificioId, 0);
+  };
+
+  const loadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchCDRData(selectedEdificio, nextPage);
+  };
+
+  const formatDateTime = (dateString) => {
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString('es-ES'),
+      time: date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+    };
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/admin')}
+                className="flex items-center space-x-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                <span>Volver</span>
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 flex items-center space-x-2">
+                  <Phone className="h-6 w-6 text-blue-600" />
+                  <span>CDR - Detalles de Llamadas</span>
+                </h1>
+                <p className="text-sm text-gray-600">Registro detallado de llamadas por edificio y vivienda</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Badge variant="outline" className="flex items-center space-x-1">
+                <Calendar className="h-3 w-3" />
+                <span>Último mes</span>
+              </Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Estadísticas */}
+        {stats && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Llamadas Este Mes</p>
+                    <p className="text-3xl font-bold text-blue-600">{stats.total_llamadas_mes}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Phone className="h-6 w-6 text-blue-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Total Histórico</p>
+                    <p className="text-3xl font-bold text-green-600">{stats.total_llamadas_historico}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Clock className="h-6 w-6 text-green-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Edificios Activos</p>
+                    <p className="text-3xl font-bold text-purple-600">{stats.edificios_activos}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Building2 className="h-6 w-6 text-purple-600" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Filtros */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Filter className="h-5 w-5" />
+              <span>Filtros</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-4">
+              <div className="flex-1 max-w-xs">
+                <Label htmlFor="edificio-filter">Filtrar por Edificio</Label>
+                <Select value={selectedEdificio} onValueChange={handleEdificioFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todos los edificios" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Todos los edificios</SelectItem>
+                    {edificios.map((edificio) => (
+                      <SelectItem key={edificio.id} value={edificio.id}>
+                        {edificio.nombre}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tabla CDR */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Registro de Llamadas</span>
+              <Badge variant="secondary">{cdrs.length} registros</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {cdrs.length === 0 ? (
+              <div className="text-center py-8">
+                <Phone className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No hay registros de llamadas para mostrar</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Fecha</TableHead>
+                      <TableHead>Hora</TableHead>
+                      <TableHead>Vivienda</TableHead>
+                      <TableHead>Familia</TableHead>
+                      <TableHead>Edificio</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {cdrs.map((cdr) => {
+                      const { date, time } = formatDateTime(cdr.call_timestamp);
+                      return (
+                        <TableRow key={cdr.id}>
+                          <TableCell className="font-medium">{date}</TableCell>
+                          <TableCell>{time}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              Vivienda {cdr.vivienda_numero}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{cdr.vivienda_nombre_familia}</TableCell>
+                          <TableCell className="text-sm text-gray-600">
+                            {cdr.edificio_nombre}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+                
+                {hasMore && (
+                  <div className="flex justify-center mt-6">
+                    <Button onClick={loadMore} variant="outline">
+                      Cargar más registros
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
 // Edificio Admin Dashboard - REDISEÑO ESTÉTICO BASADO EN REFERENCIAS
 const EdificioAdminDashboard = () => {
   const [edificioData, setEdificioData] = useState(null);
