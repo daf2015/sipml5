@@ -771,9 +771,9 @@ const EdificioAdminDashboard = () => {
           <p className="text-sm lg:text-base text-gray-500">Toca cualquier vivienda para editarla</p>
         </div>
 
-        {/* Grid de Viviendas MÓVIL MODERNO - Como app móvil */}
-        <div className="bg-white rounded-xl lg:rounded-2xl shadow-sm border-0 p-4 lg:p-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:gap-8">
+        {/* Grid de Viviendas EXACTO COMO LA REFERENCIA */}
+        <div className="bg-transparent p-4 lg:p-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-6 lg:gap-8">
             {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 12}, (_, index) => {
               const numeroVivienda = index + 1;
               const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
@@ -785,37 +785,42 @@ const EdificioAdminDashboard = () => {
                   className="relative cursor-pointer group transform transition-all duration-200 active:scale-95"
                   onClick={() => setSelectedVivienda(numeroVivienda)}
                 >
-                  <div className="bg-white rounded-2xl p-4 lg:p-6 text-center shadow-sm border border-gray-100 min-h-[140px] lg:min-h-[160px] flex flex-col justify-center hover:shadow-md transition-all duration-200">
+                  <div className="text-center py-4">
                     
-                    {/* Ícono de casa GRANDE y moderno */}
-                    <div className="mb-3 lg:mb-4 relative">
+                    {/* Ícono de casa GIGANTE como iOS */}
+                    <div className="mb-4 relative">
                       <div className={`
-                        w-16 h-16 lg:w-20 lg:h-20 mx-auto rounded-3xl flex items-center justify-center shadow-lg
+                        w-24 h-24 lg:w-28 lg:h-28 mx-auto rounded-3xl flex items-center justify-center shadow-lg
                         ${isOccupied 
-                          ? 'bg-gradient-to-br from-green-400 to-green-600' 
-                          : 'bg-gradient-to-br from-gray-300 to-gray-400'
+                          ? 'bg-green-500' 
+                          : 'bg-gray-400'
                         }
                       `}>
-                        <Home className="h-8 w-8 lg:h-10 lg:w-10 text-white" />
+                        <Home className="h-12 w-12 lg:h-14 lg:w-14 text-white" />
                       </div>
                       
-                      {/* Dot indicator */}
+                      {/* Punto verde pequeño arriba derecha */}
                       {isOccupied && (
                         <div className="absolute -top-1 -right-1">
-                          <div className="w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-lg"></div>
+                          <div className="w-4 h-4 bg-green-400 rounded-full"></div>
                         </div>
                       )}
                     </div>
                     
-                    {/* Título "Vivienda X" SIN # */}
-                    <div className="text-lg lg:text-xl font-bold text-gray-900 mb-2 leading-tight">
-                      Vivienda {numeroVivienda}
+                    {/* "Vivienda" */}
+                    <div className="text-xl lg:text-2xl font-bold text-gray-900 mb-1">
+                      Vivienda
                     </div>
                     
-                    {/* Nombre de familia o "Libre" */}
-                    <div className="text-sm lg:text-base">
+                    {/* Número GIGANTE */}
+                    <div className="text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
+                      {numeroVivienda}
+                    </div>
+                    
+                    {/* Nombre de familia */}
+                    <div className="text-base lg:text-lg">
                       {isOccupied ? (
-                        <div className="font-medium text-gray-600 leading-tight">
+                        <div className="font-medium text-gray-700">
                           {vivienda.nombre_familia}
                         </div>
                       ) : (
