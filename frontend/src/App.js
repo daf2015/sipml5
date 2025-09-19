@@ -543,6 +543,7 @@ const CDRPage = () => {
     setFechaHasta('');
     setPage(0);
     fetchCDRData({}, 0);
+    fetchEdificiosSummary();
   };
 
   const loadMore = () => {
