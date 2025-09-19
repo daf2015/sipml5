@@ -412,11 +412,19 @@ def main():
     
     tester = IntercomunicadorTester()
     
-    # Test sequence
+    # Test sequence - FOCUSED ON USER REPORTED ISSUES
     tests = [
         # Authentication tests
-        ("Super Admin Login", tester.test_super_admin_login),
         ("Edificio Admin Login", tester.test_edificio_admin_login),
+        
+        # SPECIFIC USER ISSUES - PRIORITY TESTS
+        ("Check Slug Availability", tester.test_check_slug_availability),
+        ("Create My Edificio (Admin)", tester.test_create_my_edificio),
+        ("Get My Edificios", tester.test_edificio_admin_my_edificio),
+        ("Delete My Edificio (Admin)", tester.test_delete_my_edificio),
+        
+        # Additional authentication tests
+        ("Super Admin Login", tester.test_super_admin_login),
         ("Invalid Login", tester.test_invalid_login),
         ("Unauthorized Access", tester.test_unauthorized_access),
         
@@ -425,7 +433,6 @@ def main():
         ("Create Edificio", tester.test_create_edificio),
         
         # Edificio admin functionality
-        ("Get My Edificio", tester.test_edificio_admin_my_edificio),
         ("Add Vivienda", tester.test_add_vivienda),
         ("Add Private Vivienda", tester.test_add_private_vivienda),
         ("Update Vivienda", tester.test_update_vivienda),
