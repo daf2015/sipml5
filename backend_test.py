@@ -881,41 +881,52 @@ class IntercomunicadorTester:
         return True
 
 def main():
-    print("🏢 Sistema Intercomunicador - URGENT VIVIENDA DEBUGGING")
-    print("🚨 USER REPORTS: Can add ONE vivienda but then 'Error al guardar vivienda'")
-    print("🔍 Testing multiple consecutive creations with user diego@daf-il.net")
-    print("=" * 70)
+    print("🏢 Sistema Intercomunicador - URGENT CANTIDAD VIVIENDAS UPDATE TESTING")
+    print("🚨 USER REPORTS: Housing quantity update endpoints not working for admin or super admin")
+    print("🔍 Testing specific endpoints:")
+    print("   1. Admin: PUT /api/edificios/my/cantidad-viviendas")
+    print("   2. Super Admin: PUT /api/admin/edificios/{edificio_id}/cantidad-viviendas")
+    print("=" * 80)
     
     tester = IntercomunicadorTester()
     
     # Test sequence - FOCUSED ON USER'S SPECIFIC ISSUE
     tests = [
         # Authentication first
+        ("🔐 Super Admin Login (diegofridman@gmail.com)", tester.test_super_admin_login),
         ("🔐 Edificio Admin Login (diego@daf-il.net)", tester.test_edificio_admin_login),
         
-        # Check current state
-        ("📋 Get Current Edificio State", tester.test_edificio_admin_my_edificio),
+        # Find Baitzman 163 edificio
+        ("🔍 Find Baitzman 163 Edificio ID", tester.find_baitzman_edificio),
         
-        # MAIN TEST: Multiple consecutive vivienda creations
-        ("🚨 MULTIPLE CONSECUTIVE VIVIENDA CREATIONS", tester.test_multiple_consecutive_viviendas),
+        # Check current states
+        ("📋 Get Admin Current Edificio State", tester.test_edificio_admin_my_edificio),
         
-        # Check limits and restrictions
-        ("🔍 Test Vivienda Limits and Restrictions", tester.test_vivienda_limits_and_restrictions),
+        # MAIN TESTS: Cantidad viviendas updates
+        ("🚨 ADMIN UPDATE CANTIDAD VIVIENDAS", tester.test_admin_update_cantidad_viviendas),
+        ("🚨 SUPER ADMIN UPDATE CANTIDAD VIVIENDAS", tester.test_super_admin_update_cantidad_viviendas),
         
-        # Verify final state
-        ("📊 Final Edificio State Check", tester.test_edificio_admin_my_edificio),
+        # Data structure validation
+        ("🔍 Data Structure Validation", tester.test_data_structure_validation),
         
-        # Cleanup
-        ("🧹 Cleanup Test Viviendas", tester.cleanup_test_viviendas),
+        # Edge cases
+        ("🔍 Edge Cases Testing", tester.test_edge_cases_cantidad_viviendas),
+        
+        # Final verification
+        ("📊 Final State Verification", tester.test_edificio_admin_my_edificio),
     ]
     
     # Run all tests
     for test_name, test_func in tests:
-        print(f"\n{'='*70}")
+        print(f"\n{'='*80}")
         print(f"🧪 {test_name}")
-        print('='*70)
+        print('='*80)
         try:
-            test_func()
+            result = test_func()
+            if result:
+                print(f"✅ {test_name} - PASSED")
+            else:
+                print(f"❌ {test_name} - FAILED")
         except Exception as e:
             print(f"❌ {test_name} - Exception: {str(e)}")
             import traceback
@@ -925,15 +936,15 @@ def main():
         time.sleep(1)
     
     # Print results
-    print("\n" + "=" * 70)
+    print("\n" + "=" * 80)
     print(f"📊 FINAL TEST RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
     
     if tester.tests_passed == tester.tests_run:
-        print("🎉 All tests passed! User issue may be resolved or not reproducible.")
+        print("🎉 All tests passed! Housing quantity update endpoints are working correctly.")
         return 0
     else:
         failed_count = tester.tests_run - tester.tests_passed
-        print(f"⚠️  {failed_count} tests failed - USER ISSUE REPRODUCED!")
+        print(f"⚠️  {failed_count} tests failed - HOUSING QUANTITY UPDATE ISSUE CONFIRMED!")
         print("🔍 Check the failed tests above for the exact error causing the user's issue.")
         return 1
 
