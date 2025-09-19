@@ -168,6 +168,7 @@ const SuperAdminDashboard = () => {
   const [adminNombre, setAdminNombre] = useState('');
   const [cantidadViviendas, setCantidadViviendas] = useState(20);
   const [createLoading, setCreateLoading] = useState(false);
+  const [showDetallesLlamadas, setShowDetallesLlamadas] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
