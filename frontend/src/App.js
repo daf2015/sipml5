@@ -171,6 +171,8 @@ const SuperAdminDashboard = () => {
   const [cantidadViviendas, setCantidadViviendas] = useState(20);
   const [createLoading, setCreateLoading] = useState(false);
   // Modal states removed - now using CDR page
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
