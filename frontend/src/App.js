@@ -538,6 +538,96 @@ const SuperAdminDashboard = () => {
           </div>
         </div>
         {/* Modal eliminado - ahora redirige a página CDR */}
+
+        {/* Sistema de Backup y Restore */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Settings className="h-5 w-5" />
+              <span>Backup & Restore</span>
+            </CardTitle>
+            <CardDescription>
+              Sistema de respaldo y restauración para recuperación ante desastres
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Backup Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">📦 Descargar Backups</h3>
+                
+                <Button 
+                  onClick={downloadSistemaBackup}
+                  className="w-full flex items-center space-x-2"
+                  variant="outline"
+                  disabled={loading}
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Descargar Sistema Completo</span>
+                </Button>
+                <p className="text-xs text-gray-600">Código fuente completo para reinstalación</p>
+                
+                <Button 
+                  onClick={downloadClientesBackup}
+                  className="w-full flex items-center space-x-2"
+                  variant="outline"
+                  disabled={loading}
+                >
+                  <Download className="h-4 w-4" />
+                  <span>Descargar Datos de Clientes</span>
+                </Button>
+                <p className="text-xs text-gray-600">Todos los edificios, viviendas y registros de llamadas</p>
+              </div>
+
+              {/* Restore Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">🔄 Restaurar Datos</h3>
+                
+                <div>
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleFileSelect}
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                  />
+                  <Button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full flex items-center space-x-2"
+                    variant="outline"
+                    disabled={loading}
+                  >
+                    <Upload className="h-4 w-4" />
+                    <span>Seleccionar Archivo de Clientes</span>
+                  </Button>
+                  {selectedFile && (
+                    <div className="mt-2 p-2 bg-gray-100 rounded text-sm">
+                      📄 {selectedFile.name}
+                    </div>
+                  )}
+                </div>
+                
+                {selectedFile && (
+                  <Button 
+                    onClick={restoreClientesData}
+                    className="w-full flex items-center space-x-2"
+                    disabled={loading}
+                  >
+                    <Upload className="h-4 w-4" />
+                    <span>Restaurar Datos de Clientes</span>
+                  </Button>
+                )}
+                
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
+                  <p className="text-xs text-yellow-800">
+                    ⚠️ <strong>Advertencia:</strong> La restauración eliminará todos los datos existentes y los reemplazará con el backup.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
       </main>
     </div>
   );
