@@ -773,9 +773,9 @@ const EdificioAdminDashboard = () => {
           <p className="text-sm lg:text-base text-gray-600">Toca cualquier vivienda para editarla</p>
         </div>
 
-        {/* Grid de Viviendas MODERNO - Como las referencias */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg border-0 p-6 lg:p-8">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
+        {/* Grid de Viviendas MÓVIL MODERNO - Como app móvil */}
+        <div className="bg-white rounded-xl lg:rounded-2xl shadow-sm border-0 p-4 lg:p-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:gap-8">
             {Array.from({length: edificioData?.edificio?.cantidad_viviendas || 12}, (_, index) => {
               const numeroVivienda = index + 1;
               const vivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
@@ -784,55 +784,46 @@ const EdificioAdminDashboard = () => {
               return (
                 <div
                   key={numeroVivienda}
-                  className="relative cursor-pointer group transform transition-all duration-300 hover:scale-105"
+                  className="relative cursor-pointer group transform transition-all duration-200 active:scale-95"
                   onClick={() => setSelectedVivienda(numeroVivienda)}
                 >
-                  <div className={`
-                    rounded-2xl sm:rounded-3xl p-3 sm:p-4 lg:p-6 text-center shadow-lg border-0 min-h-[120px] sm:min-h-[140px] lg:min-h-[160px] flex flex-col justify-center relative overflow-hidden
-                    ${isOccupied 
-                      ? 'bg-white shadow-green-200/50 hover:shadow-green-300/60' 
-                      : 'bg-white/80 hover:bg-white shadow-gray-200/50 hover:shadow-gray-300/60'
-                    }
-                  `}>
+                  <div className="bg-white rounded-2xl p-4 lg:p-6 text-center shadow-sm border border-gray-100 min-h-[140px] lg:min-h-[160px] flex flex-col justify-center hover:shadow-md transition-all duration-200">
                     
-                    {/* Fondo decorativo */}
-                    <div className={`absolute inset-0 opacity-5 ${isOccupied ? 'bg-green-400' : 'bg-gray-300'}`}></div>
-                    
-                    {/* Ícono de casa moderno */}
-                    <div className="mb-2 lg:mb-3 relative z-10">
+                    {/* Ícono de casa GRANDE y moderno */}
+                    <div className="mb-3 lg:mb-4 relative">
                       <div className={`
-                        w-8 h-8 sm:w-10 sm:h-10 lg:w-16 lg:h-16 mx-auto rounded-xl lg:rounded-2xl flex items-center justify-center
+                        w-16 h-16 lg:w-20 lg:h-20 mx-auto rounded-3xl flex items-center justify-center shadow-lg
                         ${isOccupied 
-                          ? 'bg-gradient-to-br from-green-400 to-green-600 shadow-lg shadow-green-200' 
-                          : 'bg-gradient-to-br from-gray-300 to-gray-500 shadow-lg shadow-gray-200'
+                          ? 'bg-gradient-to-br from-green-400 to-green-600' 
+                          : 'bg-gradient-to-br from-gray-300 to-gray-400'
                         }
                       `}>
-                        <Home className="h-4 w-4 sm:h-5 sm:w-5 lg:h-8 lg:w-8 text-white" />
+                        <Home className="h-8 w-8 lg:h-10 lg:w-10 text-white" />
                       </div>
+                      
+                      {/* Dot indicator */}
+                      {isOccupied && (
+                        <div className="absolute -top-1 -right-1">
+                          <div className="w-5 h-5 bg-green-500 rounded-full border-2 border-white shadow-lg"></div>
+                        </div>
+                      )}
                     </div>
                     
-                    {/* Título "Vivienda X" */}
-                    <div className="text-sm sm:text-base lg:text-xl font-bold text-gray-900 mb-1 lg:mb-2 relative z-10">
+                    {/* Título "Vivienda X" SIN # */}
+                    <div className="text-lg lg:text-xl font-bold text-gray-900 mb-2 leading-tight">
                       Vivienda {numeroVivienda}
                     </div>
                     
                     {/* Nombre de familia o "Libre" */}
-                    <div className="text-xs sm:text-sm lg:text-base relative z-10">
+                    <div className="text-sm lg:text-base">
                       {isOccupied ? (
-                        <div className="font-medium text-gray-700 leading-tight px-1 lg:px-2">
+                        <div className="font-medium text-gray-600 leading-tight">
                           {vivienda.nombre_familia}
                         </div>
                       ) : (
-                        <div className="text-gray-500 font-medium">Libre</div>
+                        <div className="text-gray-400 font-medium">Libre</div>
                       )}
                     </div>
-                    
-                    {/* Indicator dot */}
-                    {isOccupied && (
-                      <div className="absolute top-3 right-3 z-20">
-                        <div className="w-4 h-4 bg-green-500 rounded-full border-3 border-white shadow-lg animate-pulse"></div>
-                      </div>
-                    )}
                   </div>
                 </div>
               );
