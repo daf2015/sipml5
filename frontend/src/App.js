@@ -789,130 +789,113 @@ const EdificioAdminDashboard = () => {
     );
   }
 
-  // Formulario de creación de edificio
+  // Formulario de creación SIMPLE
   if (showCreateForm) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-2xl mx-auto">
-            <Card className="shadow-xl border-0">
-              <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg">
-                <CardTitle className="text-2xl flex items-center">
-                  <Building2 className="mr-3 h-8 w-8" />
-                  Crear Tu Edificio
-                </CardTitle>
-                <CardDescription className="text-indigo-100">
-                  Configura tu sistema de intercomunicación personalizado
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-8">
-                <form onSubmit={createEdificio} className="space-y-6">
-                  <div>
-                    <Label htmlFor="adminNombre">Tu nombre completo</Label>
-                    <Input
-                      id="adminNombre"
-                      value={adminNombre}
-                      onChange={(e) => setAdminNombre(e.target.value)}
-                      placeholder="Juan Pérez García"
-                      required
-                      className="h-12 text-lg"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="edificioNombre">Nombre del edificio</Label>
-                    <Input
-                      id="edificioNombre"
-                      value={edificioNombre}
-                      onChange={(e) => setEdificioNombre(e.target.value)}
-                      placeholder="Edificio Las Torres"
-                      required
-                      className="h-12 text-lg"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="slugPersonalizado">Nombre para el link (mínimo 3 caracteres)</Label>
-                    <div className="relative">
-                      <Input
-                        id="slugPersonalizado"
-                        value={slugPersonalizado}
-                        onChange={(e) => {
-                          const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
-                          setSlugPersonalizado(value);
-                          if (value.length >= 3) checkSlugAvailability(value);
-                        }}
-                        placeholder="bai123"
-                        required
-                        className="h-12 text-lg pr-12"
-                      />
-                      {slugStatus.available === true && (
-                        <div className="absolute right-3 top-3 text-green-500">✓</div>
-                      )}
-                      {slugStatus.available === false && (
-                        <div className="absolute right-3 top-3 text-red-500">✗</div>
-                      )}
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl flex items-center justify-center">
+              <Building2 className="mr-2 h-5 w-5 text-blue-600" />
+              Crear Mi Edificio
+            </CardTitle>
+            <CardDescription>
+              Configura tu intercomunicador en 3 pasos
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={createEdificio} className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Tu nombre completo</Label>
+                <Input
+                  value={adminNombre}
+                  onChange={(e) => setAdminNombre(e.target.value)}
+                  placeholder="Juan Pérez"
+                  required
+                  className="mt-1"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium">Nombre del edificio</Label>
+                <Input
+                  value={edificioNombre}
+                  onChange={(e) => setEdificioNombre(e.target.value)}
+                  placeholder="Edificio Las Torres"
+                  required
+                  className="mt-1"
+                />
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium">Nombre para el link</Label>
+                <Input
+                  value={slugPersonalizado}
+                  onChange={(e) => {
+                    const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+                    setSlugPersonalizado(value);
+                    if (value.length >= 3) checkSlugAvailability(value);
+                  }}
+                  placeholder="torres123"
+                  required
+                  className="mt-1"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Tu link: <strong>intercum.com/{slugPersonalizado}</strong>
+                </p>
+                {slugStatus.message && (
+                  <p className={`text-xs mt-1 ${slugStatus.available ? 'text-green-600' : 'text-red-600'}`}>
+                    {slugStatus.message}
+                  </p>
+                )}
+                {slugStatus.suggestions && slugStatus.suggestions.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-600">Sugerencias:</p>
+                    <div className="flex gap-1 mt-1">
+                      {slugStatus.suggestions.map(suggestion => (
+                        <Button
+                          key={suggestion}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="text-xs px-2 py-1"
+                          onClick={() => {
+                            setSlugPersonalizado(suggestion);
+                            checkSlugAvailability(suggestion);
+                          }}
+                        >
+                          {suggestion}
+                        </Button>
+                      ))}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Tu link será: <strong>intercum.com/{slugPersonalizado}</strong>
-                    </p>
-                    {slugStatus.message && (
-                      <p className={`text-sm mt-1 ${slugStatus.available ? 'text-green-600' : 'text-red-600'}`}>
-                        {slugStatus.message}
-                      </p>
-                    )}
-                    {slugStatus.suggestions && slugStatus.suggestions.length > 0 && (
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-600">Sugerencias disponibles:</p>
-                        <div className="flex gap-2 mt-1">
-                          {slugStatus.suggestions.map(suggestion => (
-                            <Button
-                              key={suggestion}
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setSlugPersonalizado(suggestion);
-                                checkSlugAvailability(suggestion);
-                              }}
-                            >
-                              {suggestion}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
                   </div>
-                  
-                  <div>
-                    <Label htmlFor="cantidadViviendas">Cantidad de viviendas</Label>
-                    <Input
-                      id="cantidadViviendas"
-                      type="number"
-                      min="1"
-                      max="50"
-                      value={cantidadViviendas}
-                      onChange={(e) => setCantidadViviendas(parseInt(e.target.value))}
-                      required
-                      className="h-12 text-lg"
-                    />
-                    <p className="text-sm text-gray-600 mt-1">
-                      Entre 1 y 50 viviendas
-                    </p>
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full h-12 text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700" 
-                    disabled={createLoading || !slugStatus.available}
-                  >
-                    {createLoading ? 'Creando...' : 'Crear Mi Edificio'}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                )}
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium">Cantidad de viviendas</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={cantidadViviendas}
+                  onChange={(e) => setCantidadViviendas(parseInt(e.target.value))}
+                  required
+                  className="mt-1"
+                />
+                <p className="text-xs text-gray-500 mt-1">Entre 1 y 100 viviendas</p>
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={createLoading || !slugStatus.available}
+              >
+                {createLoading ? 'Creando...' : 'Crear Edificio'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     );
   }
