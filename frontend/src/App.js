@@ -911,14 +911,14 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 lg:space-y-5">
       <div className="space-y-2">
         <Label className="text-sm font-medium text-gray-700">Nombre de la familia</Label>
         <Input
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           placeholder="Familia García"
-          className="h-11"
+          className="h-10 lg:h-11 text-base"
         />
       </div>
       
@@ -927,12 +927,14 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
         <Input
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
-          placeholder="972501234567 o +972501234567"
-          className="h-11"
+          placeholder="972501234567"
+          className="h-10 lg:h-11 text-base"
+          type="tel"
         />
+        <p className="text-xs text-gray-500">Con o sin el signo +</p>
       </div>
       
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3 py-2">
         <Checkbox
           checked={publicar}
           onCheckedChange={setPublicar}
@@ -942,11 +944,11 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
         </Label>
       </div>
       
-      <div className="flex space-x-2 pt-2">
+      <div className="flex flex-col sm:flex-row gap-2 pt-2">
         <Button 
           onClick={handleSave} 
           disabled={loading}
-          className="flex-1 bg-blue-600 hover:bg-blue-700"
+          className="flex-1 bg-blue-600 hover:bg-blue-700 h-10 lg:h-11"
         >
           {loading ? 'Guardando...' : 'Guardar'}
         </Button>
@@ -954,7 +956,7 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
         <Button 
           onClick={onCancel}
           variant="outline"
-          className="border-gray-300"
+          className="border-gray-300 h-10 lg:h-11"
         >
           Cancelar
         </Button>
@@ -963,9 +965,10 @@ const ViviendaEditForm = ({ numeroVivienda, vivienda, onSave, onDelete, onCancel
           <Button 
             onClick={handleDelete}
             variant="destructive"
-            size="sm"
+            className="h-10 lg:h-11"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Eliminar</span>
           </Button>
         )}
       </div>
