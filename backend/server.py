@@ -719,6 +719,73 @@ async def get_cdr_statistics(current_user: User = Depends(get_super_admin)):
         "edificios_activos": edificios_activos
     }
 
+@api_router.get("/admin/cdr/edificios-summary")
+async def get_edificios_summary(
+    fecha_desde: Optional[str] = None,
+    fecha_hasta: Optional[str] = None,
+    current_user: User = Depends(get_super_admin)
+):
+    """
+    Resumen de llamadas por edificio - vista rápida de totales
+    """
+    # Filtros de fecha
+    if fecha_desde and fecha_hasta:
+        try:
+            fecha_desde_dt = datetime.fromisoformat(fecha_desde.replace('Z', '+00:00'))
+            fecha_hasta_dt = datetime.fromisoformat(fecha_hasta.replace('Z', '+00:00'))
+            date_filter = {"call_timestamp": {"$gte": fecha_desde_dt, "$lte": fecha_hasta_dt}}
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Formato de fecha inválido")
+    else:
+        # Por defecto: último mes
+        one_month_ago = datetime.now(timezone.utc) - timedelta(days=30)
+        date_filter = {"call_timestamp": {"$gte": one_month_ago}}
+    
+    # Agregación para obtener totales por edificio
+    pipeline = [
+        {"$match": date_filter},
+        {
+            "$group": {
+                "_id": {
+                    "edificio_id": "$edificio_id",
+                    "edificio_nombre": "$edificio_nombre"
+                },
+                "total_llamadas": {"$sum": 1},
+                "viviendas_activas": {"$addToSet": "$vivienda_numero"},
+                "ultima_llamada": {"$max": "$call_timestamp"}
+            }
+        },
+        {
+            "$project": {
+                "edificio_id": "$_id.edificio_id",
+                "edificio_nombre": "$_id.edificio_nombre",
+                "total_llamadas": 1,
+                "viviendas_activas": {"$size": "$viviendas_activas"},
+                "ultima_llamada": 1,
+                "_id": 0
+            }
+        },
+        {"$sort": {"total_llamadas": -1}}
+    ]
+    
+    edificios_summary = await db.call_detail_records.aggregate(pipeline).to_list(None)
+    
+    # Obtener información adicional de edificios desde la colección edificios
+    for edificio in edificios_summary:
+        edificio_data = await db.edificios.find_one({"id": edificio["edificio_id"]})
+        if edificio_data:
+            edificio["admin_email"] = edificio_data.get("admin_email", "")
+            edificio["total_viviendas"] = edificio_data.get("cantidad_viviendas", 0)
+            edificio["ocupacion_porcentaje"] = round(
+                (edificio["viviendas_activas"] / edificio["total_viviendas"]) * 100, 1
+            ) if edificio["total_viviendas"] > 0 else 0
+    
+    return {
+        "edificios_summary": edificios_summary,
+        "total_edificios": len(edificios_summary),
+        "periodo": "filtrado" if fecha_desde and fecha_hasta else "último_mes"
+    }
+
 # Actualizar cantidad de viviendas - Super admin
 @api_router.put("/admin/edificios/{edificio_id}/cantidad-viviendas")
 async def update_cantidad_viviendas_admin(
