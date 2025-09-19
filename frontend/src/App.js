@@ -295,14 +295,18 @@ const SuperAdminDashboard = () => {
           
           <Card className="bg-white shadow-sm border-0">
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Llamadas</p>
-                  <p className="text-3xl font-bold text-gray-900">{dashboard?.total_llamadas || 0}</p>
-                </div>
-                <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Phone className="h-6 w-6 text-amber-600" />
                 </div>
+                <p className="text-2xl font-bold text-gray-900">{dashboard?.total_llamadas || 0}</p>
+                <p className="text-sm text-gray-600">Llamadas</p>
+                <button 
+                  onClick={() => setShowDetallesLlamadas(true)}
+                  className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+                >
+                  Detalles
+                </button>
               </div>
             </CardContent>
           </Card>
