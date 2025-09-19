@@ -609,6 +609,7 @@ async def get_call_detail_records(
         # Generar CSV
         import csv
         import io
+        from fastapi.responses import Response
         
         output = io.StringIO()
         writer = csv.writer(output)
