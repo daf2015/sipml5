@@ -497,12 +497,15 @@ const EdificioAdminDashboard = () => {
 
   const updateViviendaData = async (numeroVivienda, data) => {
     try {
+      console.log('Guardando vivienda:', { numeroVivienda, data });
       const existingVivienda = edificioData?.viviendas?.find(v => v.numero === numeroVivienda);
       
       if (existingVivienda) {
+        console.log('Actualizando vivienda existente:', existingVivienda.id);
         await axios.put(`${API}/edificios/my/viviendas/${existingVivienda.id}`, data);
         toast.success('Vivienda actualizada');
       } else {
+        console.log('Creando nueva vivienda');
         await axios.post(`${API}/edificios/my/viviendas`, data);
         toast.success('Vivienda agregada');
       }
@@ -510,6 +513,8 @@ const EdificioAdminDashboard = () => {
       fetchEdificioData();
       setSelectedVivienda(null);
     } catch (error) {
+      console.error('Error al guardar vivienda:', error);
+      console.error('Response:', error.response?.data);
       const errorMessage = typeof error.response?.data?.detail === 'string' 
         ? error.response.data.detail 
         : 'Error al guardar vivienda';
