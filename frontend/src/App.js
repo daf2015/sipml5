@@ -759,8 +759,8 @@ const EdificioAdminDashboard = () => {
 
       {/* ÁREA PRINCIPAL - Casitas RESPONSIVE */}
       <div className="flex-1 p-3 lg:p-6">
-        <div className="mb-4 lg:mb-6">
-          <h1 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1 lg:mb-2">Gestión de Viviendas</h1>
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2 lg:mb-3">Gestión de Viviendas</h1>
           <p className="text-sm lg:text-base text-gray-600">Toca cualquier vivienda para editarla</p>
         </div>
 
