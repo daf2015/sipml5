@@ -751,9 +751,9 @@ const EdificioAdminDashboard = () => {
             
             {/* Estadísticas COMPACTAS - MÓVIL */}
             <div className="grid grid-cols-2 gap-2 lg:gap-4 mb-3 lg:mb-6">
-              <div className="bg-blue-50 p-2 lg:p-4 rounded-xl text-center">
+              <div className="bg-blue-50 p-2 lg:p-4 rounded-xl text-center cursor-pointer hover:bg-blue-100" onClick={() => setShowEditCantidad(true)}>
                 <p className="text-lg lg:text-2xl font-bold text-blue-600">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
-                <p className="text-xs text-blue-600">Total</p>
+                <p className="text-xs text-blue-600">Total (editar)</p>
               </div>
               <div className="bg-green-50 p-2 lg:p-4 rounded-xl text-center">
                 <p className="text-lg lg:text-2xl font-bold text-green-600">{edificioData?.viviendas?.length || 0}</p>
