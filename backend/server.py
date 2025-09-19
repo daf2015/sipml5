@@ -545,6 +545,39 @@ async def update_nombre_edificio_admin(
     
     return {"message": f"Nombre actualizado a '{nombre}'"}
 
+# Obtener detalles de llamadas para super admin
+@api_router.get("/admin/detalles-llamadas")
+async def get_detalles_llamadas(current_user: User = Depends(get_super_admin)):
+    # Obtener todos los edificios con sus estadísticas
+    edificios = serialize_docs(
+        await db.edificios.find({}).sort("total_calls", -1).to_list(None)
+    )
+    
+    # Calcular totales
+    total_llamadas = sum(e.get("total_calls", 0) for e in edificios)
+    total_edificios = len(edificios)
+    
+    # Obtener ranking de edificios por uso
+    ranking_edificios = []
+    for edificio in edificios:
+        viviendas_count = await db.viviendas.count_documents({"edificio_id": edificio["id"]})
+        ranking_edificios.append({
+            "nombre": edificio["nombre"],
+            "slug": edificio["slug"],
+            "total_calls": edificio.get("total_calls", 0),
+            "monthly_calls": edificio.get("monthly_calls", 0),
+            "total_viviendas": edificio.get("cantidad_viviendas", 0),
+            "viviendas_ocupadas": viviendas_count,
+            "admin_email": edificio.get("admin_email", ""),
+            "created_at": edificio.get("created_at", "")
+        })
+    
+    return {
+        "total_llamadas": total_llamadas,
+        "total_edificios": total_edificios,
+        "ranking_edificios": ranking_edificios
+    }
+
 # Actualizar cantidad de viviendas - Super admin
 @api_router.put("/admin/edificios/{edificio_id}/cantidad-viviendas")
 async def update_cantidad_viviendas_admin(
