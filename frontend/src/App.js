@@ -188,6 +188,15 @@ const SuperAdminDashboard = () => {
     }
   };
 
+  const fetchDetallesLlamadas = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/detalles-llamadas`);
+      setDetallesLlamadas(response.data);
+    } catch (error) {
+      toast.error('Error al cargar detalles de llamadas');
+    }
+  };
+
   const createEdificio = async (e) => {
     e.preventDefault();
     setCreateLoading(true);
