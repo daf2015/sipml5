@@ -313,6 +313,20 @@ const SuperAdminDashboard = () => {
                   </p>
                 </div>
                 <div>
+                  <Label htmlFor="adminNombre">Nombre completo del administrador</Label>
+                  <Input
+                    id="adminNombre"
+                    value={adminNombre}
+                    onChange={(e) => setAdminNombre(e.target.value)}
+                    placeholder="Juan Pérez García"
+                    required
+                    minLength={2}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Para registro, facturación y comunicaciones
+                  </p>
+                </div>
+                <div>
                   <Label htmlFor="adminEmail">Email del administrador</Label>
                   <Input
                     id="adminEmail"
@@ -322,6 +336,21 @@ const SuperAdminDashboard = () => {
                     placeholder="admin@edificio.com"
                     required
                   />
+                </div>
+                <div>
+                  <Label htmlFor="cantidadViviendas">Cantidad de viviendas</Label>
+                  <Input
+                    id="cantidadViviendas"
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={cantidadViviendas}
+                    onChange={(e) => setCantidadViviendas(parseInt(e.target.value))}
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Entre 1 y 20 viviendas por edificio
+                  </p>
                 </div>
                 <Button type="submit" className="w-full" disabled={createLoading}>
                   {createLoading ? 'Creando...' : 'Crear Edificio'}
