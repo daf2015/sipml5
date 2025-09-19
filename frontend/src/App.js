@@ -787,44 +787,44 @@ const EdificioAdminDashboard = () => {
                 >
                   <div className="text-center py-4">
                     
-                    {/* Ícono de casa GIGANTE como iOS */}
-                    <div className="mb-4 relative">
+                    {/* Ícono casa SÚPER GIGANTE exacto como referencia */}
+                    <div className="mb-3 relative">
                       <div className={`
-                        w-24 h-24 lg:w-28 lg:h-28 mx-auto rounded-3xl flex items-center justify-center shadow-lg
+                        w-20 h-20 mx-auto rounded-2xl flex items-center justify-center
                         ${isOccupied 
                           ? 'bg-green-500' 
-                          : 'bg-gray-400'
+                          : 'bg-gray-300'
                         }
                       `}>
-                        <Home className="h-12 w-12 lg:h-14 lg:w-14 text-white" />
+                        <Home className="h-10 w-10 text-white" />
                       </div>
                       
-                      {/* Punto verde pequeño arriba derecha */}
+                      {/* Punto verde arriba derecha */}
                       {isOccupied && (
-                        <div className="absolute -top-1 -right-1">
+                        <div className="absolute -top-1 -right-1 z-10">
                           <div className="w-4 h-4 bg-green-400 rounded-full"></div>
                         </div>
                       )}
                     </div>
                     
                     {/* "Vivienda" */}
-                    <div className="text-xl lg:text-2xl font-bold text-gray-900 mb-1">
+                    <div className="text-sm font-semibold text-gray-800 mb-1">
                       Vivienda
                     </div>
                     
                     {/* Número GIGANTE */}
-                    <div className="text-4xl lg:text-5xl font-bold text-gray-900 mb-3">
+                    <div className="text-3xl font-bold text-gray-900 mb-2">
                       {numeroVivienda}
                     </div>
                     
-                    {/* Nombre de familia */}
-                    <div className="text-base lg:text-lg">
+                    {/* Nombre familia pequeño */}
+                    <div className="text-xs px-1">
                       {isOccupied ? (
-                        <div className="font-medium text-gray-700">
+                        <div className="font-medium text-gray-600 leading-tight">
                           {vivienda.nombre_familia}
                         </div>
                       ) : (
-                        <div className="text-gray-400 font-medium">Libre</div>
+                        <div className="text-gray-400">Libre</div>
                       )}
                     </div>
                   </div>
