@@ -524,11 +524,21 @@ const EdificioAdminDashboard = () => {
       
       if (existingVivienda) {
         console.log('Actualizando vivienda existente:', existingVivienda.id);
-        await axios.put(`${API}/edificios/my/viviendas/${existingVivienda.id}`, data);
+        
+        if (isSuperAdminManaging) {
+          await axios.put(`${API}/admin/viviendas/${existingVivienda.id}`, data);
+        } else {
+          await axios.put(`${API}/edificios/my/viviendas/${existingVivienda.id}`, data);
+        }
         toast.success('Vivienda actualizada');
       } else {
         console.log('Creando nueva vivienda');
-        await axios.post(`${API}/edificios/my/viviendas`, data);
+        
+        if (isSuperAdminManaging) {
+          await axios.post(`${API}/admin/edificios/${edificioIdFromUrl}/viviendas`, data);
+        } else {
+          await axios.post(`${API}/edificios/my/viviendas`, data);
+        }
         toast.success('Vivienda agregada');
       }
       
