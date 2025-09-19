@@ -710,45 +710,51 @@ const EdificioAdminDashboard = () => {
             </div>
           </div>
 
-          {/* Funciones */}
-          <div className="space-y-3">
+          {/* Funciones - RESPONSIVE */}
+          <div className="space-y-2 lg:space-y-3">
             <Button
               onClick={() => {
                 const url = `${window.location.origin}/${edificioData?.edificio?.slug}`;
                 navigator.clipboard.writeText(url);
                 toast.success('Link copiado');
               }}
-              className="w-full justify-start bg-blue-600 hover:bg-blue-700"
+              className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-sm lg:text-base"
+              size="sm"
             >
-              <Copy className="h-4 w-4 mr-3" />
-              Copiar Link Público
+              <Copy className="h-4 w-4 mr-2 lg:mr-3" />
+              <span className="hidden sm:inline">Copiar Link Público</span>
+              <span className="sm:hidden">Copiar Link</span>
             </Button>
             
             <Button
               onClick={() => window.open(`/${edificioData?.edificio?.slug}`, '_blank')}
               variant="outline"
-              className="w-full justify-start"
+              className="w-full justify-start text-sm lg:text-base"
+              size="sm"
             >
-              <ExternalLink className="h-4 w-4 mr-3" />
-              Ver Página Pública
+              <ExternalLink className="h-4 w-4 mr-2 lg:mr-3" />
+              <span className="hidden sm:inline">Ver Página Pública</span>
+              <span className="sm:hidden">Ver Público</span>
             </Button>
             
             <Button
               onClick={deleteEdificio}
               variant="destructive"
-              className="w-full justify-start"
+              className="w-full justify-start text-sm lg:text-base"
+              size="sm"
             >
-              <Trash2 className="h-4 w-4 mr-3" />
+              <Trash2 className="h-4 w-4 mr-2 lg:mr-3" />
               Eliminar Edificio
             </Button>
             
-            <div className="pt-4 border-t">
+            <div className="pt-3 lg:pt-4 border-t">
               <Button
                 onClick={logout}
                 variant="ghost"
-                className="w-full justify-start text-gray-600"
+                className="w-full justify-start text-gray-600 text-sm lg:text-base"
+                size="sm"
               >
-                <LogOut className="h-4 w-4 mr-3" />
+                <LogOut className="h-4 w-4 mr-2 lg:mr-3" />
                 Cerrar Sesión
               </Button>
             </div>
