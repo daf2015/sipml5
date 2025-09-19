@@ -839,16 +839,16 @@ const EdificioAdminDashboard = () => {
           </div>
         </div>
         
-        {/* Modal MODERNO */}
+        {/* Modal MODERNO Y RESPONSIVE */}
         {selectedVivienda && (
           <Dialog open={!!selectedVivienda} onOpenChange={() => setSelectedVivienda(null)}>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="w-[95vw] max-w-md mx-auto">
               <DialogHeader>
-                <DialogTitle className="flex items-center space-x-2">
+                <DialogTitle className="flex items-center space-x-2 text-lg">
                   <Home className="h-5 w-5 text-blue-600" />
                   <span>Vivienda #{selectedVivienda}</span>
                 </DialogTitle>
-                <DialogDescription>
+                <DialogDescription className="text-sm">
                   {edificioData?.viviendas?.find(v => v.numero === selectedVivienda) 
                     ? 'Edita la información de contacto'
                     : 'Agrega información de contacto'
