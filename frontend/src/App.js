@@ -673,18 +673,33 @@ const CDRPage = () => {
         {/* Filtros */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Filter className="h-5 w-5" />
-              <span>Filtros</span>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-5 w-5" />
+                <span>Filtros Avanzados</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button 
+                  onClick={downloadCSV} 
+                  disabled={downloading}
+                  variant="outline" 
+                  size="sm"
+                  className="flex items-center space-x-2"
+                >
+                  <Download className="h-4 w-4" />
+                  <span>{downloading ? 'Descargando...' : 'Descargar CSV'}</span>
+                </Button>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center space-x-4">
-              <div className="flex-1 max-w-xs">
-                <Label htmlFor="edificio-filter">Filtrar por Edificio</Label>
-                <Select value={selectedEdificio || "all"} onValueChange={(value) => handleEdificioFilter(value === "all" ? "" : value)}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-4">
+              {/* Filtro de Edificio */}
+              <div>
+                <Label>Edificio</Label>
+                <Select value={selectedEdificio || "all"} onValueChange={(value) => setSelectedEdificio(value === "all" ? "" : value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Todos los edificios" />
+                    <SelectValue placeholder="Todos" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todos los edificios</SelectItem>
@@ -696,6 +711,75 @@ const CDRPage = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Filtro de Vivienda */}
+              <div>
+                <Label>Vivienda</Label>
+                <Select value={selectedVivienda || "all"} onValueChange={(value) => setSelectedVivienda(value === "all" ? "" : value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las viviendas</SelectItem>
+                    {viviendas.map((vivienda) => (
+                      <SelectItem key={vivienda} value={vivienda.toString()}>
+                        Vivienda {vivienda}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro de Familia */}
+              <div>
+                <Label>Familia</Label>
+                <Select value={selectedFamilia || "all"} onValueChange={(value) => setSelectedFamilia(value === "all" ? "" : value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Todas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las familias</SelectItem>
+                    {familias.map((familia) => (
+                      <SelectItem key={familia} value={familia}>
+                        {familia}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro Fecha Desde */}
+              <div>
+                <Label>Desde</Label>
+                <Input
+                  type="date"
+                  value={fechaDesde}
+                  onChange={(e) => setFechaDesde(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              {/* Filtro Fecha Hasta */}
+              <div>
+                <Label>Hasta</Label>
+                <Input
+                  type="date"
+                  value={fechaHasta}
+                  onChange={(e) => setFechaHasta(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            </div>
+
+            {/* Botones de acción */}
+            <div className="flex items-center space-x-2">
+              <Button onClick={applyFilters} className="flex items-center space-x-2">
+                <Filter className="h-4 w-4" />
+                <span>Aplicar Filtros</span>
+              </Button>
+              <Button onClick={clearFilters} variant="outline" className="flex items-center space-x-2">
+                <span>Limpiar Filtros</span>
+              </Button>
             </div>
           </CardContent>
         </Card>
