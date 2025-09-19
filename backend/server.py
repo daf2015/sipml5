@@ -17,6 +17,7 @@ import string
 import re
 from unidecode import unidecode
 import asyncio
+import json
 from pymongo import IndexModel
 
 ROOT_DIR = Path(__file__).parent
