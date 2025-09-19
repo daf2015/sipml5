@@ -798,9 +798,32 @@ const EdificioAdminDashboard = () => {
             
             {/* Estadísticas COMPACTAS - MÓVIL */}
             <div className="grid grid-cols-2 gap-2 lg:gap-4 mb-3 lg:mb-6">
-              <div className="bg-blue-50 p-2 lg:p-4 rounded-xl text-center cursor-pointer hover:bg-blue-100" onClick={() => setShowEditCantidad(true)}>
+              <div className="bg-blue-50 p-2 lg:p-4 rounded-xl text-center">
                 <p className="text-lg lg:text-2xl font-bold text-blue-600">{edificioData?.edificio?.cantidad_viviendas || 0}</p>
-                <p className="text-xs text-blue-600">Total (editar)</p>
+                <p className="text-xs text-blue-600">Total</p>
+                
+                {/* Botones simples +/- */}
+                <div className="flex justify-center gap-1 mt-2">
+                  <button 
+                    onClick={() => cambiarCantidadViviendas(-1)}
+                    className="bg-red-500 text-white rounded px-2 py-1 text-xs hover:bg-red-600"
+                    disabled={edificioData?.edificio?.cantidad_viviendas <= (edificioData?.viviendas?.length || 0)}
+                  >
+                    -1
+                  </button>
+                  <button 
+                    onClick={() => cambiarCantidadViviendas(1)}
+                    className="bg-green-500 text-white rounded px-2 py-1 text-xs hover:bg-green-600"
+                  >
+                    +1
+                  </button>
+                  <button 
+                    onClick={() => cambiarCantidadViviendas(2)}
+                    className="bg-green-500 text-white rounded px-2 py-1 text-xs hover:bg-green-600"
+                  >
+                    +2
+                  </button>
+                </div>
               </div>
               <div className="bg-green-50 p-2 lg:p-4 rounded-xl text-center">
                 <p className="text-lg lg:text-2xl font-bold text-green-600">{edificioData?.viviendas?.length || 0}</p>
