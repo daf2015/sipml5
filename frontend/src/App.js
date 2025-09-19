@@ -1147,6 +1147,9 @@ function App() {
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
             
+            {/* Public edificio route - DEBE IR ANTES que las rutas protegidas */}
+            <Route path="/:slug" element={<PublicEdificio />} />
+            
             {/* Protected admin routes */}
             <Route 
               path="/admin" 
@@ -1174,9 +1177,6 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            
-            {/* Public edificio route */}
-            <Route path="/:slug" element={<PublicEdificio />} />
           </Routes>
           <Toaster />
         </div>
